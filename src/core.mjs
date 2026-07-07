@@ -305,6 +305,13 @@ export async function runSelfTest() {
   await writeFile(join(root, "src", "index.js"), "export const ok = true;\n", "utf8");
   await writeFile(join(root, "docs", "guide.md"), "# Guide\n\nLast updated: 2026-07-07\n", "utf8");
   await initHarness(["--project-name", "Self Test", "--force"], { root });
+  const configPath = join(root, "harness.config.json");
+  const config = JSON.parse(await readFile(configPath, "utf8"));
+  config.packs.chain = {
+    label: "Chained command",
+    commands: ["npm run typecheck && npm test"]
+  };
+  await writeJson(configPath, config);
   process.chdir(root);
   const assessed = await assessChangeImpact([
     "--files",
@@ -324,6 +331,8 @@ export async function runSelfTest() {
   assert(assessed.value.required_packs.includes("docs"), "docs file should route docs");
   const regressed = await runProtectedRegression(["--files", "src/index.js docs/guide.md"]);
   assert(regressed.value.status === "passed", "regression should pass");
+  const chained = await runProtectedRegression(["--pack", "chain"]);
+  assert(chained.value.status === "passed", "regression should support chained shell commands");
   const refreshed = await refreshStatus(["--quiet"]);
   assert(refreshed.value.leq.score >= 80, "fresh fixture should have solid LEQ");
   return {
@@ -896,10 +905,10 @@ async function runHarnessStep(name, fn) {
 }
 
 async function runShell(command, { cwd }) {
-  const shell = process.platform === "win32" ? "powershell.exe" : "/bin/sh";
+  const shell = process.platform === "win32" ? process.env.ComSpec || "cmd.exe" : "/bin/sh";
   const args = process.platform === "win32"
-    ? ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command]
-    : ["-lc", command];
+    ? ["/d", "/s", "/c", command]
+    : ["-c", command];
   return runProcess(shell, args, { cwd });
 }
 
