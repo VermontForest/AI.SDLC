@@ -1,0 +1,31 @@
+{
+  "name": "ai-sldc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable AI SDLC workflow harness for work contracts, protected regression routing, loop metrics, and human-readable status dashboards.",
+  "type": "module",
+  "bin": {
+    "ai-sldc": "bin/ai-sldc.mjs"
+  },
+  "scripts": {
+    "test": "node src/cli.mjs self-test",
+    "self-test": "node src/cli.mjs self-test",
+    "assess:change-impact": "node src/cli.mjs assess",
+    "regress:protected": "node src/cli.mjs regress",
+    "finish:iteration": "node src/cli.mjs finish",
+    "manage:status": "node src/cli.mjs status",
+    "manage:refresh": "node src/cli.mjs refresh",
+    "manage:metrics:test": "node src/cli.mjs self-test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "schemas/",
+    "README.md"
+  ],
+  "license": "UNLICENSED"
+}

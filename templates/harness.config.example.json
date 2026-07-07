@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "example-project",
+    "name": "Example Project",
+    "productName": "Example Product"
+  },
+  "status": {
+    "json": "ops/status.json",
+    "markdown": "docs/status.md",
+    "dashboard": "ops/dashboard.html"
+  },
+  "metrics": {
+    "thresholds": {
+      "leqHealthy": 85,
+      "jouleworkProductive": 70
+    },
+    "taskMarkerGlobs": [
+      "src/**",
+      "scripts/**",
+      "docs/**",
+      "README.md"
+    ]
+  },
+  "docs": {
+    "staleDays": 45,
+    "required": [
+      "README.md",
+      "AGENTS.md",
+      "docs/management-sop.md",
+      "docs/test-release-plan.md",
+      "docs/status.md",
+      "ops/status.json",
+      "ops/dashboard.html"
+    ]
+  },
+  "defaultSurface": "general",
+  "surfaces": [
+    {
+      "id": "general",
+      "label": "General code",
+      "filePatterns": [
+        "src/**",
+        "lib/**",
+        "scripts/**"
+      ],
+      "riskClasses": [
+        "code"
+      ],
+      "packs": [
+        "typecheck",
+        "test"
+      ],
+      "skills": []
+    },
+    {
+      "id": "docs",
+      "label": "Documentation",
+      "filePatterns": [
+        "README.md",
+        "AGENTS.md",
+        "docs/**"
+      ],
+      "riskClasses": [
+        "docs"
+      ],
+      "packs": [
+        "docs"
+      ],
+      "skills": [
+        "readme-writing"
+      ]
+    },
+    {
+      "id": "frontend",
+      "label": "Frontend/UI",
+      "filePatterns": [
+        "app/**",
+        "apps/site/**",
+        "src/**/*.tsx",
+        "src/**/*.jsx",
+        "src/**/*.css"
+      ],
+      "riskClasses": [
+        "frontend",
+        "human-display"
+      ],
+      "packs": [
+        "typecheck",
+        "test",
+        "ui-smoke"
+      ],
+      "skills": [
+        "ui-polish"
+      ]
+    }
+  ],
+  "packs": {
+    "typecheck": {
+      "label": "Typecheck",
+      "commands": [
+        "npm run typecheck"
+      ]
+    },
+    "test": {
+      "label": "Unit tests",
+      "commands": [
+        "npm test"
+      ]
+    },
+    "docs": {
+      "label": "Docs verification",
+      "commands": [
+        "npm run docs:verify"
+      ]
+    },
+    "ui-smoke": {
+      "label": "Human display smoke",
+      "commands": [],
+      "externalProof": "Attach a current desktop/mobile screenshot or browser-smoke artifact before claiming visual work complete."
+    }
+  }
+}

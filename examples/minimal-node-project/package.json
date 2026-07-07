@@ -1,0 +1,15 @@
+{
+  "name": "ai-sldc-minimal-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "node -e \"process.exit(0)\"",
+    "test": "node -e \"process.exit(0)\"",
+    "docs:verify": "node -e \"process.exit(0)\"",
+    "assess:change-impact": "ai-sldc assess",
+    "regress:protected": "ai-sldc regress",
+    "finish:iteration": "ai-sldc finish",
+    "manage:refresh": "ai-sldc refresh",
+    "manage:status": "ai-sldc status"
+  }
+}
