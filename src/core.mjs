@@ -7,14 +7,14 @@ import { fileURLToPath } from "node:url";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_CONFIG_PATH = "harness.config.json";
-const GENERATED_ARTIFACTS = [
-  "ops/change-impact.latest.json",
-  "ops/protected-regression.latest.json",
-  "ops/iteration-finish.latest.json",
-  "ops/status.json",
-  "ops/dashboard.html",
-  "docs/status.md"
-];
+const DEFAULT_ARTIFACTS = {
+  changeImpact: "ops/change-impact.latest.json",
+  protectedRegression: "ops/protected-regression.latest.json",
+  iterationFinish: "ops/iteration-finish.latest.json",
+  statusJson: "ops/status.json",
+  statusMarkdown: "docs/status.md",
+  dashboardHtml: "ops/dashboard.html"
+};
 
 export async function initHarness(argv = [], options = {}) {
   const args = parseArgs(argv);
@@ -72,7 +72,7 @@ export async function assessChangeImpact(argv = [], options = {}) {
     work_contract: workContract,
     next_command: "npm run regress:protected"
   };
-  await writeArtifact(root, "ops/change-impact.latest.json", report);
+  await writeArtifact(root, artifactPath(config, "changeImpact"), report);
   printAssessment(report);
   return { value: report, printJson: Boolean(args.json) };
 }
@@ -81,7 +81,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
   const root = options.root || process.cwd();
   const args = parseArgs(argv);
   const config = await loadConfig(root, args.config);
-  const latestImpact = await readJsonIfExists(join(root, "ops", "change-impact.latest.json"));
+  const latestImpact = await readJsonIfExists(join(root, artifactPath(config, "changeImpact")));
   const explicitFiles = normalizeFiles(args.files || []);
   const files = explicitFiles.length ? explicitFiles : latestImpact?.changed_files || [];
   if (files.length === 0 && !args.pack) throw new Error("regress requires --files or a latest change-impact artifact.");
@@ -141,9 +141,9 @@ export async function runProtectedRegression(argv = [], options = {}) {
     checks,
     pending_external_proof: pending,
     failures,
-    change_impact_artifact: "ops/change-impact.latest.json"
+    change_impact_artifact: artifactPath(config, "changeImpact")
   };
-  await writeArtifact(root, "ops/protected-regression.latest.json", report);
+  await writeArtifact(root, artifactPath(config, "protectedRegression"), report);
   printRegression(report);
   return { value: report, printJson: Boolean(args.json), exitCode: failures.length ? 1 : 0 };
 }
@@ -151,6 +151,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
 export async function finishIteration(argv = [], options = {}) {
   const root = options.root || process.cwd();
   const args = parseArgs(argv);
+  const config = await loadConfig(root, args.config);
   const files = normalizeFiles(args.intentionalFiles || args.files || []);
   if (files.length === 0) throw new Error("finish requires --intentional-files <repo paths>.");
 
@@ -199,7 +200,7 @@ export async function finishIteration(argv = [], options = {}) {
   commands.push(refresh.command);
   if (refresh.error) failures.push(refresh.error);
 
-  const protectedRegression = await readJsonIfExists(join(root, "ops", "protected-regression.latest.json"));
+  const protectedRegression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
   const status = failures.length ? "failed" : blockers.length ? "blocked" : "passed";
   const report = {
     schema_version: 1,
@@ -229,13 +230,13 @@ export async function finishIteration(argv = [], options = {}) {
     verifier_status: {
       required: true,
       status: protectedRegression?.status === "passed" ? "artifact_backed" : "artifact_backed_pending_external",
-      artifact: "ops/protected-regression.latest.json"
+      artifact: artifactPath(config, "protectedRegression")
     }
   };
-  await writeArtifact(root, "ops/iteration-finish.latest.json", report);
+  await writeArtifact(root, artifactPath(config, "iterationFinish"), report);
 
   if (status === "passed" && execute && !skipGit && !noArtifactBackup) {
-    const artifactFiles = GENERATED_ARTIFACTS.filter((file) => existsSync(join(root, file)));
+    const artifactFiles = generatedArtifactPaths(config).filter((file) => existsSync(join(root, file)));
     await runGit(root, ["add", "--", ...artifactFiles]);
     const staged = await gitLines(root, ["diff", "--cached", "--name-only"]);
     if (staged.length) {
@@ -257,15 +258,15 @@ export async function refreshStatus(argv = [], options = {}) {
   const args = parseArgs(argv);
   const config = await loadConfig(root, args.config);
   let status = await buildStatus(root, config);
-  await writeArtifact(root, "ops/status.json", status);
-  await writeTextArtifact(root, "docs/status.md", renderStatusMarkdown(status));
-  await writeTextArtifact(root, "ops/dashboard.html", renderDashboardHtml(status));
+  await writeArtifact(root, artifactPath(config, "statusJson"), status);
+  await writeTextArtifact(root, artifactPath(config, "statusMarkdown"), renderStatusMarkdown(status));
+  await writeTextArtifact(root, artifactPath(config, "dashboardHtml"), renderDashboardHtml(status));
   status = await buildStatus(root, config);
-  await writeArtifact(root, "ops/status.json", status);
-  await writeTextArtifact(root, "docs/status.md", renderStatusMarkdown(status));
-  await writeTextArtifact(root, "ops/dashboard.html", renderDashboardHtml(status));
+  await writeArtifact(root, artifactPath(config, "statusJson"), status);
+  await writeTextArtifact(root, artifactPath(config, "statusMarkdown"), renderStatusMarkdown(status));
+  await writeTextArtifact(root, artifactPath(config, "dashboardHtml"), renderDashboardHtml(status));
   if (!args.quiet) {
-    console.log(`Wrote ${config.status?.dashboard || "ops/dashboard.html"}`);
+    console.log(`Wrote ${artifactPath(config, "dashboardHtml")}`);
     console.log(`Status ${status.classification}; LEQ ${status.leq.score}; JW ${status.joulework.score}`);
   }
   return { value: status, printJson: Boolean(args.json) };
@@ -274,7 +275,11 @@ export async function refreshStatus(argv = [], options = {}) {
 export async function statusSummary(argv = [], options = {}) {
   const root = options.root || process.cwd();
   const args = parseArgs(argv);
-  const status = (await readJsonIfExists(join(root, "ops", "status.json"))) || (await refreshStatus(["--quiet"], { root })).value;
+  const config = await loadConfig(root, args.config);
+  const refreshArgs = ["--quiet", ...(args.config ? ["--config", args.config] : [])];
+  const status =
+    (await readJsonIfExists(join(root, artifactPath(config, "statusJson")))) ||
+    (await refreshStatus(refreshArgs, { root })).value;
   if (args.json) return { value: status, printJson: true };
   return {
     message: [
@@ -329,9 +334,9 @@ export async function runSelfTest() {
 }
 
 async function buildStatus(root, config) {
-  const changeImpact = await readJsonIfExists(join(root, "ops", "change-impact.latest.json"));
-  const protectedRegression = await readJsonIfExists(join(root, "ops", "protected-regression.latest.json"));
-  const finish = await readJsonIfExists(join(root, "ops", "iteration-finish.latest.json"));
+  const changeImpact = await readJsonIfExists(join(root, artifactPath(config, "changeImpact")));
+  const protectedRegression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
+  const finish = await readJsonIfExists(join(root, artifactPath(config, "iterationFinish")));
   const docs = await inspectDocs(root, config);
   const git = await inspectGit(root);
   const todoCount = await countTaskMarkers(root, config);
@@ -373,12 +378,12 @@ async function buildStatus(root, config) {
     docs,
     git,
     artifacts: {
-      change_impact: "ops/change-impact.latest.json",
-      protected_regression: "ops/protected-regression.latest.json",
-      iteration_finish: "ops/iteration-finish.latest.json",
-      status_json: "ops/status.json",
-      status_markdown: "docs/status.md",
-      dashboard_html: "ops/dashboard.html"
+      change_impact: artifactPath(config, "changeImpact"),
+      protected_regression: artifactPath(config, "protectedRegression"),
+      iteration_finish: artifactPath(config, "iterationFinish"),
+      status_json: artifactPath(config, "statusJson"),
+      status_markdown: artifactPath(config, "statusMarkdown"),
+      dashboard_html: artifactPath(config, "dashboardHtml")
     }
   };
 }
@@ -386,7 +391,8 @@ async function buildStatus(root, config) {
 async function loadConfig(root, explicitPath) {
   const configPath = resolve(root, stringArg(explicitPath) || DEFAULT_CONFIG_PATH);
   if (existsSync(configPath)) {
-    return normalizeConfig(JSON.parse(await readFile(configPath, "utf8")));
+    const rawConfig = (await readFile(configPath, "utf8")).replace(/^\uFEFF/, "");
+    return normalizeConfig(JSON.parse(rawConfig));
   }
   const template = JSON.parse(await readFile(join(packageRoot, "templates", "harness.config.example.json"), "utf8"));
   template.project.name = basename(root);
@@ -404,10 +410,32 @@ function normalizeConfig(config) {
     },
     surfaces: arrayValue(config.surfaces),
     packs: config.packs || {},
+    artifacts: {
+      ...DEFAULT_ARTIFACTS,
+      ...(config.status?.json ? { statusJson: config.status.json } : {}),
+      ...(config.status?.markdown ? { statusMarkdown: config.status.markdown } : {}),
+      ...(config.status?.dashboard ? { dashboardHtml: config.status.dashboard } : {}),
+      ...(config.artifacts || {})
+    },
     status: config.status || {},
     docs: config.docs || {},
     metrics: config.metrics || {}
   };
+}
+
+function artifactPath(config, key) {
+  return config.artifacts?.[key] || DEFAULT_ARTIFACTS[key];
+}
+
+function generatedArtifactPaths(config) {
+  return [
+    artifactPath(config, "changeImpact"),
+    artifactPath(config, "protectedRegression"),
+    artifactPath(config, "iterationFinish"),
+    artifactPath(config, "statusJson"),
+    artifactPath(config, "statusMarkdown"),
+    artifactPath(config, "dashboardHtml")
+  ];
 }
 
 function matchSurfaces(files, config) {

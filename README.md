@@ -91,6 +91,7 @@ The core routing file is `harness.config.json`.
 
 - `surfaces` map file globs to risk classes, protected packs, and skills.
 - `packs` define machine commands and optional external proof.
+- `artifacts` can point AI.SLDC at sidecar files such as `ops/ai-sldc-status.json` during parity migration.
 - `docs.required` drives documentation health.
 - `metrics.thresholds` drives LEQ/JouleWork health labels.
 

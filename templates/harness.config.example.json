@@ -10,6 +10,14 @@
     "markdown": "docs/status.md",
     "dashboard": "ops/dashboard.html"
   },
+  "artifacts": {
+    "changeImpact": "ops/change-impact.latest.json",
+    "protectedRegression": "ops/protected-regression.latest.json",
+    "iterationFinish": "ops/iteration-finish.latest.json",
+    "statusJson": "ops/status.json",
+    "statusMarkdown": "docs/status.md",
+    "dashboardHtml": "ops/dashboard.html"
+  },
   "metrics": {
     "thresholds": {
       "leqHealthy": 85,
