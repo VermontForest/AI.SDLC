@@ -32,6 +32,7 @@
   },
   "jsm": {
     "skillRoots": [
+      "~/.claude/skills",
       "~/.codex/skills",
       "~/.agents/skills"
     ]

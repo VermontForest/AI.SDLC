@@ -139,6 +139,7 @@ the explicit `{ "name", "stages" }` form.
 
 The default skill roots are:
 
+- `~/.claude/skills`;
 - `~/.codex/skills`;
 - `~/.agents/skills`.
 
@@ -153,6 +154,47 @@ They can be overridden for a project or test fixture:
 ```
 
 Each root is expected to contain `<skill-name>/SKILL.md`.
+
+### Official JSM Dependency Collection
+
+AI.SLDC carries a metadata-only lock for the complete official JSM collection.
+At the time of the current lock, that is 121 named, versioned, integrity-bound
+skills. The lock is `jsm/official-skills.lock.json`.
+
+Premium skill bodies are not copied into this repository. Jeffrey's Skills.md
+identifies them as proprietary works and prohibits redistribution outside its
+service. An authorized subscriber installs them locally through `jsm`, while
+AI.SLDC verifies the installed names, versions, and deterministic package
+hashes against the committed lock.
+
+Install the complete locked collection:
+
+```bash
+ai-sldc skills:install
+```
+
+Verify an existing installation without modifying it:
+
+```bash
+ai-sldc skills:verify
+```
+
+Both commands fail closed when `jsm` is missing, too old, unauthenticated, a
+locked package is absent, a version differs, or package integrity differs.
+`skills:install` first uses the official `jsm install-all` operation and then
+pins any version that differs from the lock.
+
+This separation is deliberate:
+
+- AI.SLDC owns routing, lifecycle gates, the dependency lock, and verification.
+- JSM owns authentication, licensed delivery, version installation, and package
+  integrity.
+- The consuming project owns its configured skill selection and any
+  project-specific overlay.
+
+See the [JSM service](https://jeffreys-skills.md/) and its
+[terms](https://jeffreys-skills.md/terms) for subscription and usage
+requirements.
 
 ## LEQ And JouleWork
 
@@ -202,6 +244,8 @@ git clone https://github.com/VermontForest/AI.SLDC.git
 cd AI.SLDC
 npm install
 npm link
+ai-sldc skills:install
+ai-sldc skills:verify
 ```
 
 Initialize a consuming project:
@@ -333,6 +377,8 @@ These files are needed to run the published CLI itself:
 | `bin/ai-sldc.mjs` | Executable launcher |
 | `src/cli.mjs` | Command dispatch and help |
 | `src/core.mjs` | Routing, JSM gates, regression, Finish, LEQ, JouleWork, status, and self-test |
+| `src/jsm-dependencies.mjs` | Licensed JSM installation, locked-version verification, and lock maintenance |
+| `jsm/official-skills.lock.json` | Metadata-only inventory of every official JSM skill, version, and deterministic hash |
 | `templates/harness.config.example.json` | Default project configuration |
 | `templates/AGENTS.sldc.snippet.md` | Agent operating contract installed by `init` |
 | `templates/docs/management-sop.md` | Management-loop documentation template |
@@ -351,6 +397,7 @@ A project using an installed AI.SLDC package needs:
 | `harness.config.json` | Project-specific surfaces, staged JSM methods, packs, artifacts, docs, and thresholds |
 | The files named by every configured pack command | Real project tests and validation commands |
 | `<skill-root>/<skill-name>/SKILL.md` for every routed method | JSM package presence |
+| An authorized `jsm` installation matching `jsm/official-skills.lock.json` | Licensed delivery and integrity of the complete official dependency collection |
 | Node.js 20 or newer | CLI runtime |
 
 Package scripts are convenient but optional; direct `ai-sldc` commands work.
@@ -396,6 +443,12 @@ Run the built-in no-mock self-test:
 npm test
 ```
 
+Verify the real locally installed JSM dependency collection:
+
+```bash
+npm run jsm:verify
+```
+
 The self-test creates a real temporary project, real skill packages, real
 project files, and real shell-command packs. It proves:
 
@@ -430,6 +483,7 @@ Do not commit live consumer-project state here:
 - `ops/status.json`;
 - `ops/dashboard.html`;
 - secrets or provider tokens;
+- premium JSM `SKILL.md` bodies or their reference/script payloads;
 - customer data;
 - private product rules or evidence; or
 - production deployment artifacts.

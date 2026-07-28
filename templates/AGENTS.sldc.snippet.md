@@ -4,6 +4,8 @@ Use this project harness before changing durable behavior.
 
 - Start by reading `docs/status.md`, `ops/status.json`, and, when useful, `ops/dashboard.html`.
 - JSM spans the workflow: read and apply the methods routed to Assess, Regress, and Finish rather than treating skills as a kickoff-only step.
+- Before the first workflow run on a machine, run `ai-sldc skills:verify`; if it fails because packages are absent, use `ai-sldc skills:install` with an authorized JSM subscription.
+- Keep premium JSM skill bodies in JSM-managed local directories. Commit only the AI.SLDC metadata lock and project-owned overlays; do not redistribute premium packages.
 - Before implementation, run `npm run assess:change-impact -- --files <repo paths> --applied-skill <Assess methods> ...` with a clear Work Contract.
 - Before claiming done, run `npm run regress:protected -- --files <repo paths> --applied-skill <Regress methods>`.
 - Close the same file set with `npm run finish:iteration -- --intentional-files "<repo paths>" --applied-skill <Finish methods> --skip-git`.

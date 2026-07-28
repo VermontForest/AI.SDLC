@@ -8,6 +8,10 @@ import {
   runSelfTest,
   statusSummary
 } from "./core.mjs";
+import {
+  installJsmDependencies,
+  verifyJsmDependencies
+} from "./jsm-dependencies.mjs";
 
 const raw = process.argv.slice(2);
 const command = normalizeCommand(raw[0]);
@@ -36,6 +40,12 @@ try {
       break;
     case "self-test":
       result = await runSelfTest(args);
+      break;
+    case "skills:install":
+      result = await installJsmDependencies(args);
+      break;
+    case "skills:verify":
+      result = await verifyJsmDependencies(args);
       break;
     case "help":
       printHelp();
@@ -68,6 +78,8 @@ function normalizeCommand(value) {
   if (["manage:refresh", "dashboard"].includes(normalized)) return "refresh";
   if (["manage:status"].includes(normalized)) return "status";
   if (["manage:metrics:test", "test"].includes(normalized)) return "self-test";
+  if (["jsm:install", "skills-install"].includes(normalized)) return "skills:install";
+  if (["jsm:verify", "skills-verify"].includes(normalized)) return "skills:verify";
   return normalized;
 }
 
@@ -82,9 +94,12 @@ Usage:
   ai-sldc refresh
   ai-sldc status --json
   ai-sldc self-test
+  ai-sldc skills:install [--json]
+  ai-sldc skills:verify [--json]
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.
 Applied skills accept comma-separated or repeated --applied-skill flags.
 Text flags such as --active-deliverable, --why, --boundary, and --proof collect words until the next flag.
+JSM skill bodies are installed from Jeffrey's Skills.md and are not redistributed by this package.
 `);
 }

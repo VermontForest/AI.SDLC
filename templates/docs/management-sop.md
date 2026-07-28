@@ -23,6 +23,17 @@ JSM is applied at three separate gates:
 Every stage records its own `--applied-skill` evidence. Installed skill files
 without a stage attestation do not satisfy the gate.
 
+Before the first lifecycle run on a machine, verify the complete official JSM
+dependency lock:
+
+```bash
+ai-sldc skills:verify
+```
+
+If licensed packages are absent, an authorized subscriber installs them with
+`ai-sldc skills:install`. AI.SLDC commits only names, versions, and integrity
+hashes; premium skill bodies remain in JSM-managed local directories.
+
 Accepted `--files` forms:
 
 ```bash

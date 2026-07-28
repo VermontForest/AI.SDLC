@@ -1,0 +1,624 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-28T12:41:35.529Z",
+  "source": {
+    "service": "Jeffrey's Skills.md",
+    "url": "https://jeffreys-skills.md",
+    "terms_url": "https://jeffreys-skills.md/terms",
+    "selection": "all_official",
+    "distribution": "metadata_only",
+    "note": "Premium skill bodies are installed through jsm and are not redistributed by AI.SLDC."
+  },
+  "cli": {
+    "minimum_version": "0.3.16",
+    "resolved_version": "0.3.16"
+  },
+  "skill_count": 121,
+  "skills": [
+    {
+      "name": "ab-testing",
+      "version": 2,
+      "sha256": "06d2b4a027075a137250b30a36bf6deee52cfb8309f9fb8101ee6cee24679cf9"
+    },
+    {
+      "name": "admin-page-for-nextjs-sites",
+      "version": 2,
+      "sha256": "006938ec2ddfe0b9c3ebc940d808441367c7f927c561f04f417a18d949010fca"
+    },
+    {
+      "name": "agent-ergonomics-and-intuitiveness-maximization-for-cli-tools",
+      "version": 11,
+      "sha256": "a1afee3769a905c84b365ebdb4cecb63b8995314802e8c7c3f9b31c79587477d"
+    },
+    {
+      "name": "agent-fungibility-philosophy",
+      "version": 4,
+      "sha256": "65553b01c3f22301298417c5377d16b727fc26f6e39e3b1ecd833d6b481bb107"
+    },
+    {
+      "name": "agent-mail",
+      "version": 2,
+      "sha256": "6fe9cfce5cdb521ee68a46486c17f094f8dac245460c687d45cf52bb5574f619"
+    },
+    {
+      "name": "asupersync-mega-skill",
+      "version": 4,
+      "sha256": "36854f9b0976a6d2889189ffbc48987ed529be53fa3abc652ad8fdb8411add8d"
+    },
+    {
+      "name": "automating-your-automations",
+      "version": 2,
+      "sha256": "9632047db95f3fbfc665872856c46fcd3d9e16a1c0ee659b98e7484ce17db377"
+    },
+    {
+      "name": "bd-to-br-migration",
+      "version": 3,
+      "sha256": "578756bdae2a2d8b587613c2cd1e8f4a72497020fd3aaea3bd3890cd1c7c5e08"
+    },
+    {
+      "name": "beads-br",
+      "version": 3,
+      "sha256": "f3ee1932f89eb80e9e4eb3969c7af33c093eca8e75c04bb8e6481d5c86e0ba38"
+    },
+    {
+      "name": "beads-bv",
+      "version": 1,
+      "sha256": "ec3e0490a8fddcf8bbbe78c1482ca68f9cfc3d2a755ce5309e222346d87899a8"
+    },
+    {
+      "name": "beads-compliance-and-completion-verification",
+      "version": 13,
+      "sha256": "b8e96862e92929f0e1cf34016347b7d60163c391155ed2fb6b355960563af427"
+    },
+    {
+      "name": "beads-workflow",
+      "version": 4,
+      "sha256": "140ed01539cc98504ab9e8eb1390721355904342870aed78f87cff34698db9f0"
+    },
+    {
+      "name": "brenner",
+      "version": 1,
+      "sha256": "c312d085773a1ee73804b8570106ba9c7b89eae6a707a00762ecdbb84ec55eec"
+    },
+    {
+      "name": "brennerbot-with-ntm",
+      "version": 4,
+      "sha256": "0479a2495911038e3f6d766bfc845de50d48fee53a7e488ca240f4d073d149d9"
+    },
+    {
+      "name": "browser-extension-automation",
+      "version": 1,
+      "sha256": "66d204ea8d0a7b7ff16820e5a4b191c773f9495ad823a1e377169f70ede2a951"
+    },
+    {
+      "name": "caam",
+      "version": 2,
+      "sha256": "a599e42ec006aeb9f47ad2c9decc284006720c5386b7759c966363aa4a8fcd08"
+    },
+    {
+      "name": "cass",
+      "version": 8,
+      "sha256": "813a8fbb22024ce845d824cb94f6de55ca9baf10dbcadfdfc11f78b8934a1e29"
+    },
+    {
+      "name": "cass-memory",
+      "version": 3,
+      "sha256": "e7951b84dfcc6c40571f8bbc8309635aa144f179bb441e546cb80b930624d7d3"
+    },
+    {
+      "name": "cc-hooks",
+      "version": 2,
+      "sha256": "a885ff59721f281e4649df92011b91b3050e850fb595f649842ecee48d4c329c"
+    },
+    {
+      "name": "changelog-md-workmanship",
+      "version": 3,
+      "sha256": "6355e11be4206f55f30811bddc7484445da8c8692e484abebd6978458025ca6e"
+    },
+    {
+      "name": "code-review-gemini-swarm-with-ntm",
+      "version": 2,
+      "sha256": "7cf4b1e35b1b5a5de07989f9b34c9e394aa9d81a43967db255ff9441d25e9048"
+    },
+    {
+      "name": "codebase-archaeology",
+      "version": 1,
+      "sha256": "f2e53392dbaa25456e472ffba82900b515e395d0bd02b08a0ee83fde50811405"
+    },
+    {
+      "name": "codebase-audit",
+      "version": 2,
+      "sha256": "f9afaa7a66594b8989fa4d5d1ab2253b02f7783413c7fb50f6ffc4d4b1c78aba"
+    },
+    {
+      "name": "codebase-pattern-extraction",
+      "version": 1,
+      "sha256": "5c763e87d3545834fcd03c850ae77acb2c578366e2134e6db29444700650fa4a"
+    },
+    {
+      "name": "codebase-report",
+      "version": 5,
+      "sha256": "087ee3b79cfcd72e1aff42e94c8eff5fcbd3fe659e8089abfa774e4029b481ed"
+    },
+    {
+      "name": "csctf",
+      "version": 1,
+      "sha256": "e12a1c75ad084fcccf556d96950b0c85142154c5e62ee5dcc31ac43f24fbaa8f"
+    },
+    {
+      "name": "cursor",
+      "version": 1,
+      "sha256": "b71e7a5fc6d03f432afe79ffcde36615b6900bc47099241782d812af3f0cb7fd"
+    },
+    {
+      "name": "dcg",
+      "version": 5,
+      "sha256": "0f73abd811b5b71466b71a5c3ed9abca18cb19a6108be2d9ae7ede855cb83aec"
+    },
+    {
+      "name": "de-monolithize-your-codebase-isomorphically",
+      "version": 2,
+      "sha256": "795f795b034a8e4da859f1750bbaebcf7b74c1b5b61778719967c13605750602"
+    },
+    {
+      "name": "de-slopify",
+      "version": 3,
+      "sha256": "5ab8056614c097d1fe1868d91ddebf4393c12e386d5457a8de866b736dba4a15"
+    },
+    {
+      "name": "deadlock-finder-and-fixer",
+      "version": 7,
+      "sha256": "8899be2632ca3143ce3d35250b0df3039ed4da51078ee3f71087ce9aa47ecd75"
+    },
+    {
+      "name": "documentation-website-for-software-project",
+      "version": 13,
+      "sha256": "e1333eeeac9238cbac6738f363efc27ff3c85c43f419fcf695b625ce4df3a460"
+    },
+    {
+      "name": "dsr",
+      "version": 1,
+      "sha256": "b1087d948e0d24fdf16e8ec11858e4778224ef258116012ef4644b52a538c1b8"
+    },
+    {
+      "name": "dueling-idea-wizards",
+      "version": 4,
+      "sha256": "ddc4e23d8d37559db38a5f7609036e1bce4127d0b74ed782e6835ec1b0f8b10d"
+    },
+    {
+      "name": "e2e-testing-for-webapps",
+      "version": 3,
+      "sha256": "73d1b2211be7bd7edf881cd27f70cda1fef6ab0b0a04c219d6e1a3a56bd5f73c"
+    },
+    {
+      "name": "extreme-software-optimization",
+      "version": 1,
+      "sha256": "7ff9d50d8c7cd7fae39893f311858c1ad8c20950b647d111a482f65cc5690e7d"
+    },
+    {
+      "name": "focr",
+      "version": 4,
+      "sha256": "fe415c442ffa1dfb3d55281a761faad6b3cc3e881e0894954f09fcb69ce0ba37"
+    },
+    {
+      "name": "frankensearch-integration-for-rust-projects",
+      "version": 1,
+      "sha256": "60a846b05e7dc5129381aceb410f1b71197319696407af5f72b8011e7e66fdad"
+    },
+    {
+      "name": "frankensuite-website-development",
+      "version": 1,
+      "sha256": "ef22556bdcf12e990a5b7c54d78bd66d727226b061a454f2f14d95fca794c84f"
+    },
+    {
+      "name": "frankentui",
+      "version": 1,
+      "sha256": "a98c0ae79eaf80fb17fc4a8a1a683dc6e02236b70a3cbad7ac6819c3b471cc54"
+    },
+    {
+      "name": "fsnow",
+      "version": 1,
+      "sha256": "783d3d49fadbe7a794f0a027f2a4debdda49d03453291a0ad47e69233927e039"
+    },
+    {
+      "name": "ga4",
+      "version": 2,
+      "sha256": "63df9e72f144b021839df78dc5c3d3a75e1a633c3b2b4df19cd0f0bc94b8578e"
+    },
+    {
+      "name": "gcloud",
+      "version": 1,
+      "sha256": "ce740ffd9c952df052eafd1f7c32b28d80f5000343d5fab7b460426b033a631a"
+    },
+    {
+      "name": "gdb-for-debugging",
+      "version": 2,
+      "sha256": "be60b7b916b5f49768088e284b3f49ee6d61ba93d0744bd295ef005e16b531b1"
+    },
+    {
+      "name": "gh-actions",
+      "version": 2,
+      "sha256": "09edfabffb69d5bf68c7c41a70124855ae296ee254353c15e6c7eb717a9119f3"
+    },
+    {
+      "name": "gh-cli",
+      "version": 1,
+      "sha256": "e8b4fc79ef51558190befe8636c41689914adeafd981fb110beb9ec0bfa498a4"
+    },
+    {
+      "name": "gh-og-share-images",
+      "version": 2,
+      "sha256": "1a65b6d3c1021a05cf61cd1de20c272c2033e4bac6a38ee19b88645f90a9d6f5"
+    },
+    {
+      "name": "gh-triage-ru",
+      "version": 3,
+      "sha256": "538dd7b416dae62177b9f6d85cb6e2dd40aaa70903ff306d24d31de13dd1bd8f"
+    },
+    {
+      "name": "ghostty",
+      "version": 1,
+      "sha256": "c0090f591f8963d4796596871bfdfb70603b1e7cfec4d038f5f94c8146d22096"
+    },
+    {
+      "name": "giil",
+      "version": 1,
+      "sha256": "253e1c95bfd4000903eae1075ebc59e1c054bdc267dc720600792e1c932b2289"
+    },
+    {
+      "name": "git-repo-janitor",
+      "version": 7,
+      "sha256": "81ed1820242b285b25feb7615cf81be01580c8f99cefdf67914765dac4ec8c18"
+    },
+    {
+      "name": "git-stash-janitor",
+      "version": 8,
+      "sha256": "e9d07f68efd52af0cab8dbe89616cd8076005dd73d5c16876effb83ee41360ba"
+    },
+    {
+      "name": "git-worktree-branch-rationalization",
+      "version": 7,
+      "sha256": "75224519ad8d1258374ed17230b635300c4c04b2174dd4d4afadd1f0f2cb92f6"
+    },
+    {
+      "name": "idea-wizard",
+      "version": 3,
+      "sha256": "020438f316bae79f2f2ca917c260b1b466e849705d22803a59365b2ebb1222b7"
+    },
+    {
+      "name": "installer-workmanship",
+      "version": 2,
+      "sha256": "2d7dc034dfa8865f18f1551923b08a31ac1534f49b89155afa098f7ea9d3de9e"
+    },
+    {
+      "name": "interactive-visualization-creator",
+      "version": 1,
+      "sha256": "124e788e0c92321feaa8a0833a0b67e5e31831f0f08604a0f01dbf5368f524fb"
+    },
+    {
+      "name": "lean-formal-feedback-loop",
+      "version": 2,
+      "sha256": "7e3878408578cb806f10f2d9d6ccf82d0886e083a2ba8020a8fe04bbcd69487f"
+    },
+    {
+      "name": "library-updater",
+      "version": 5,
+      "sha256": "c2443794b705bc33284cf86ac95998761c12f62ffd4b765249cf08e90aa5150e"
+    },
+    {
+      "name": "mcp-server-design",
+      "version": 6,
+      "sha256": "c2c975d0cd42c93f8a91c4dabbf396f9a4215187b2c5e3eb0d407359c0ba379a"
+    },
+    {
+      "name": "mock-code-finder",
+      "version": 1,
+      "sha256": "0709e0ea4d724ed249646886b6a4cbdde97c3acbb5bd93ebf2898411d4a24e66"
+    },
+    {
+      "name": "modes-of-reasoning-project-analysis",
+      "version": 4,
+      "sha256": "9ef125fe370e7e191642714ece84819b03eb12223b231fbf9a8dafbd11d247e3"
+    },
+    {
+      "name": "multi-model-triangulation",
+      "version": 2,
+      "sha256": "a9f070a733b2ea75afffb94b1c1a33c172451b930d95d438b4b6dec1fa1d4031"
+    },
+    {
+      "name": "multi-pass-bug-hunting",
+      "version": 1,
+      "sha256": "cfb7876274761509bc4aa631e2571c1d70600eb42fdb0561683ae924258ded62"
+    },
+    {
+      "name": "ntm",
+      "version": 10,
+      "sha256": "ff9355d92858ae736f7a41a681f8d0a86705b8df020f52a018629d4ac8dedac3"
+    },
+    {
+      "name": "og-share-images",
+      "version": 2,
+      "sha256": "ac2b0e34f0a9c7c979b28d7ba2d79b7d670a47d1033b2304e7a001e021762265"
+    },
+    {
+      "name": "operationalizing-expertise",
+      "version": 6,
+      "sha256": "3b7ef18187aa1baedbca709c95ec1c762a495fe788a3d136fa61453c62c09a21"
+    },
+    {
+      "name": "path-rationalization",
+      "version": 2,
+      "sha256": "a90df91ed3c101cbfd785cf8d36b2c9021933ac865b90e2823dfcb7cb30bee39"
+    },
+    {
+      "name": "pi-agent-rust",
+      "version": 1,
+      "sha256": "2442820ead87aba632847d83c8f19ae531aa9f1217475154b252b997f656f00f"
+    },
+    {
+      "name": "planning-workflow",
+      "version": 6,
+      "sha256": "836cb96af7f0101b9983eb319bf255ca546a31740ad8be424f636bf70024cb8e"
+    },
+    {
+      "name": "profiling-software-performance",
+      "version": 7,
+      "sha256": "a8755d3197e9e0a0cc3488e731c50380ddebb852140da1095ca842033c47ee8a"
+    },
+    {
+      "name": "rch",
+      "version": 5,
+      "sha256": "a144e55d82171f14a8276c4e893bcd14cd2f84c01b287e3e82f31b2f97d7107c"
+    },
+    {
+      "name": "readme-writing",
+      "version": 1,
+      "sha256": "3612968d01f521416811452ffb9fe4954a2eec3ebf8345b595e22c8ca09910b8"
+    },
+    {
+      "name": "reality-check-for-project",
+      "version": 3,
+      "sha256": "838400d620b84678c27c9ce0d39b54ec2d39dce06dc24b8709ad1b5a669774ab"
+    },
+    {
+      "name": "redacting-sensitive-parts-of-screencast-videos",
+      "version": 1,
+      "sha256": "4ff6d369d71d47f8b5fd7d48e3801fcdbcc6cddac2ec6aa0cec7dbb38095f52b"
+    },
+    {
+      "name": "release-preparations",
+      "version": 3,
+      "sha256": "33e6605ed5159a9ee37b2b99e1c4659c39502ae28478dccd38b3f5920f9919bb"
+    },
+    {
+      "name": "repeatedly-apply-skill",
+      "version": 3,
+      "sha256": "a9dcfc6ddc41c5a800d249f2b511a4bebb971abb38be984f7461e3f63b7e4e2f"
+    },
+    {
+      "name": "research-software",
+      "version": 1,
+      "sha256": "9cdfc98c211297089a2a42b605c6fbfd1e2fd8b7a53cf61c9036755ec4756294"
+    },
+    {
+      "name": "rg-optimized",
+      "version": 4,
+      "sha256": "33b9ed2c3060cc2f40d4176549c7339109928cddb1ff9b0cdb537f7e60c31c4b"
+    },
+    {
+      "name": "ru-multi-repo-workflow",
+      "version": 2,
+      "sha256": "35a28a02d58c7ad7233b51821cd2df3eb43511777397c8d2e0da662e75735294"
+    },
+    {
+      "name": "running-the-gauntlet-on-your-rust-port",
+      "version": 5,
+      "sha256": "84dfc7b5e9cc976e47265cf9030575a73607eedc999327ad63c01a48f141ca56"
+    },
+    {
+      "name": "rust-cli-with-sqlite",
+      "version": 1,
+      "sha256": "910c6cc2666674957826cbbd5f79e3ba3702a67e2fe3083aba85347842b00794"
+    },
+    {
+      "name": "rust-crates-publishing",
+      "version": 1,
+      "sha256": "e37d8aae4d153cc11180cc39be620488d1a335f2363df774e57c87cd1456d2ac"
+    },
+    {
+      "name": "rust-undefined-behavior-exorcist",
+      "version": 13,
+      "sha256": "db893031b982f18ff4c6a634f00090199e761cf9489c3ffb56e6afee54ad43d2"
+    },
+    {
+      "name": "rust-unsafe-code-exorcist",
+      "version": 8,
+      "sha256": "5211ebed86f5d77b4ff1617dd3ee8586da6d1aedce1b33d38ce500a8d1c5d864"
+    },
+    {
+      "name": "saas-billing-patterns-for-stripe-and-paypal",
+      "version": 11,
+      "sha256": "3247cc651df94a8f4cc0c797a27d2fe0c2c20310ce6363be2d1f3608b929fe70"
+    },
+    {
+      "name": "saas-cli-auth-flow",
+      "version": 1,
+      "sha256": "81656ec6818aa9093457da4ddc9b87f53358bb70661f1db0a0bcabcadc6be93d"
+    },
+    {
+      "name": "saas-customer-analytics",
+      "version": 3,
+      "sha256": "3c527098e531e4c7844c0e45a0933b1ee35cade148271a90b63121b3cfd0a5a5"
+    },
+    {
+      "name": "security-audit-for-saas",
+      "version": 6,
+      "sha256": "30dd6af5fc078a0d55d5a8067010732d6cfb06b95b2570f0dc5f52d827aa3c57"
+    },
+    {
+      "name": "seo-for-saas-businesses",
+      "version": 5,
+      "sha256": "e1856339ab14e9f4d6b99aa457567ee7f64f56628a6c7469d4e850585dfc72ec"
+    },
+    {
+      "name": "simplify-and-refactor-code-isomorphically",
+      "version": 9,
+      "sha256": "73f30f1b851f527438f852cf1eaca4279f35c68ea0d50296bf5562c84463e016"
+    },
+    {
+      "name": "slack-migration-to-mattermost-phase-1-extraction",
+      "version": 5,
+      "sha256": "7818162707bedf1edb8c621c65e6f0deaadb403fdba4f76c1d7ed6c088e5de98"
+    },
+    {
+      "name": "slack-migration-to-mattermost-phase-2-setup-and-import",
+      "version": 2,
+      "sha256": "9fff3b9af301b5206b23b9919033f4beeabe64f0a6866868db1aef867fd23a19"
+    },
+    {
+      "name": "slack-migration-to-mattermost-phase-3-ongoing-maintenance",
+      "version": 5,
+      "sha256": "4733498d0adce158d51d4a4f1853238d376df126baaf06944653cdf80b69d7bf"
+    },
+    {
+      "name": "slb",
+      "version": 2,
+      "sha256": "0d12b9f7747367a7351ab3e129684b3f76584bb0c38b6f4239b843118eb9a8f8"
+    },
+    {
+      "name": "ssh",
+      "version": 1,
+      "sha256": "4a6ca31e9b546365d3d6b8b1c97a9100b37db6c975346bb3eeae64b1616f237e"
+    },
+    {
+      "name": "stripe-checkout",
+      "version": 2,
+      "sha256": "48f8fa4fa5b297d0929beda6857d9dca58d94d8e729451cb0b31903789a71171"
+    },
+    {
+      "name": "supabase",
+      "version": 2,
+      "sha256": "86865ff053807e9d125be2f2ad95122b5f3624a22bb1a800e0c072c5a7315e28"
+    },
+    {
+      "name": "system-performance-remediation",
+      "version": 3,
+      "sha256": "c221326eaf655d47d257e832b100aeb9d090e7de207a7801927ccca7c317911c"
+    },
+    {
+      "name": "tanstack",
+      "version": 3,
+      "sha256": "6d72f7d596ee676a9748c2bed5a8cbf5c948c0a5993498859f0acd2046b00b37"
+    },
+    {
+      "name": "tax-return-preparation-and-advice-generic",
+      "version": 1,
+      "sha256": "eebf4216332e57d2390a9de3b78588e24c9f7feee14c629745c5e1385874f8b4"
+    },
+    {
+      "name": "testing-conformance-harnesses",
+      "version": 3,
+      "sha256": "de918773b4ee7bdac3aac8b5d78d188006ebbd910a36be28ddab3a0cd89e9d54"
+    },
+    {
+      "name": "testing-fuzzing",
+      "version": 4,
+      "sha256": "610fc1c271c07fd76e56f461edec2ecbfa74dcd1857a1ad7201dcb687d2cdcea"
+    },
+    {
+      "name": "testing-golden-artifacts",
+      "version": 3,
+      "sha256": "bd9ac0f831bee2a0bda7920e5d859d121f7ecbe95b11b9fb9e2a0ac8cfbd6f27"
+    },
+    {
+      "name": "testing-metamorphic",
+      "version": 6,
+      "sha256": "0b7463576125f0cd0a74f27fa22c57c6c01baa20548acc8976cd3c5732348a52"
+    },
+    {
+      "name": "testing-real-service-e2e-no-mocks",
+      "version": 2,
+      "sha256": "a9da76eb32bcaad489b2980e35649aa0399b09ac0e378bd022547659d7eb830f"
+    },
+    {
+      "name": "transcribing-audio-from-calls-and-meetings",
+      "version": 2,
+      "sha256": "f9ee0c383d7da95d002cb1ac5224af343fa839eaf24edd30f9972c1bab306b82"
+    },
+    {
+      "name": "tui-glamorous",
+      "version": 4,
+      "sha256": "52008ecfbcda8e902ccaa4c6e37d3f29f620cf3f4c2c911e123773a6e530071e"
+    },
+    {
+      "name": "tui-inspector",
+      "version": 1,
+      "sha256": "13673e632b27e17db53d2fd6fb1bddf7419cc9668afb54f288574f9525c6b756"
+    },
+    {
+      "name": "ubs",
+      "version": 2,
+      "sha256": "6074651a7f2c31b529b7d550006fae6a52d69c8e0f7d977217f07e92a79325cc"
+    },
+    {
+      "name": "ui-polish",
+      "version": 2,
+      "sha256": "e4371690ee76e246a26eff83a27463f4af9c5613c80699c653337216fd92ab5f"
+    },
+    {
+      "name": "user-support-ticketing-system-for-saas",
+      "version": 7,
+      "sha256": "525d233746e036eafb33fba32d87a964799c405466007684d500c52fd9757f78"
+    },
+    {
+      "name": "user-support-triage-for-saas-and-open-source-projects",
+      "version": 9,
+      "sha256": "63afab5f5cf611fc626378e041db597f1c13be63b684fbaff21e92d6d6ea80ff"
+    },
+    {
+      "name": "ux-audit",
+      "version": 1,
+      "sha256": "a78adeefa5be8cf08bed9e6db2bb139157c90c5a9e209bfcbb6e1a0dce3a64d3"
+    },
+    {
+      "name": "vercel",
+      "version": 4,
+      "sha256": "20f4d671e7277d584456e03b9df650c9989993ab4b8815adbbb5ef4cd7f24e4d"
+    },
+    {
+      "name": "vibing-with-ntm",
+      "version": 12,
+      "sha256": "eca47b27402fca25516f6ff5141365d73a8e9b68f1749c960e858d2787b279dc"
+    },
+    {
+      "name": "video-obs-youtube-music",
+      "version": 5,
+      "sha256": "e3d6a075aa532c44db0712526c7e2398dec57b6a2a6b5aca3d96af8210d850c4"
+    },
+    {
+      "name": "wezterm",
+      "version": 2,
+      "sha256": "4bd989bdd2889f98e025bfef370c29cf62a91d282cb09e84cf72ac18bc12e130"
+    },
+    {
+      "name": "wills-and-estate-planning-skill",
+      "version": 4,
+      "sha256": "b6e1acfa54e61ed38acd56d892bcaa7cfd490d3808bf11c99d92decb3d4e7aeb"
+    },
+    {
+      "name": "world-class-doctor-mode-for-cli-tools",
+      "version": 7,
+      "sha256": "ebb009e97dd4e8c7ba3e6cadde8653535737385ba20b1c21949114cf9f1555ec"
+    },
+    {
+      "name": "wrangler",
+      "version": 1,
+      "sha256": "1bbe01d868c7309d234cf2510169641999e8201c616f3aa3c32137f19521f76e"
+    },
+    {
+      "name": "xf",
+      "version": 6,
+      "sha256": "5a5be6d02f05f2a0bd121caf2caedd15ed223fcd208ae5c97db7ac8c0c9e291f"
+    }
+  ]
+}

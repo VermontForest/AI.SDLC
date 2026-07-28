@@ -4,6 +4,7 @@ import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises"
 import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readJsmLock } from "./jsm-dependencies.mjs";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_CONFIG_PATH = "harness.config.json";
@@ -367,6 +368,18 @@ export async function statusSummary(argv = [], options = {}) {
 }
 
 export async function runSelfTest() {
+  const jsmLock = await readJsmLock();
+  const lockedJsmNames = new Set(jsmLock.skills.map((skill) => skill.name));
+  for (const requiredSkill of [
+    "planning-workflow",
+    "testing-real-service-e2e-no-mocks",
+    "reality-check-for-project",
+    "codebase-report",
+    "readme-writing",
+    "ui-polish"
+  ]) {
+    assert(lockedJsmNames.has(requiredSkill), `JSM dependency lock should include ${requiredSkill}`);
+  }
   const root = await mkdtemp(join(tmpdir(), "ai-sldc-self-test-"));
   await writeJson(join(root, "package.json"), {
     scripts: {
@@ -825,6 +838,7 @@ async function resolveSkillPreflight(skills, root, config) {
   const roots = configuredRoots.length
     ? configuredRoots.map((path) => resolveSkillRoot(root, path))
     : [
+        join(homedir(), ".claude", "skills"),
         join(homedir(), ".codex", "skills"),
         join(homedir(), ".agents", "skills")
       ];

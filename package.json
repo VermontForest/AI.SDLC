@@ -10,6 +10,9 @@
   "scripts": {
     "test": "node src/cli.mjs self-test",
     "self-test": "node src/cli.mjs self-test",
+    "jsm:install": "node src/cli.mjs skills:install",
+    "jsm:verify": "node src/cli.mjs skills:verify",
+    "jsm:lock": "node src/jsm-dependencies.mjs write-lock",
     "assess:change-impact": "node src/cli.mjs assess",
     "regress:protected": "node src/cli.mjs regress",
     "finish:iteration": "node src/cli.mjs finish",
@@ -25,6 +28,7 @@
     "src/",
     "templates/",
     "schemas/",
+    "jsm/",
     "README.md"
   ],
   "license": "UNLICENSED"
