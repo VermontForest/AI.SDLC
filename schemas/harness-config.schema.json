@@ -25,7 +25,37 @@
           "filePatterns": { "type": "array", "items": { "type": "string" } },
           "riskClasses": { "type": "array", "items": { "type": "string" } },
           "packs": { "type": "array", "items": { "type": "string" } },
-          "skills": { "type": "array", "items": { "type": "string" } }
+          "skills": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["name", "stages"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "stages": {
+                      "type": "array",
+                      "items": { "enum": ["Assess", "Regress", "Finish"] },
+                      "minItems": 1,
+                      "uniqueItems": true
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "jsm": {
+      "type": "object",
+      "properties": {
+        "skillRoots": {
+          "type": "array",
+          "items": { "type": "string" }
         }
       }
     },

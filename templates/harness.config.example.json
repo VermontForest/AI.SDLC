@@ -19,7 +19,7 @@
     "dashboardHtml": "ops/dashboard.html"
   },
   "metrics": {
-    "thresholds": {
+    "targets": {
       "leqHealthy": 85,
       "jouleworkProductive": 70
     },
@@ -28,6 +28,12 @@
       "scripts/**",
       "docs/**",
       "README.md"
+    ]
+  },
+  "jsm": {
+    "skillRoots": [
+      "~/.codex/skills",
+      "~/.agents/skills"
     ]
   },
   "docs": {
@@ -59,7 +65,26 @@
         "typecheck",
         "test"
       ],
-      "skills": []
+      "skills": [
+        {
+          "name": "planning-workflow",
+          "stages": [
+            "Assess"
+          ]
+        },
+        {
+          "name": "testing-real-service-e2e-no-mocks",
+          "stages": [
+            "Regress"
+          ]
+        },
+        {
+          "name": "reality-check-for-project",
+          "stages": [
+            "Finish"
+          ]
+        }
+      ]
     },
     {
       "id": "docs",
@@ -76,7 +101,18 @@
         "docs"
       ],
       "skills": [
-        "readme-writing"
+        {
+          "name": "readme-writing",
+          "stages": [
+            "Assess"
+          ]
+        },
+        {
+          "name": "codebase-report",
+          "stages": [
+            "Finish"
+          ]
+        }
       ]
     },
     {
@@ -99,7 +135,24 @@
         "ui-smoke"
       ],
       "skills": [
-        "ui-polish"
+        {
+          "name": "ui-polish",
+          "stages": [
+            "Assess"
+          ]
+        },
+        {
+          "name": "screenshot",
+          "stages": [
+            "Regress"
+          ]
+        },
+        {
+          "name": "reality-check-for-project",
+          "stages": [
+            "Finish"
+          ]
+        }
       ]
     }
   ],

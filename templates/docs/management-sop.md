@@ -14,6 +14,15 @@ Every meaningful change starts with a Work Contract:
 - Required proof
 - Verifier required or not
 
+JSM is applied at three separate gates:
+
+- Assess methods trace the change and establish the plan.
+- Regress methods govern how protected evidence is produced and reviewed.
+- Finish methods govern the bounded closure and handoff.
+
+Every stage records its own `--applied-skill` evidence. Installed skill files
+without a stage attestation do not satisfy the gate.
+
 Accepted `--files` forms:
 
 ```bash
@@ -39,4 +48,7 @@ Completed work should say `Completed deliverable`, not `Active deliverable`.
 
 ## Loop Health
 
-LEQ and JouleWork are operating metrics, not decorative numbers. Low scores mean the next Work Contract should either close the active deliverable or recover loop health.
+LEQ and JouleWork are operating metrics, not decorative numbers. An incomplete
+JSM lifecycle reduces LEQ, adds JouleWork waste, and prevents healthy status.
+Low scores mean the next Work Contract should either close the active
+deliverable or recover loop health.

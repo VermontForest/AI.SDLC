@@ -76,14 +76,15 @@ function printHelp() {
 
 Usage:
   ai-sldc init [--project-name MyProject]
-  ai-sldc assess --files src/a.ts docs/b.md --active-deliverable "..."
-  ai-sldc regress --files src/a.ts docs/b.md
-  ai-sldc finish --intentional-files src/a.ts --execute --commit-message "..."
+  ai-sldc assess --files src/a.ts docs/b.md --applied-skill planning-workflow --active-deliverable "..."
+  ai-sldc regress --files src/a.ts docs/b.md --applied-skill testing-real-service-e2e-no-mocks
+  ai-sldc finish --intentional-files src/a.ts --applied-skill reality-check-for-project --skip-git
   ai-sldc refresh
   ai-sldc status --json
   ai-sldc self-test
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.
+Applied skills accept comma-separated or repeated --applied-skill flags.
 Text flags such as --active-deliverable, --why, --boundary, and --proof collect words until the next flag.
 `);
 }

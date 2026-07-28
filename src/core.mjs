@@ -47,8 +47,21 @@ export async function assessChangeImpact(argv = [], options = {}) {
   const matchedSurfaces = matchSurfaces(files, config);
   const packs = unique(matchedSurfaces.flatMap((surface) => surface.packs || []));
   const riskClasses = unique(matchedSurfaces.flatMap((surface) => surface.riskClasses || [surface.id]));
-  const requiredSkills = unique(matchedSurfaces.flatMap((surface) => surface.skills || []));
-  const skillPreflight = await resolveSkillPreflight(requiredSkills);
+  const skillsByStage = {
+    assess: requiredSkillsForStage(matchedSurfaces, "Assess"),
+    regress: requiredSkillsForStage(matchedSurfaces, "Regress"),
+    finish: requiredSkillsForStage(matchedSurfaces, "Finish")
+  };
+  const requiredSkills = unique(Object.values(skillsByStage).flat());
+  const skillPreflight = await resolveSkillPreflight(requiredSkills, root, config);
+  const skillAttestation = skillAttestationFor(skillsByStage.assess, args.appliedSkill);
+  const failures = [];
+  if (skillPreflight.missing_count > 0) {
+    failures.push(`Required JSM skill packages are missing: ${skillPreflight.missing_skills.join(", ")}`);
+  }
+  if (skillAttestation.status === "missing_required_skills") {
+    failures.push(`Required Assess JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
+  }
   const workContract = buildWorkContract(args);
   const pendingExternalProof = unique(
     packs.flatMap((packId) => {
@@ -60,21 +73,29 @@ export async function assessChangeImpact(argv = [], options = {}) {
   const report = {
     schema_version: 1,
     generated_at: new Date().toISOString(),
-    status: packs.length > 0 ? "packs_required" : "no_packs_required",
+    status: failures.length ? "blocked" : packs.length > 0 ? "packs_required" : "no_packs_required",
     project: compactProject(config.project),
     changed_files: files,
     matched_surfaces: matchedSurfaces.map((surface) => surface.id),
     risk_classes: riskClasses,
     required_packs: packs,
     required_skills: requiredSkills,
+    required_skills_by_stage: skillsByStage,
     skill_preflight: skillPreflight,
+    skill_attestation: skillAttestation,
+    jsm_workflow: {
+      assess: skillAttestation,
+      regress: pendingStageAttestation(skillsByStage.regress),
+      finish: pendingStageAttestation(skillsByStage.finish)
+    },
     pending_external_proof: pendingExternalProof,
     work_contract: workContract,
+    failures,
     next_command: "npm run regress:protected"
   };
   await writeArtifact(root, artifactPath(config, "changeImpact"), report);
   printAssessment(report);
-  return { value: report, printJson: Boolean(args.json) };
+  return { value: report, printJson: Boolean(args.json), exitCode: failures.length ? 1 : 0 };
 }
 
 export async function runProtectedRegression(argv = [], options = {}) {
@@ -91,9 +112,20 @@ export async function runProtectedRegression(argv = [], options = {}) {
       ? normalizeList(args.pack)
       : latestImpact?.required_packs || matchSurfaces(files, config).flatMap((surface) => surface.packs || [])
   );
+  const matchedSurfaces = matchSurfaces(files, config);
+  const regressSkills = requiredSkillsForStage(matchedSurfaces, "Regress");
+  const skillPreflight = await resolveSkillPreflight(regressSkills, root, config);
+  const skillAttestation = skillAttestationFor(regressSkills, args.appliedSkill);
   const checks = [];
   const failures = [];
   const pendingExternalProof = [];
+  if (skillPreflight.missing_count > 0) {
+    failures.push(`Required Regress JSM skill packages are missing: ${skillPreflight.missing_skills.join(", ")}`);
+  }
+  if (skillAttestation.status === "missing_required_skills") {
+    failures.push(`Required Regress JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
+  }
+  const jsmGateFailed = failures.length > 0;
 
   for (const packId of packs) {
     const pack = config.packs?.[packId];
@@ -108,6 +140,10 @@ export async function runProtectedRegression(argv = [], options = {}) {
       continue;
     }
     for (const command of commands) {
+      if (jsmGateFailed) {
+        checks.push({ pack: packId, command, status: "skipped_jsm_gate" });
+        continue;
+      }
       if (args.dryRun || args.skipCommands) {
         checks.push({ pack: packId, command, status: "skipped" });
         continue;
@@ -138,6 +174,8 @@ export async function runProtectedRegression(argv = [], options = {}) {
     project: compactProject(config.project),
     changed_files: files,
     required_packs: packs,
+    jsm_attestation: skillAttestation,
+    jsm_skill_preflight: skillPreflight,
     checks,
     pending_external_proof: pending,
     failures,
@@ -162,23 +200,50 @@ export async function finishIteration(argv = [], options = {}) {
   const skipGit = Boolean(args.skipGit);
   const noArtifactBackup = Boolean(args.noArtifactBackup);
   const commitMessage = stringArg(args.commitMessage);
+  const matchedSurfaces = matchSurfaces(files, config);
+  const finishSkills = requiredSkillsForStage(matchedSurfaces, "Finish");
+  const skillPreflight = await resolveSkillPreflight(finishSkills, root, config);
+  const skillAttestation = skillAttestationFor(finishSkills, args.appliedSkill);
+  const changeImpact = await readJsonIfExists(join(root, artifactPath(config, "changeImpact")));
+  const protectedRegression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
+  const impactMatches = sameFileSet(files, changeImpact?.changed_files || []);
+  const regressionMatches = sameFileSet(files, protectedRegression?.changed_files || []);
 
-  const assessArgs = [
-    "--files",
-    files.join(","),
-    ...workContractArgsFrom(args)
-  ];
-  const assess = await runHarnessStep("assess-change-impact", () => assessChangeImpact(assessArgs, { root }));
-  commands.push(assess.command);
-  if (assess.error) failures.push(assess.error);
+  commands.push({
+    name: "assess-evidence",
+    status: changeImpact && impactMatches && changeImpact.status !== "blocked" ? "passed" : "failed",
+    artifact: artifactPath(config, "changeImpact")
+  });
+  commands.push({
+    name: "regress-evidence",
+    status: protectedRegression && regressionMatches && protectedRegression.status !== "failed" ? "passed" : "failed",
+    artifact: artifactPath(config, "protectedRegression")
+  });
 
-  const regress = await runHarnessStep("regress-protected", () => runProtectedRegression(["--files", files.join(",")], { root }));
-  commands.push(regress.command);
-  if (regress.error) failures.push(regress.error);
+  if (!changeImpact) blockers.push("Change-impact artifact is missing; run Assess for this file set.");
+  else if (!impactMatches) blockers.push("Change-impact artifact is not bound to the intentional file set.");
+  else if (changeImpact.status === "blocked") blockers.push("Latest Assess stage is blocked.");
+  else if (!["complete", "not_required"].includes(changeImpact.skill_attestation?.status)) {
+    blockers.push("Assess-stage JSM attestation is incomplete.");
+  }
+
+  if (!protectedRegression) blockers.push("Protected-regression artifact is missing; run Regress for this file set.");
+  else if (!regressionMatches) blockers.push("Protected-regression artifact is not bound to the intentional file set.");
+  else if (protectedRegression.status === "failed") failures.push("Latest protected regression failed.");
+  else if (!["complete", "not_required"].includes(protectedRegression.jsm_attestation?.status)) {
+    blockers.push("Regress-stage JSM attestation is incomplete.");
+  }
+
+  if (skillPreflight.missing_count > 0) {
+    blockers.push(`Required Finish JSM skill packages are missing: ${skillPreflight.missing_skills.join(", ")}`);
+  }
+  if (skillAttestation.status === "missing_required_skills") {
+    blockers.push(`Required Finish JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
+  }
 
   let primaryCommitSha = null;
   let branch = null;
-  if (execute && !skipGit && failures.length === 0) {
+  if (execute && !skipGit && failures.length === 0 && blockers.length === 0) {
     if (!commitMessage) throw new Error("finish --execute requires --commit-message unless --skip-git is set.");
     await runGit(root, ["add", "--", ...files]);
     const staged = await gitLines(root, ["diff", "--cached", "--name-only"]);
@@ -196,12 +261,7 @@ export async function finishIteration(argv = [], options = {}) {
     }
   }
 
-  const refresh = await runHarnessStep("manage-refresh", () => refreshStatus(["--quiet"], { root }));
-  commands.push(refresh.command);
-  if (refresh.error) failures.push(refresh.error);
-
-  const protectedRegression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
-  const status = failures.length ? "failed" : blockers.length ? "blocked" : "passed";
+  let status = failures.length ? "failed" : blockers.length ? "blocked" : "passed";
   const report = {
     schema_version: 1,
     generated_at: new Date().toISOString(),
@@ -219,6 +279,8 @@ export async function finishIteration(argv = [], options = {}) {
       branch
     },
     commands,
+    jsm_attestation: skillAttestation,
+    jsm_skill_preflight: skillPreflight,
     blockers,
     failures,
     work_contract_result: {
@@ -233,6 +295,18 @@ export async function finishIteration(argv = [], options = {}) {
       artifact: artifactPath(config, "protectedRegression")
     }
   };
+  await writeArtifact(root, artifactPath(config, "iterationFinish"), report);
+
+  const refresh = await runHarnessStep("manage-refresh", () => refreshStatus(["--quiet"], { root }));
+  commands.push(refresh.command);
+  if (refresh.error) {
+    failures.push(refresh.error);
+    status = "failed";
+    report.status = status;
+    report.failures = failures;
+    report.work_contract_result.state = status;
+    report.work_contract_result.closed = false;
+  }
   await writeArtifact(root, artifactPath(config, "iterationFinish"), report);
 
   if (status === "passed" && execute && !skipGit && !noArtifactBackup) {
@@ -284,6 +358,7 @@ export async function statusSummary(argv = [], options = {}) {
   return {
     message: [
       `${status.project.project_name}: ${status.top_line}`,
+      `JSM lifecycle ${status.workflow.jsm_lifecycle.status}`,
       `LEQ ${status.leq.score} (${status.leq.classification}); JW ${status.joulework.score} (${status.joulework.classification})`,
       `Workflow: ${status.workflow.contract_state}`,
       `Next: ${status.workflow.next_command}`
@@ -304,6 +379,7 @@ export async function runSelfTest() {
   await mkdir(join(root, "docs"), { recursive: true });
   await writeFile(join(root, "src", "index.js"), "export const ok = true;\n", "utf8");
   await writeFile(join(root, "docs", "guide.md"), "# Guide\n\nLast updated: 2026-07-07\n", "utf8");
+  await writeFile(join(root, "README.md"), "# Self Test\n", "utf8");
   await initHarness(["--project-name", "Self Test", "--force"], { root });
   const configPath = join(root, "harness.config.json");
   const config = JSON.parse(await readFile(configPath, "utf8"));
@@ -311,9 +387,22 @@ export async function runSelfTest() {
     label: "Chained command",
     commands: ["npm run typecheck && npm test"]
   };
+  config.jsm = { skillRoots: [".skills"] };
+  config.metrics.taskMarkerGlobs = ["src/**"];
+  const lifecycleSkills = [
+    { name: "assess-method", stages: ["Assess"] },
+    { name: "regress-method", stages: ["Regress"] },
+    { name: "finish-method", stages: ["Finish"] }
+  ];
+  for (const surface of config.surfaces) surface.skills = lifecycleSkills;
+  for (const skill of lifecycleSkills) {
+    const skillDir = join(root, ".skills", skill.name);
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(join(skillDir, "SKILL.md"), `# ${skill.name}\n`, "utf8");
+  }
   await writeJson(configPath, config);
   process.chdir(root);
-  const assessed = await assessChangeImpact([
+  const assessArgs = [
     "--files",
     "src/index.js",
     "docs/guide.md",
@@ -326,15 +415,60 @@ export async function runSelfTest() {
     "--proof",
     "npm test",
     "--verifier-required"
-  ]);
+  ];
+  const missingAssessJsm = await assessChangeImpact(assessArgs);
+  assert(missingAssessJsm.exitCode === 1, "Assess should fail closed without its applied JSM skill");
+  assert(missingAssessJsm.value.skill_attestation.status === "missing_required_skills", "Assess should record missing JSM attestation");
+  const assessed = await assessChangeImpact([...assessArgs, "--applied-skill", "assess-method"]);
   assert(assessed.value.required_packs.includes("typecheck"), "src file should route typecheck");
   assert(assessed.value.required_packs.includes("docs"), "docs file should route docs");
-  const regressed = await runProtectedRegression(["--files", "src/index.js docs/guide.md"]);
+  assert(assessed.value.required_skills_by_stage.regress.includes("regress-method"), "Assess should route Regress JSM methods");
+  assert(assessed.value.required_skills_by_stage.finish.includes("finish-method"), "Assess should route Finish JSM methods");
+  const missingRegressJsm = await runProtectedRegression(["--files", "src/index.js", "docs/guide.md"]);
+  assert(missingRegressJsm.exitCode === 1, "Regress should fail closed without its applied JSM skill");
+  assert(
+    missingRegressJsm.value.checks.filter((check) => check.command).every((check) => check.status === "skipped_jsm_gate"),
+    "Regress should not execute protected commands before its JSM gate"
+  );
+  const regressed = await runProtectedRegression([
+    "--files",
+    "src/index.js",
+    "docs/guide.md",
+    "--applied-skill",
+    "regress-method"
+  ]);
   assert(regressed.value.status === "passed", "regression should pass");
-  const chained = await runProtectedRegression(["--pack", "chain"]);
+  assert(regressed.value.jsm_attestation.status === "complete", "Regress should record complete JSM attestation");
+  const chained = await runProtectedRegression(["--pack", "chain", "--applied-skill", "regress-method"]);
   assert(chained.value.status === "passed", "regression should support chained shell commands");
+  const mismatchedFinish = await finishIteration([
+    "--intentional-files",
+    "src/index.js",
+    "--applied-skill",
+    "finish-method",
+    "--skip-git"
+  ]);
+  assert(mismatchedFinish.value.status === "blocked", "Finish should block evidence from a different file set");
+  const missingFinishJsm = await finishIteration([
+    "--intentional-files",
+    "src/index.js",
+    "docs/guide.md",
+    "--skip-git"
+  ]);
+  assert(missingFinishJsm.value.status === "blocked", "Finish should block without its applied JSM skill");
+  const finished = await finishIteration([
+    "--intentional-files",
+    "src/index.js",
+    "docs/guide.md",
+    "--applied-skill",
+    "finish-method",
+    "--skip-git"
+  ]);
+  assert(finished.value.status === "passed", "Finish should close after all stage JSM evidence exists");
   const refreshed = await refreshStatus(["--quiet"]);
   assert(refreshed.value.leq.score >= 80, "fresh fixture should have solid LEQ");
+  assert(refreshed.value.joulework.score >= 70, "complete useful-work chain should reach productive JouleWork");
+  assert(refreshed.value.workflow.jsm_lifecycle.status === "complete", "status should aggregate the three-stage JSM lifecycle");
   return {
     message: `AI.SLDC self-test passed in ${root}`,
     value: { status: "passed", fixture: root },
@@ -349,9 +483,11 @@ async function buildStatus(root, config) {
   const docs = await inspectDocs(root, config);
   const git = await inspectGit(root);
   const todoCount = await countTaskMarkers(root, config);
-  const leq = computeLeq({ docs, git, todoCount, protectedRegression, finish }, config);
-  const joulework = computeJouleWork({ docs, git, todoCount, leq, changeImpact, protectedRegression, finish }, config);
+  const jsmLifecycle = buildJsmLifecycle(changeImpact, protectedRegression, finish);
+  const leq = computeLeq({ docs, git, todoCount, protectedRegression, finish, jsmLifecycle }, config);
+  const joulework = computeJouleWork({ docs, git, todoCount, leq, changeImpact, protectedRegression, finish, jsmLifecycle }, config);
   const loopHealthy =
+    jsmLifecycle.status === "complete" &&
     leq.score >= threshold(config, "leqHealthy", 85) &&
     joulework.score >= threshold(config, "jouleworkProductive", 70);
   const contractState = finish?.work_contract_result?.closed ? "completed" : changeImpact?.work_contract ? "active" : "missing";
@@ -372,6 +508,7 @@ async function buildStatus(root, config) {
       verifier_status: protectedRegression?.status || "missing",
       active_pending_proof: contractState === "active" ? protectedRegression?.pending_external_proof || [] : [],
       global_pending_proof: contractState !== "active" ? protectedRegression?.pending_external_proof || [] : [],
+      jsm_lifecycle: jsmLifecycle,
       harness_health: {
         change_impact: changeImpact?.status || "missing",
         protected_regression: protectedRegression?.status || "missing",
@@ -382,7 +519,8 @@ async function buildStatus(root, config) {
     health_debt: [
       { key: "workspace_changes", label: "Open workspace changes", count: git.changed_count },
       { key: "stale_docs", label: "Stale docs", count: docs.stale.length },
-      { key: "task_markers", label: "TODO/FIXME markers", count: todoCount }
+      { key: "task_markers", label: "TODO/FIXME markers", count: todoCount },
+      { key: "jsm_lifecycle", label: "Incomplete JSM stages", count: jsmLifecycle.incomplete_stages.length }
     ],
     docs,
     git,
@@ -428,7 +566,8 @@ function normalizeConfig(config) {
     },
     status: config.status || {},
     docs: config.docs || {},
-    metrics: config.metrics || {}
+    metrics: config.metrics || {},
+    jsm: config.jsm || {}
   };
 }
 
@@ -492,32 +631,17 @@ function buildWorkContract(args) {
     lane: stringArg(args.lane) || "unknown",
     boundaries: normalizeList(args.boundary),
     required_proof: normalizeList(args.proof),
+    applied_skills: normalizeSkills(args.appliedSkill),
     verifier_required: Boolean(args.verifierRequired),
     next_command: "npm run regress:protected",
     warnings: []
   };
 }
 
-function workContractArgsFrom(args) {
-  const out = [];
-  for (const [key, cli] of [
-    ["activeDeliverable", "--active-deliverable"],
-    ["why", "--why"],
-    ["targetSurface", "--target-surface"],
-    ["lane", "--lane"]
-  ]) {
-    if (args[key]) out.push(cli, stringArg(args[key]));
-  }
-  for (const value of normalizeList(args.boundary)) out.push("--boundary", value);
-  for (const value of normalizeList(args.proof)) out.push("--proof", value);
-  if (args.verifierRequired) out.push("--verifier-required");
-  return out;
-}
-
 function parseArgs(argv = []) {
   const args = {};
   const fileKeys = new Set(["files", "intentionalFiles"]);
-  const repeatTextKeys = new Set(["boundary", "proof", "pack"]);
+  const repeatTextKeys = new Set(["boundary", "proof", "pack", "appliedSkill"]);
   const textKeys = new Set([
     "activeDeliverable",
     "why",
@@ -578,6 +702,15 @@ function normalizeList(value) {
   return [String(value)].filter(Boolean);
 }
 
+function normalizeSkills(value) {
+  return unique(
+    normalizeList(value)
+      .flatMap((entry) => String(entry).split(/[\s,]+/))
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  );
+}
+
 function stringArg(value) {
   if (Array.isArray(value)) return value.join(" ").trim();
   if (value === undefined || value === null || value === false) return "";
@@ -594,6 +727,12 @@ function camel(value) {
 
 function unique(values) {
   return Array.from(new Set(values.filter(Boolean)));
+}
+
+function sameFileSet(left, right) {
+  const a = unique(normalizeFiles(left)).sort();
+  const b = unique(normalizeFiles(right)).sort();
+  return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
 function compactProject(project) {
@@ -616,11 +755,79 @@ function matchesGlob(file, pattern) {
   return regex.test(normalizedFile);
 }
 
-async function resolveSkillPreflight(skills) {
-  const roots = [
-    join(homedir(), ".codex", "skills"),
-    join(homedir(), ".agents", "skills")
-  ];
+function requiredSkillsForStage(surfaces, stage) {
+  const required = [];
+  for (const surface of surfaces) {
+    for (const entry of arrayValue(surface.skills)) {
+      if (typeof entry === "string") {
+        if (stage === "Assess") required.push(entry);
+        continue;
+      }
+      const name = String(entry?.name || "").trim();
+      const stages = arrayValue(entry?.stages).map((value) => String(value).toLowerCase());
+      if (name && stages.includes(stage.toLowerCase())) required.push(name);
+    }
+  }
+  return unique(required);
+}
+
+function skillAttestationFor(requiredSkills, appliedSkills) {
+  const required = unique(normalizeSkills(requiredSkills));
+  const applied = unique(normalizeSkills(appliedSkills));
+  const appliedSet = new Set(applied.map((skill) => skill.toLowerCase()));
+  const missing = required.filter((skill) => !appliedSet.has(skill.toLowerCase()));
+  return {
+    status: required.length === 0 ? "not_required" : missing.length === 0 ? "complete" : "missing_required_skills",
+    required_skills: required,
+    applied_skills: applied,
+    missing_skills: missing,
+    attestation: "The caller attests that applied_skills were read and used for this workflow stage. Package presence alone is not application evidence."
+  };
+}
+
+function pendingStageAttestation(requiredSkills) {
+  return {
+    status: requiredSkills.length ? "pending" : "not_required",
+    required_skills: requiredSkills
+  };
+}
+
+function buildJsmLifecycle(changeImpact, protectedRegression, finish) {
+  const routed = changeImpact?.required_skills_by_stage || {};
+  const stages = {
+    assess: stageAttestation(changeImpact?.skill_attestation, routed.assess),
+    regress: stageAttestation(protectedRegression?.jsm_attestation, routed.regress),
+    finish: stageAttestation(finish?.jsm_attestation, routed.finish)
+  };
+  const incompleteStages = Object.entries(stages)
+    .filter(([, value]) => !["complete", "not_required"].includes(value.status))
+    .map(([name]) => name);
+  return {
+    status: incompleteStages.length ? "incomplete" : "complete",
+    incomplete_stages: incompleteStages,
+    stages
+  };
+}
+
+function stageAttestation(attestation, routedSkills) {
+  if (attestation) return attestation;
+  const required = normalizeSkills(routedSkills);
+  return {
+    status: required.length ? "missing" : "not_required",
+    required_skills: required,
+    applied_skills: [],
+    missing_skills: required
+  };
+}
+
+async function resolveSkillPreflight(skills, root, config) {
+  const configuredRoots = arrayValue(config.jsm?.skillRoots);
+  const roots = configuredRoots.length
+    ? configuredRoots.map((path) => resolveSkillRoot(root, path))
+    : [
+        join(homedir(), ".codex", "skills"),
+        join(homedir(), ".agents", "skills")
+      ];
   const exact_skill_paths = [];
   const missing_skills = [];
   for (const skill of skills) {
@@ -637,6 +844,13 @@ async function resolveSkillPreflight(skills) {
     missing_skills,
     exact_skill_paths
   };
+}
+
+function resolveSkillRoot(root, path) {
+  const value = String(path);
+  if (value === "~") return homedir();
+  if (value.startsWith("~/") || value.startsWith("~\\")) return resolve(homedir(), value.slice(2));
+  return resolve(root, value);
 }
 
 async function inspectDocs(root, config) {
@@ -710,7 +924,7 @@ async function walk(dir) {
   return out;
 }
 
-function computeLeq({ docs, git, todoCount, protectedRegression, finish }, config) {
+function computeLeq({ docs, git, todoCount, protectedRegression, finish, jsmLifecycle }, config) {
   let score = 100;
   const reasons = [];
   if (docs.missing.length) {
@@ -737,6 +951,10 @@ function computeLeq({ docs, git, todoCount, protectedRegression, finish }, confi
     score -= 10;
     reasons.push("latest finish checkpoint is not closed");
   }
+  if (jsmLifecycle.status !== "complete") {
+    score -= 15;
+    reasons.push(`incomplete JSM lifecycle: ${jsmLifecycle.incomplete_stages.join(", ") || "unknown stage"}`);
+  }
   score = Math.max(0, Math.round(score));
   return {
     score,
@@ -745,14 +963,15 @@ function computeLeq({ docs, git, todoCount, protectedRegression, finish }, confi
   };
 }
 
-function computeJouleWork({ docs, git, todoCount, leq, changeImpact, protectedRegression, finish }, config) {
-  const useful = [changeImpact, protectedRegression, finish].filter(Boolean).length;
+function computeJouleWork({ docs, git, todoCount, leq, changeImpact, protectedRegression, finish, jsmLifecycle }, config) {
+  const useful = [changeImpact, protectedRegression, finish].filter(Boolean).length + (jsmLifecycle.status === "complete" ? 1 : 0);
   let score = useful * 20;
   const waste = [];
   if (!docs.health_ok) waste.push({ reason: "docs not healthy", penalty: 10 });
   if (git.changed_count) waste.push({ reason: "uncommitted git changes", penalty: 12 });
   if (todoCount) waste.push({ reason: "TODO/FIXME debt", penalty: 8 });
   if (leq.score < threshold(config, "leqHealthy", 85)) waste.push({ reason: "LEQ below healthy threshold", penalty: 8 });
+  if (jsmLifecycle.status !== "complete") waste.push({ reason: "JSM lifecycle incomplete", penalty: 15 });
   score -= waste.reduce((sum, item) => sum + item.penalty, 0);
   score = Math.max(0, Math.min(100, Math.round(score)));
   return {
@@ -773,6 +992,7 @@ Last updated: ${status.generated_at.slice(0, 10)}
 ## Top Line
 
 - Classification: \`${status.classification}\`
+- JSM lifecycle: \`${status.workflow.jsm_lifecycle.status}\`
 - LEQ: \`${status.leq.score}\` (${status.leq.classification})
 - JouleWork: \`${status.joulework.score} ${status.joulework.unit}\` (${status.joulework.classification})
 - Workflow state: \`${status.workflow.contract_state}\`
@@ -784,6 +1004,9 @@ ${status.health_debt.map((item) => `- ${item.label}: \`${item.count}\``).join("\
 
 ## Harness Health
 
+- JSM Assess: \`${status.workflow.jsm_lifecycle.stages.assess.status}\`
+- JSM Regress: \`${status.workflow.jsm_lifecycle.stages.regress.status}\`
+- JSM Finish: \`${status.workflow.jsm_lifecycle.stages.finish.status}\`
 - Change impact: \`${status.workflow.harness_health.change_impact}\`
 - Protected regression: \`${status.workflow.harness_health.protected_regression}\`
 - Finish iteration: \`${status.workflow.harness_health.finish_iteration}\`
@@ -840,6 +1063,7 @@ function renderDashboardHtml(status) {
     <section>
       <h2>Loop State</h2>
       <p>Workflow: <code>${escapeHtml(status.workflow.contract_state)}</code></p>
+      <p>JSM lifecycle: <code>${escapeHtml(status.workflow.jsm_lifecycle.status)}</code></p>
       <p>Protected regression: <code>${escapeHtml(status.workflow.harness_health.protected_regression)}</code></p>
       <p>Finish: <code>${escapeHtml(status.workflow.harness_health.finish_iteration)}</code></p>
     </section>
@@ -946,7 +1170,7 @@ function secondsSince(started) {
 }
 
 function threshold(config, key, fallback) {
-  return Number(config.metrics?.thresholds?.[key] || fallback);
+  return Number(config.metrics?.targets?.[key] ?? config.metrics?.thresholds?.[key] ?? fallback);
 }
 
 function slug(value) {
@@ -971,6 +1195,7 @@ function printAssessment(report) {
   console.log(`Changed files: ${report.changed_files.length}`);
   console.log(`Required packs: ${report.required_packs.join(", ") || "none"}`);
   console.log(`Required skills: ${report.required_skills.join(", ") || "none"}`);
+  console.log(`Assess JSM: ${report.skill_attestation.status}`);
   console.log(`Next: ${report.next_command}`);
 }
 
@@ -978,5 +1203,6 @@ function printRegression(report) {
   console.log("AI.SLDC protected regression");
   console.log(`Status: ${report.status}`);
   console.log(`Packs: ${report.required_packs.join(", ") || "none"}`);
+  console.log(`Regress JSM: ${report.jsm_attestation.status}`);
   if (report.pending_external_proof.length) console.log(`Pending external proof: ${report.pending_external_proof.join("; ")}`);
 }

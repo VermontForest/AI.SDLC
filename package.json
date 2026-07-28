@@ -2,7 +2,7 @@
   "name": "ai-sldc",
   "version": "0.1.0",
   "private": true,
-  "description": "Portable AI SDLC workflow harness for work contracts, protected regression routing, loop metrics, and human-readable status dashboards.",
+  "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",
   "bin": {
     "ai-sldc": "bin/ai-sldc.mjs"

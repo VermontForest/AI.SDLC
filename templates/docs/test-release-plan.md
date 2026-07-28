@@ -5,11 +5,14 @@ Last updated: 2026-07-07
 ## Standard Commands
 
 ```bash
-npm run assess:change-impact -- --files <repo paths> --active-deliverable "..." --why "..." --target-surface "..." --lane "..." --boundary "..." --proof "..."
-npm run regress:protected -- --files <repo paths>
-npm run finish:iteration -- --intentional-files "<repo paths>" --execute --commit-message "..."
+npm run assess:change-impact -- --files <repo paths> --applied-skill <Assess methods> --active-deliverable "..." --why "..." --target-surface "..." --lane "..." --boundary "..." --proof "..."
+npm run regress:protected -- --files <repo paths> --applied-skill <Regress methods>
+npm run finish:iteration -- --intentional-files "<repo paths>" --applied-skill <Finish methods> --skip-git
 npm run manage:refresh
 ```
+
+Use `--execute --commit-message "..."` at Finish only when the current user has
+authorized staging, committing, and pushing the exact intentional file set.
 
 ## Proof Rule
 
