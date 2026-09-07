@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-28T12:41:35.529Z",
+  "generated_at": "2026-09-07T16:13:44.366Z",
   "source": {
     "service": "Jeffrey's Skills.md",
     "url": "https://jeffreys-skills.md",
@@ -10,10 +10,10 @@
     "note": "Premium skill bodies are installed through jsm and are not redistributed by AI.SLDC."
   },
   "cli": {
-    "minimum_version": "0.3.16",
-    "resolved_version": "0.3.16"
+    "minimum_version": "0.3.22",
+    "resolved_version": "0.3.22"
   },
-  "skill_count": 121,
+  "skill_count": 135,
   "skills": [
     {
       "name": "ab-testing",
@@ -27,13 +27,13 @@
     },
     {
       "name": "agent-ergonomics-and-intuitiveness-maximization-for-cli-tools",
-      "version": 11,
-      "sha256": "a1afee3769a905c84b365ebdb4cecb63b8995314802e8c7c3f9b31c79587477d"
+      "version": 12,
+      "sha256": "3bfb99f4d9276be2615f0f82276ee9950ff909a081434de76ccfc435c2c8f86c"
     },
     {
       "name": "agent-fungibility-philosophy",
-      "version": 4,
-      "sha256": "65553b01c3f22301298417c5377d16b727fc26f6e39e3b1ecd833d6b481bb107"
+      "version": 5,
+      "sha256": "17428e0e10605269afe6febd85633a104358f8cb829701b40c3c921cad73df27"
     },
     {
       "name": "agent-mail",
@@ -41,9 +41,14 @@
       "sha256": "6fe9cfce5cdb521ee68a46486c17f094f8dac245460c687d45cf52bb5574f619"
     },
     {
+      "name": "ai-model-into-rust-mega-fused-hyper-kernel",
+      "version": 1,
+      "sha256": "f0d3e11736f489e29612b061c5c9662aa4c1cd904e8a5b544bd3fa8acc2232d3"
+    },
+    {
       "name": "asupersync-mega-skill",
-      "version": 4,
-      "sha256": "36854f9b0976a6d2889189ffbc48987ed529be53fa3abc652ad8fdb8411add8d"
+      "version": 5,
+      "sha256": "c1885568e2c8a9a8cdaf7110a4a1c6afacbecfe4a483b80b8722eb4cf6d06aa3"
     },
     {
       "name": "automating-your-automations",
@@ -67,8 +72,8 @@
     },
     {
       "name": "beads-compliance-and-completion-verification",
-      "version": 13,
-      "sha256": "b8e96862e92929f0e1cf34016347b7d60163c391155ed2fb6b355960563af427"
+      "version": 14,
+      "sha256": "72d2ba722a9ae925291619d81b262d4333dfd2cca07c25fea64f437861c99751"
     },
     {
       "name": "beads-workflow",
@@ -82,8 +87,8 @@
     },
     {
       "name": "brennerbot-with-ntm",
-      "version": 4,
-      "sha256": "0479a2495911038e3f6d766bfc845de50d48fee53a7e488ca240f4d073d149d9"
+      "version": 5,
+      "sha256": "41dc351b0591efefb09e93a704afcf1adaeadebd56bd17dd4ab2f55dcb576b78"
     },
     {
       "name": "browser-extension-automation",
@@ -92,8 +97,8 @@
     },
     {
       "name": "caam",
-      "version": 2,
-      "sha256": "a599e42ec006aeb9f47ad2c9decc284006720c5386b7759c966363aa4a8fcd08"
+      "version": 3,
+      "sha256": "6129722f949efaa86a1a40c60ac0d1d2ce967dc7cceae2cc650fd511a900a8e1"
     },
     {
       "name": "cass",
@@ -116,9 +121,14 @@
       "sha256": "6355e11be4206f55f30811bddc7484445da8c8692e484abebd6978458025ca6e"
     },
     {
+      "name": "choose-the-best-skills-for-me-to-run-in-this-project",
+      "version": 1,
+      "sha256": "bd7fcdb805d0a42b616856651b3f0c2f96d52b1016954496ebacdb14a803774b"
+    },
+    {
       "name": "code-review-gemini-swarm-with-ntm",
-      "version": 2,
-      "sha256": "7cf4b1e35b1b5a5de07989f9b34c9e394aa9d81a43967db255ff9441d25e9048"
+      "version": 3,
+      "sha256": "7cc6ead90cc0e0db281df034fabe7b199f4f7e86fb6b2ac37b970d49fa3b2540"
     },
     {
       "name": "codebase-archaeology",
@@ -162,8 +172,8 @@
     },
     {
       "name": "de-slopify",
-      "version": 3,
-      "sha256": "5ab8056614c097d1fe1868d91ddebf4393c12e386d5457a8de866b736dba4a15"
+      "version": 4,
+      "sha256": "70ddcdfbf75e1def598ad79c1d9695c7588dc9974bae2696baae76472198c0d9"
     },
     {
       "name": "deadlock-finder-and-fixer",
@@ -182,13 +192,18 @@
     },
     {
       "name": "dueling-idea-wizards",
-      "version": 4,
-      "sha256": "ddc4e23d8d37559db38a5f7609036e1bce4127d0b74ed782e6835ec1b0f8b10d"
+      "version": 5,
+      "sha256": "47dba82ed2058c0127a548e7379bb4e86ce5243094c119d49edf4b913564fc9c"
     },
     {
       "name": "e2e-testing-for-webapps",
       "version": 3,
       "sha256": "73d1b2211be7bd7edf881cd27f70cda1fef6ab0b0a04c219d6e1a3a56bd5f73c"
+    },
+    {
+      "name": "eidetic-engine-cli",
+      "version": 1,
+      "sha256": "b5fcc5edac2a81ab14a5a595c5a01dfc42a69ba8778c1e350cc885c3f25e71b9"
     },
     {
       "name": "extreme-software-optimization",
@@ -197,13 +212,18 @@
     },
     {
       "name": "focr",
-      "version": 4,
-      "sha256": "fe415c442ffa1dfb3d55281a761faad6b3cc3e881e0894954f09fcb69ce0ba37"
+      "version": 5,
+      "sha256": "c91bfab509fdeaebf930bcd7038aef985134fbeab0d996d8f34f9a05ea3e117f"
     },
     {
       "name": "frankensearch-integration-for-rust-projects",
       "version": 1,
       "sha256": "60a846b05e7dc5129381aceb410f1b71197319696407af5f72b8011e7e66fdad"
+    },
+    {
+      "name": "frankensqlite-mega-skill",
+      "version": 2,
+      "sha256": "b5151363bf22b67fef97ed4193f0391c7d0ea8d8eb948be490529f7400db35df"
     },
     {
       "name": "frankensuite-website-development",
@@ -219,6 +239,16 @@
       "name": "fsnow",
       "version": 1,
       "sha256": "783d3d49fadbe7a794f0a027f2a4debdda49d03453291a0ad47e69233927e039"
+    },
+    {
+      "name": "ftts",
+      "version": 3,
+      "sha256": "32fc102e3fe75c4a2af1bde70d5f935e0321b3273556b792e103e6a66e847328"
+    },
+    {
+      "name": "fw",
+      "version": 1,
+      "sha256": "a4cb71fd92513e85789a62efaaf158d31010f9e4d328cacb16ea184f5e522e60"
     },
     {
       "name": "ga4",
@@ -296,9 +326,24 @@
       "sha256": "124e788e0c92321feaa8a0833a0b67e5e31831f0f08604a0f01dbf5368f524fb"
     },
     {
+      "name": "iphone-videos-to-music-video-with-audio-track",
+      "version": 1,
+      "sha256": "2492c7cb9078974baa1d9813a006bf8dfb4dca3d0461880f000d5101466c57dd"
+    },
+    {
+      "name": "just-say-no-to-process-porn-and-ceremony",
+      "version": 1,
+      "sha256": "1a89a8014c8654fbf15ec6ade4ec34361a348263f63874ee62b2e048938fcc3d"
+    },
+    {
       "name": "lean-formal-feedback-loop",
       "version": 2,
       "sha256": "7e3878408578cb806f10f2d9d6ccf82d0886e083a2ba8020a8fe04bbcd69487f"
+    },
+    {
+      "name": "lean-proof-mastery-with-epistemic-humility",
+      "version": 6,
+      "sha256": "1b027976b6694978c4fc2cd6b48f84602fcf40f41921674224afb7b8991f7ef5"
     },
     {
       "name": "library-updater",
@@ -311,14 +356,19 @@
       "sha256": "c2c975d0cd42c93f8a91c4dabbf396f9a4215187b2c5e3eb0d407359c0ba379a"
     },
     {
+      "name": "mini-display-for-headless-system-status",
+      "version": 2,
+      "sha256": "5acd370dadeaa7d2431573a025ced748f7ac93b34b83a60ee66609c0ce5733df"
+    },
+    {
       "name": "mock-code-finder",
       "version": 1,
       "sha256": "0709e0ea4d724ed249646886b6a4cbdde97c3acbb5bd93ebf2898411d4a24e66"
     },
     {
       "name": "modes-of-reasoning-project-analysis",
-      "version": 4,
-      "sha256": "9ef125fe370e7e191642714ece84819b03eb12223b231fbf9a8dafbd11d247e3"
+      "version": 7,
+      "sha256": "d735514b105a9e26eebf36c90ffeb1e817f41f171cbb745f89b738c9264adbcc"
     },
     {
       "name": "multi-model-triangulation",
@@ -332,8 +382,8 @@
     },
     {
       "name": "ntm",
-      "version": 10,
-      "sha256": "ff9355d92858ae736f7a41a681f8d0a86705b8df020f52a018629d4ac8dedac3"
+      "version": 12,
+      "sha256": "2f57b244ddc63f2eb554ddee97eab7a043a7f183906fbfdb3152eafb43ac1ab7"
     },
     {
       "name": "og-share-images",
@@ -344,6 +394,11 @@
       "name": "operationalizing-expertise",
       "version": 6,
       "sha256": "3b7ef18187aa1baedbca709c95ec1c762a495fe788a3d136fa61453c62c09a21"
+    },
+    {
+      "name": "optimizing-your-rust-projects-for-wasm-in-browsers-and-phones",
+      "version": 3,
+      "sha256": "66c09b607419db98327d0c0bc3c3ed1e75f3608740ac4a7b33b8f486d468ab00"
     },
     {
       "name": "path-rationalization",
@@ -367,8 +422,8 @@
     },
     {
       "name": "rch",
-      "version": 5,
-      "sha256": "a144e55d82171f14a8276c4e893bcd14cd2f84c01b287e3e82f31b2f97d7107c"
+      "version": 6,
+      "sha256": "37d1dfad8ba80a74cdd9e315f9ba5aa1cd34737497ed1b756f7cb6a3fd713000"
     },
     {
       "name": "readme-writing",
@@ -412,8 +467,8 @@
     },
     {
       "name": "running-the-gauntlet-on-your-rust-port",
-      "version": 5,
-      "sha256": "84dfc7b5e9cc976e47265cf9030575a73607eedc999327ad63c01a48f141ca56"
+      "version": 6,
+      "sha256": "e3a3fed3c228c3de859a0159ad7fc65a94cd464c52c1e4791921d1e89272af00"
     },
     {
       "name": "rust-cli-with-sqlite",
@@ -432,13 +487,13 @@
     },
     {
       "name": "rust-unsafe-code-exorcist",
-      "version": 8,
-      "sha256": "5211ebed86f5d77b4ff1617dd3ee8586da6d1aedce1b33d38ce500a8d1c5d864"
+      "version": 9,
+      "sha256": "def7173987c2f4b218f37639965bf7747fa249774d7cb54b7357d0626f290a0e"
     },
     {
       "name": "saas-billing-patterns-for-stripe-and-paypal",
-      "version": 11,
-      "sha256": "3247cc651df94a8f4cc0c797a27d2fe0c2c20310ce6363be2d1f3608b929fe70"
+      "version": 12,
+      "sha256": "42356a85d640090d5998949df2dee98425af2e37f8efbd37d8a1e299e05123e1"
     },
     {
       "name": "saas-cli-auth-flow",
@@ -462,8 +517,8 @@
     },
     {
       "name": "simplify-and-refactor-code-isomorphically",
-      "version": 9,
-      "sha256": "73f30f1b851f527438f852cf1eaca4279f35c68ea0d50296bf5562c84463e016"
+      "version": 10,
+      "sha256": "fa859d5693b84ea4dc83b7098b875f71be482623ed65804262875a0e54728734"
     },
     {
       "name": "slack-migration-to-mattermost-phase-1-extraction",
@@ -541,9 +596,19 @@
       "sha256": "a9da76eb32bcaad489b2980e35649aa0399b09ac0e378bd022547659d7eb830f"
     },
     {
+      "name": "threejs-visualizations-with-good-quality-and-real-physics",
+      "version": 1,
+      "sha256": "1216d7677e691f798880e5ef434fcd80a6772649d9b4e7d0255fa72f5d9f94f1"
+    },
+    {
       "name": "transcribing-audio-from-calls-and-meetings",
-      "version": 2,
-      "sha256": "f9ee0c383d7da95d002cb1ac5224af343fa839eaf24edd30f9972c1bab306b82"
+      "version": 3,
+      "sha256": "76e8eab91c82f7723a3a158dd07a4ba6072eb9300f2235740dac336a8563f644"
+    },
+    {
+      "name": "transcribing-youtube-videos",
+      "version": 1,
+      "sha256": "3ecb294f1c1df66876d8fe541b55b787fb08dfdd591aed88200ad7a776456da1"
     },
     {
       "name": "tui-glamorous",
@@ -587,13 +652,18 @@
     },
     {
       "name": "vibing-with-ntm",
-      "version": 12,
-      "sha256": "eca47b27402fca25516f6ff5141365d73a8e9b68f1749c960e858d2787b279dc"
+      "version": 14,
+      "sha256": "21fafccebc3a6241b9f970758b2ae27dc943b7b34f922e28c503910573400d37"
     },
     {
       "name": "video-obs-youtube-music",
       "version": 5,
       "sha256": "e3d6a075aa532c44db0712526c7e2398dec57b6a2a6b5aca3d96af8210d850c4"
+    },
+    {
+      "name": "web-frontend-ui-ux-excellence-on-desktop-and-mobile",
+      "version": 3,
+      "sha256": "048d863cfcc4bc03a3b63f5262abb30e2e4d2280ee0a127b09c129e598400255"
     },
     {
       "name": "wezterm",
