@@ -511,6 +511,45 @@ project files, and real shell-command packs. It proves:
 
 ## Trust Boundaries
 
+### Codex lifecycle guardrails (opt-in per project)
+
+`src/codex-hooks.mjs` implements local-only startup context, pre-edit admission,
+and bounded completion checks; run `npm run test:hooks` for the real-filesystem
+positive/negative tests. Install the global agreement from
+`templates/codex-global-AGENTS.md` without overwriting existing instructions.
+Deploy the runtime to a content-hash-named directory outside project worktrees
+and reference that exact absolute Node/script pair from Codex `hooks.json` for
+`SessionStart`, `SubagentStart`, `PostCompact`, `PreToolUse`, and `Stop`.
+Changing deployed bytes requires a new path and renewed hook-definition review.
+Never edit Codex trust storage or bypass its trust check to claim activation.
+
+A consuming project's existing `harness.config.json` opts in using `lifecycle`
+schema version 1, `maxAssessmentMinutes`, `maxMetricMinutes`, `metrics` (JSON
+paths with `generated_at`), `claimGate`, `remote`, optional `nestedRepositories`,
+and explicit local `knowledgeRoots`. Its assessment producer must provide
+`execution_context: {root, head, work_id}` plus the complete outcome contract.
+Its claim gate must emit the current `manifest_sha256` as well as work identity.
+The manifest's `lifecycle` contains exact changed `source_hashes`, per-required-
+skill `skill_application` entries (`skill`, `skill_sha256`, `action`, hashed
+`evidence` paths), `knowledge_update` (`updated` with hashed paths, or justified
+`not_applicable`), and `no_claim`. These extend existing project evidence; they
+are not a new project-management store. Skill attestations and hashed outputs
+still do not establish the quality of the agent's reasoning.
+
+Unenrolled locations get a visible warning, not an unapproved global lockdown.
+Hosted tools and some specialized tools are outside hook coverage; the current
+pre-edit policy covers shell and apply_patch only. Shell admission is a
+conservative heuristic, not a complete PowerShell parser. An assessed shell
+program is not restricted to the assessed file list. Direct patch admission
+requires exact files; directories and submodule gitlinks need their own project
+proof path and are refused by this version. An assessed shell
+program can still perform indirect actions: independent permissions and
+server-side promotion checks remain necessary for a security boundary.
+The stop check requests at most one recovery continuation, then reports partial
+status; it must not create an infinite paid loop. Tests retain their temporary
+Git repositories. No prompts, transcripts, commands, tool results, or project
+file contents are uploaded or written to the metadata-only hook audit.
+
 AI.SDLC does not decide whether product logic is correct. It coordinates the
 checks that the consuming project declares and records their results.
 
