@@ -133,6 +133,8 @@ test('unregistered project is disclosed, never falsely called enforced', () => {
 });
 test('complete evidence + real Git remote parity closes the actual changed source', () => {
   const f = fixture();
+  f.impact.changed_files.push('evidence/impact.json', 'evidence/regress.json',
+    'evidence/manifest.json', 'evidence/gate.json', 'evidence/claim-copy.json');
   f.write('skills/test-skill/SKILL.md', 'Fixture skill');
   f.write('evidence/skill-output.json', { result: 'fixture output, not reasoning proof' });
   f.impact.required_skills = ['test-skill'];
@@ -143,14 +145,16 @@ test('complete evidence + real Git remote parity closes the actual changed sourc
   const impactHash = digest(join(f.root, 'evidence/impact.json'));
   f.write('evidence/regress.json', { status: 'passed', generated_at: stamp(), change_impact_sha256: impactHash });
   f.write('evidence/manifest.json', { work_id: 'TEST-1', status: 'pass', blockers: [], lifecycle: { no_claim: 'Fixture proves mechanics only',
-    source_hashes: { 'source.txt': digest(join(f.root, 'source.txt')) },
+    source_hashes: { 'source.txt': digest(join(f.root, 'source.txt')) }, claim_receipts: ['evidence/claim-copy.json'],
     skill_application: [{ skill: 'test-skill', skill_sha256: digest(join(f.root, 'skills/test-skill/SKILL.md')),
       action: 'Exercise fixture skill evidence validation', evidence: [{ path: 'evidence/skill-output.json', sha256: digest(join(f.root, 'evidence/skill-output.json')) }] }],
     knowledge_update: { status: 'not_applicable', reason: 'Isolated test fixture with no operator knowledge change' } } });
-  f.write('evidence/gate.json', { pass: true, generated_at: stamp(), work_id: 'TEST-1', manifest_path: 'evidence/manifest.json', manifest_sha256: digest(join(f.root, 'evidence/manifest.json')) });
+  const gate = { pass: true, generated_at: stamp(), work_id: 'TEST-1', claim_level_requested: 'tests_passed', manifest_path: 'evidence/manifest.json', manifest_sha256: digest(join(f.root, 'evidence/manifest.json')) };
+  f.write('evidence/gate.json', gate);
+  f.write('evidence/claim-copy.json', { ...gate, proof_pack: 'universal-claim-gate', claim_level: 'tests_passed', validation_results: [{ passed: true }] });
   const remote = mkdtempSync(join(tmpdir(), 'ai-sldc-hook-remote-'));
   assert.equal(spawnSync('git', ['init', '--bare', remote], { windowsHide: true }).status, 0);
-  f.git('remote', 'add', 'origin', remote); f.git('add', 'source.txt'); f.git('commit', '-m', 'changed'); f.git('push', 'origin', 'HEAD');
+  f.git('remote', 'add', 'origin', remote); f.git('add', 'source.txt', 'evidence'); f.git('commit', '-m', 'changed'); f.git('push', 'origin', 'HEAD');
   const originalManifest = readFileSync(join(f.root, 'evidence/manifest.json'), 'utf8');
   f.write('evidence/manifest.json', originalManifest + ' ');
   assert.match(f.invoke({ hook_event_name: 'Stop' }).reason, /manifest changed/);
@@ -159,5 +163,13 @@ test('complete evidence + real Git remote parity closes the actual changed sourc
   f.write('evidence/skill-output.json', '{}');
   assert.match(f.invoke({ hook_event_name: 'Stop' }).systemMessage, /Skill output evidence changed/);
   f.write('evidence/skill-output.json', originalOutput);
+  const originalCopy = readFileSync(join(f.root, 'evidence/claim-copy.json'), 'utf8');
+  f.write('evidence/claim-copy.json', { ...gate, manifest_sha256: '0'.repeat(64) });
+  assert.match(f.invoke({ hook_event_name: 'Stop' }).systemMessage, /receipt copy differs/);
+  f.write('evidence/claim-copy.json', { ...JSON.parse(originalCopy), validation_results: [{ passed: false }] });
+  assert.match(f.invoke({ hook_event_name: 'Stop' }).systemMessage, /nonpassing result metadata/);
+  f.write('evidence/claim-copy.json', { ...JSON.parse(originalCopy), constructor: 'not receipt metadata' });
+  assert.match(f.invoke({ hook_event_name: 'Stop' }).systemMessage, /non-receipt fields/);
+  f.write('evidence/claim-copy.json', originalCopy);
   assert.deepEqual(f.invoke({ hook_event_name: 'Stop' }), {});
 });

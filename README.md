@@ -536,6 +536,15 @@ skill `skill_application` entries (`skill`, `skill_sha256`, `action`, hashed
 are not a new project-management store. Skill attestations and hashed outputs
 still do not establish the quality of the agent's reasoning.
 
+The configured assessment, regression and claim-gate artifacts and the gate's
+hash-bound manifest are validated by their exact proof roles; they must not
+contain their own source hashes. Optional `lifecycle.claim_receipts` lists JSON
+copies of that gate used for private checkpointing. Every canonical gate field
+must match exactly; only proof-pack, claim-level and validation-result metadata
+may be added. Ordinary source files still require exact source hashes. The
+positive Git-fixture test includes these assessed receipts and rejects a
+tampered copy, avoiding circular manifest/receipt hashing.
+
 Unenrolled locations get a visible warning, not an unapproved global lockdown.
 Hosted tools and some specialized tools are outside hook coverage; the current
 pre-edit policy covers shell and apply_patch only. Shell admission is a

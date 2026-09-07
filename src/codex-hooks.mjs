@@ -138,9 +138,29 @@ function verifyClose(project, state, now) {
   requireThat(manifest.work_id === state.work_id, 'Claim manifest belongs to another job');
   requireThat(manifest.status === 'pass' && !(manifest.blockers || []).length, 'Claim manifest is incomplete');
   requireThat(nonempty(manifest.lifecycle?.no_claim), 'Closeout requires explicit no-claim boundary');
+  // Control receipts bind one another by role, not by a self-referential
+  // source hash. Their exact checks above are mandatory before this exemption.
+  const proofPaths = [impactPath, safePath(root, config.artifacts.protectedRegression),
+    safePath(root, policy.claimGate), manifestPath];
+  for (const name of manifest.lifecycle?.claim_receipts || []) {
+    const path = safePath(root, name);
+    requireThat(path.endsWith('.json'), 'Claim receipt copy must be JSON');
+    const copy = json(path);
+    requireThat(Object.entries(claim).every(([key, value]) => JSON.stringify(copy[key]) === JSON.stringify(value)),
+      'Claim receipt copy differs from the current validated gate');
+    requireThat(Object.keys(copy).every(key => Object.hasOwn(claim, key) || ['proof_pack', 'claim_level', 'validation_results'].includes(key)),
+      'Claim receipt copy contains non-receipt fields');
+    requireThat(copy.proof_pack === 'universal-claim-gate' && copy.claim_level === claim.claim_level_requested,
+      'Claim receipt copy has the wrong proof role');
+    requireThat(Array.isArray(copy.validation_results) && copy.validation_results.length > 0
+      && copy.validation_results.every(item => item.passed === true && (!item.status || ['pass', 'passed', 'tests_passed'].includes(item.status))),
+      'Claim receipt copy has missing or nonpassing result metadata');
+    proofPaths.push(path);
+  }
   const current = sourceFingerprint(project, Object.keys(state.before));
   for (const [name, hash] of Object.entries(current)) {
-    if (hash !== state.before[name]) requireThat(manifest.lifecycle?.source_hashes?.[name] === hash,
+    const isBoundProof = proofPaths.some(path => relative(safePath(root, name), path) === '');
+    if (hash !== state.before[name] && !isBoundProof) requireThat(manifest.lifecycle?.source_hashes?.[name] === hash,
       `Unverified current source: ${name}`);
   }
   const impact = json(impactPath);
