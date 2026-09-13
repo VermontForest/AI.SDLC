@@ -1,6 +1,6 @@
-# AI.SLDC
+# AI.SDLC
 
-AI.SLDC is a portable, config-driven workflow harness for AI-assisted software
+AI.SDLC is a portable, config-driven workflow harness for AI-assisted software
 projects. It turns a changed-file list into a bounded Work Contract, routes the
 change to relevant methods and regression packs, records evidence at each
 workflow stage, and reports whether the loop is healthy enough to continue.
@@ -15,7 +15,12 @@ JSM is not only used at the beginning. It spans `Assess`, `Regress`, and
 `Finish`, with a separate required/applied/missing attestation at every stage.
 Status is not healthy until that full lifecycle is complete.
 
-AI.SLDC is project-neutral. Product rules, commands, skill choices, provider
+For work on this repository itself, read [AGENTS.md](AGENTS.md), the checked-in
+[routing configuration](harness.config.json), and the
+[test and release plan](docs/test-release-plan.md). They apply this same framework
+to the harness, with durable agent responsibility rules and automated checks.
+
+AI.SDLC is project-neutral. Product rules, commands, skill choices, provider
 requirements, and external proof belong in the consuming project's
 `harness.config.json`.
 
@@ -35,7 +40,7 @@ flowchart LR
 
 ### 1. Assess
 
-`ai-sldc assess` answers: “Given these files and this proposed deliverable,
+`ai-sdlc assess` answers: “Given these files and this proposed deliverable,
 which controls apply?”
 
 It:
@@ -55,7 +60,7 @@ that an agent applied the method.
 
 ### 2. Regress
 
-`ai-sldc regress` answers: “Did the change satisfy its protected checks, and
+`ai-sdlc regress` answers: “Did the change satisfy its protected checks, and
 what proof is still external?”
 
 It:
@@ -72,7 +77,7 @@ the checks do not run until the required method is attested.
 
 ### 3. Finish
 
-`ai-sldc finish` answers: “Can this exact file set be closed from current
+`ai-sdlc finish` answers: “Can this exact file set be closed from current
 evidence?”
 
 Finish does not silently recreate earlier JSM evidence. It requires current
@@ -92,13 +97,13 @@ attestation.
 
 ### 4. Refresh And Status
 
-`ai-sldc refresh` rebuilds:
+`ai-sdlc refresh` rebuilds:
 
 - `ops/status.json`;
 - `docs/status.md`; and
 - `ops/dashboard.html`.
 
-`ai-sldc status` reads the current status and prints a compact summary.
+`ai-sdlc status` reads the current status and prints a compact summary.
 Refresh aggregates the three JSM attestations but does not invent or
 auto-complete them.
 
@@ -157,26 +162,26 @@ Each root is expected to contain `<skill-name>/SKILL.md`.
 
 ### Official JSM Dependency Collection
 
-AI.SLDC carries a metadata-only lock for the complete official JSM collection.
-At the time of the current lock, that is 121 named, versioned, integrity-bound
+AI.SDLC carries a metadata-only lock for the complete official JSM collection.
+At the time of the current lock, that is 135 named, versioned, integrity-bound
 skills. The lock is `jsm/official-skills.lock.json`.
 
 Premium skill bodies are not copied into this repository. Jeffrey's Skills.md
 identifies them as proprietary works and prohibits redistribution outside its
 service. An authorized subscriber installs them locally through `jsm`, while
-AI.SLDC verifies the installed names, versions, and deterministic package
+AI.SDLC verifies the installed names, versions, and deterministic package
 hashes against the committed lock.
 
 Install the complete locked collection:
 
 ```bash
-ai-sldc skills:install
+ai-sdlc skills:install
 ```
 
 Verify an existing installation without modifying it:
 
 ```bash
-ai-sldc skills:verify
+ai-sdlc skills:verify
 ```
 
 Both commands fail closed when `jsm` is missing, too old, unauthenticated, a
@@ -186,7 +191,7 @@ pins any version that differs from the lock.
 
 This separation is deliberate:
 
-- AI.SLDC owns routing, lifecycle gates, the dependency lock, and verification.
+- AI.SDLC owns routing, lifecycle gates, the dependency lock, and verification.
 - JSM owns authentication, licensed delivery, version installation, and package
   integrity.
 - The consuming project owns its configured skill selection and any
@@ -240,19 +245,19 @@ approval.
 ## Install
 
 ```bash
-git clone https://github.com/VermontForest/AI.SLDC.git
-cd AI.SLDC
+git clone https://github.com/VermontForest/AI.SDLC.git
+cd AI.SDLC
 npm install
 npm link
-ai-sldc skills:install
-ai-sldc skills:verify
+ai-sdlc skills:install
+ai-sdlc skills:verify
 ```
 
 Initialize a consuming project:
 
 ```bash
 cd /path/to/project
-ai-sldc init --project-name "My Project"
+ai-sdlc init --project-name "My Project"
 ```
 
 Add convenient scripts to that project:
@@ -260,17 +265,24 @@ Add convenient scripts to that project:
 ```json
 {
   "scripts": {
-    "assess:change-impact": "ai-sldc assess",
-    "regress:protected": "ai-sldc regress",
-    "finish:iteration": "ai-sldc finish",
-    "manage:status": "ai-sldc status",
-    "manage:refresh": "ai-sldc refresh",
-    "manage:metrics:test": "ai-sldc self-test"
+    "assess:change-impact": "ai-sdlc assess",
+    "regress:protected": "ai-sdlc regress",
+    "finish:iteration": "ai-sdlc finish",
+    "manage:status": "ai-sdlc status",
+    "manage:refresh": "ai-sdlc refresh",
+    "manage:metrics:test": "ai-sdlc self-test"
   }
 }
 ```
 
 ## Daily Use
+
+Agents own tool discovery, documentation reading, and authorized routine setup,
+troubleshooting, edits, and commands. Carl is not the assistant's assistant.
+Investigate available capabilities and permitted alternatives before declaring a
+blocker. Ask only for an essential user-owned decision or action, such as
+authentication or consent inaccessible to tools, with a specific explanation.
+See the [generated operating contract](templates/AGENTS.sdlc.snippet.md).
 
 Start a mixed code/documentation change with the methods selected for Assess:
 
@@ -321,6 +333,31 @@ npm run manage:refresh
 ```
 
 Then open `ops/dashboard.html`.
+
+Before claiming completion, verify the actual dependencies and current lifecycle:
+
+```bash
+ai-sdlc verify-completion --intentional-files "src/a.ts,docs/b.md"
+```
+
+This read-only command returns nonzero for missing licensed dependencies,
+incomplete or mismatched stage evidence, changed tested contents or configuration,
+pending external proof, or unhealthy LEQ/JouleWork. It never creates missing
+attestations. Reassess changed scope/configuration; rerun Regress and Finish after
+editing tested contents. Assess requires a complete Work Contract (deliverable,
+why, surface, lane, boundaries, proof; verifier requirement defaults to false).
+Skipped regression commands and optional-pack-only runs cannot satisfy Finish.
+Blocked Finish now returns a nonzero exit code.
+
+### Updating existing installations
+
+Use repository name `AI.SDLC`, package and command `ai-sdlc`, launcher
+`bin/ai-sdlc.mjs`, and template `templates/AGENTS.sdlc.snippet.md`. Update local
+remote URLs and consuming-project scripts/dependencies, reinstall or relink the
+package, and review the revised agent/SOP templates. Existing AGENTS.md files are
+preserved by `init`; merge the updated contract into them deliberately. There are
+no misspelled CLI aliases. A repository rename preserves its Git history and
+access; repository redirects do not rename installed commands.
 
 ## File List And Skill Parsing
 
@@ -374,13 +411,14 @@ These files are needed to run the published CLI itself:
 | File | Purpose |
 |---|---|
 | `package.json` | Package metadata, commands, Node requirement, and CLI entry |
-| `bin/ai-sldc.mjs` | Executable launcher |
+| `bin/ai-sdlc.mjs` | Executable launcher |
 | `src/cli.mjs` | Command dispatch and help |
+| `src/process.mjs` | Real child-process execution and Windows-compatible output capture |
 | `src/core.mjs` | Routing, JSM gates, regression, Finish, LEQ, JouleWork, status, and self-test |
 | `src/jsm-dependencies.mjs` | Licensed JSM installation, locked-version verification, and lock maintenance |
 | `jsm/official-skills.lock.json` | Metadata-only inventory of every official JSM skill, version, and deterministic hash |
 | `templates/harness.config.example.json` | Default project configuration |
-| `templates/AGENTS.sldc.snippet.md` | Agent operating contract installed by `init` |
+| `templates/AGENTS.sdlc.snippet.md` | Agent operating contract installed by `init` |
 | `templates/docs/management-sop.md` | Management-loop documentation template |
 | `templates/docs/test-release-plan.md` | Proof and release documentation template |
 
@@ -390,7 +428,7 @@ runtime imports.
 
 ### Minimum consuming project
 
-A project using an installed AI.SLDC package needs:
+A project using an installed AI.SDLC package needs:
 
 | File or dependency | Required role |
 |---|---|
@@ -400,13 +438,13 @@ A project using an installed AI.SLDC package needs:
 | An authorized `jsm` installation matching `jsm/official-skills.lock.json` | Licensed delivery and integrity of the complete official dependency collection |
 | Node.js 20 or newer | CLI runtime |
 
-Package scripts are convenient but optional; direct `ai-sldc` commands work.
+Package scripts are convenient but optional; direct `ai-sdlc` commands work.
 
 ### Controlled, shareable project setup
 
 For a durable team workflow, also keep:
 
-- `AGENTS.md` with the AI.SLDC operating contract;
+- `AGENTS.md` with the AI.SDLC operating contract;
 - `docs/management-sop.md`;
 - `docs/test-release-plan.md`;
 - numbered requirements and traceability artifacts appropriate to the project;
@@ -437,6 +475,13 @@ gate as protected packs.
 
 ## Verification
 
+`npm test` runs the repository contract validator and real temporary-project
+self-test. GitHub Actions runs it on Windows/Linux with Node 20/24. The validator
+checks canonical spelling, package entry points, locked staged skill routing,
+protected test commands, and durable responsibility guidance. No premium skill
+bodies are distributed in CI. Fixture attestations test the harness; actual
+completion still requires the separate licensed `verify-completion` gate.
+
 Run the built-in no-mock self-test:
 
 ```bash
@@ -457,13 +502,16 @@ project files, and real shell-command packs. It proves:
 - fail-closed Assess, Regress, and Finish behavior;
 - chained shell-command execution;
 - exact Finish evidence binding;
+- blocked Finish exit codes, skipped/partial regression rejection, and stale
+  tested-content rejection;
+- complete Work Contracts and the read-only completion evidence gate;
 - complete JSM aggregation in status;
 - LEQ participation; and
 - productive JouleWork after a complete useful-work chain.
 
 ## Trust Boundaries
 
-AI.SLDC does not decide whether product logic is correct. It coordinates the
+AI.SDLC does not decide whether product logic is correct. It coordinates the
 checks that the consuming project declares and records their results.
 
 It also does not:

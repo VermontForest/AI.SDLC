@@ -1,14 +1,14 @@
 {
-  "name": "ai-sldc",
+  "name": "ai-sdlc",
   "version": "0.1.0",
   "private": true,
   "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",
   "bin": {
-    "ai-sldc": "bin/ai-sldc.mjs"
+    "ai-sdlc": "bin/ai-sdlc.mjs"
   },
   "scripts": {
-    "test": "node src/cli.mjs self-test",
+    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test",
     "self-test": "node src/cli.mjs self-test",
     "jsm:install": "node src/cli.mjs skills:install",
     "jsm:verify": "node src/cli.mjs skills:verify",
@@ -18,7 +18,9 @@
     "finish:iteration": "node src/cli.mjs finish",
     "manage:status": "node src/cli.mjs status",
     "manage:refresh": "node src/cli.mjs refresh",
-    "manage:metrics:test": "node src/cli.mjs self-test"
+    "manage:metrics:test": "node src/cli.mjs self-test",
+    "verify:repository": "node scripts/verify-repository.mjs",
+    "verify:completion": "node src/cli.mjs verify-completion"
   },
   "engines": {
     "node": ">=20"
@@ -31,5 +33,9 @@
     "jsm/",
     "README.md"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VermontForest/AI.SDLC.git"
+  }
 }

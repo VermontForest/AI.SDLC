@@ -6,7 +6,8 @@ import {
   refreshStatus,
   runProtectedRegression,
   runSelfTest,
-  statusSummary
+  statusSummary,
+  verifyCompletion
 } from "./core.mjs";
 import {
   installJsmDependencies,
@@ -47,11 +48,16 @@ try {
     case "skills:verify":
       result = await verifyJsmDependencies(args);
       break;
+    case "verify-completion": {
+      const dependencies = await verifyJsmDependencies(["--json"]);
+      result = dependencies.exitCode ? dependencies : await verifyCompletion(args);
+      break;
+    }
     case "help":
       printHelp();
       process.exit(0);
     default:
-      throw new Error(`Unknown ai-sldc command: ${raw[0]}`);
+      throw new Error(`Unknown ai-sdlc command: ${raw[0]}`);
   }
 
   if (result?.printJson) {
@@ -84,18 +90,19 @@ function normalizeCommand(value) {
 }
 
 function printHelp() {
-  console.log(`AI.SLDC harness
+  console.log(`AI.SDLC harness
 
 Usage:
-  ai-sldc init [--project-name MyProject]
-  ai-sldc assess --files src/a.ts docs/b.md --applied-skill planning-workflow --active-deliverable "..."
-  ai-sldc regress --files src/a.ts docs/b.md --applied-skill testing-real-service-e2e-no-mocks
-  ai-sldc finish --intentional-files src/a.ts --applied-skill reality-check-for-project --skip-git
-  ai-sldc refresh
-  ai-sldc status --json
-  ai-sldc self-test
-  ai-sldc skills:install [--json]
-  ai-sldc skills:verify [--json]
+  ai-sdlc init [--project-name MyProject]
+  ai-sdlc assess --files src/a.ts docs/b.md --applied-skill planning-workflow,readme-writing --active-deliverable "..." --why "..." --target-surface app --lane full-sdlc --boundary "..." --proof "npm test"
+  ai-sdlc regress --files src/a.ts docs/b.md --applied-skill testing-real-service-e2e-no-mocks
+  ai-sdlc finish --intentional-files src/a.ts --applied-skill reality-check-for-project --skip-git
+  ai-sdlc refresh
+  ai-sdlc status --json
+  ai-sdlc self-test
+  ai-sdlc skills:install [--json]
+  ai-sdlc skills:verify [--json]
+  ai-sdlc verify-completion --intentional-files src/a.ts,docs/b.md
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.
 Applied skills accept comma-separated or repeated --applied-skill flags.

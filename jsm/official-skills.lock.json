@@ -7,7 +7,7 @@
     "terms_url": "https://jeffreys-skills.md/terms",
     "selection": "all_official",
     "distribution": "metadata_only",
-    "note": "Premium skill bodies are installed through jsm and are not redistributed by AI.SLDC."
+    "note": "Premium skill bodies are installed through jsm and are not redistributed by AI.SDLC."
   },
   "cli": {
     "minimum_version": "0.3.22",

@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { captureProcess as spawnSync } from "./process.mjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -133,7 +133,7 @@ export async function writeJsmLock(lockPath = defaultLockPath) {
       terms_url: JSM_TERMS,
       selection: "all_official",
       distribution: "metadata_only",
-      note: "Premium skill bodies are installed through jsm and are not redistributed by AI.SLDC."
+      note: "Premium skill bodies are installed through jsm and are not redistributed by AI.SDLC."
     },
     cli: {
       minimum_version: cliVersion,

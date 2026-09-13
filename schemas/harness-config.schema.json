@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "AI.SLDC harness config",
+  "title": "AI.SDLC harness config",
   "type": "object",
   "required": ["project", "surfaces", "packs"],
   "properties": {
