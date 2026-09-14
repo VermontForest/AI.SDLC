@@ -34,7 +34,7 @@
     "jsm/",
     "README.md"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/VermontForest/AI.SDLC.git"

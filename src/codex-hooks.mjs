@@ -43,7 +43,7 @@ function projectAt(cwd) {
 }
 export function assessment(project, now = Date.now()) {
   const { root, config, policy } = project;
-  requireThat(policy?.schema_version === 1, 'Project is not enrolled in AI.SLDC lifecycle controls');
+  requireThat(policy?.schema_version === 1, 'Project is not enrolled in AI.SDLC lifecycle controls');
   const path = safePath(root, config.artifacts?.changeImpact);
   const impact = json(path);
   requireThat(['packs_required', 'no_packs_required'].includes(impact.status), 'Assessment is not admitted');
@@ -84,7 +84,7 @@ export function readOnlyCommand(command) {
 function maintenanceCommand(command) {
   if (!nonempty(command) || /[\r\n;&|`<>$(){}]/.test(command)) return false;
   // These are configured project-owned entry points; there is no arbitrary bypass flag.
-  return /^npm(?:\.cmd)?\s+run\s+(?:assess:change-impact|regress:protected|checkpoint:source|finish:iteration|manage:status|manage:refresh|ai-sldc:self-test)(?:\s|$)/.test(command)
+  return /^npm(?:\.cmd)?\s+run\s+(?:assess:change-impact|regress:protected|checkpoint:source|finish:iteration|manage:status|manage:refresh|self-test)(?:\s|$)/.test(command)
     || /^(?:\.\\|\.\/)?scripts[\\/](?:verify_sdlc_claim_gate|update_sdlc_job_claim)\.ps1(?:\s|$)/.test(command)
     || /^(?:\.\\|\.\/)?scripts[\\/]codex_autonomous\.ps1\s+-Action\s+(?:sdlc-agent-startup|leq-refresh|cost-ledger-refresh|joulework-refresh|python-runtime-diagnostic)\s*$/.test(command);
 }
@@ -193,7 +193,7 @@ function verifyClose(project, state, now) {
   // Only assess-owned files are checked: unrelated concurrent edits are preserved.
   for (const name of Object.keys(current)) requireThat(!git(root, ['status', '--porcelain', '--', name]), `Assessed source remains uncommitted: ${name}`);
 }
-export function handleEvent(event, { stateDir = join(homedir(), '.codex', 'ai-sldc', 'state'), now = Date.now() } = {}) {
+export function handleEvent(event, { stateDir = join(homedir(), '.codex', 'ai-sdlc', 'state'), now = Date.now() } = {}) {
   const eventName = event.hook_event_name;
   const input = event.tool_input || {};
   const requestedCwd = input.workdir || input.cwd || event.cwd;
@@ -201,8 +201,8 @@ export function handleEvent(event, { stateDir = join(homedir(), '.codex', 'ai-sl
   const cwd = realpathSync.native(requestedCwd);
   const project = projectAt(cwd);
   const message = project?.policy
-    ? `AI.SLDC project ${project.root}. Before edits run its startup and assessed exact-file Work Contract. At completion run protected regression, current claim gate, material SDLC/Second Brain update and private checkpoint. Skills installed is not skills applied. LEQ/JouleWork are evidence-health proxies, never trading edge. Read-only questions do not require an implementation contract.`
-    : 'AI.SLDC: this location is not enrolled in automatic project enforcement. Read global/project instructions; do not claim controls are active here. Enroll a project before substantive changes. No project data or transcripts are transmitted by this hook.';
+    ? `AI.SDLC project ${project.root}. Before edits run its startup and assessed exact-file Work Contract. At completion run protected regression, current claim gate, material SDLC/Second Brain update and private checkpoint. Skills installed is not skills applied. LEQ/JouleWork are evidence-health proxies, never trading edge. Read-only questions do not require an implementation contract.`
+    : 'AI.SDLC: this location is not enrolled in automatic project enforcement. Read global/project instructions; do not claim controls are active here. Enroll a project before substantive changes. No project data or transcripts are transmitted by this hook.';
   if (['SessionStart', 'SubagentStart', 'UserPromptSubmit', 'PostCompact'].includes(eventName)) {
     return { hookSpecificOutput: { hookEventName: eventName, additionalContext: message } };
   }
@@ -234,7 +234,7 @@ export function handleEvent(event, { stateDir = join(homedir(), '.codex', 'ai-sl
       else saveState(file, { ...state, active_turn: event.turn_id });
       return {};
     } catch (error) {
-      return { hookSpecificOutput: { hookEventName: eventName, permissionDecision: 'deny', permissionDecisionReason: `AI.SLDC: ${error.message}. Read-only inspection and documented recovery commands remain available.` } };
+      return { hookSpecificOutput: { hookEventName: eventName, permissionDecision: 'deny', permissionDecisionReason: `AI.SDLC: ${error.message}. Read-only inspection and documented recovery commands remain available.` } };
     }
   }
   if (eventName === 'Stop' && project?.policy) {
@@ -251,7 +251,7 @@ export function handleEvent(event, { stateDir = join(homedir(), '.codex', 'ai-sl
     }
     catch (error) {
       // Never spend indefinitely on a failing stop hook; one recovery continuation only.
-      const reason = `AI.SLDC closeout incomplete: ${error.message}. Complete the existing proof/checkpoint or report PARTIAL with the precise blocker. Do not weaken a gate.`;
+      const reason = `AI.SDLC closeout incomplete: ${error.message}. Complete the existing proof/checkpoint or report PARTIAL with the precise blocker. Do not weaken a gate.`;
       if (event.stop_hook_active || state.stop_requested) return { systemMessage: reason };
       saveState(file, { ...state, stop_requested: true });
       return { decision: 'block', reason };
@@ -266,18 +266,18 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     event = JSON.parse(readFileSync(0, 'utf8'));
     const result = handleEvent(event);
     // Metadata only: never store prompt, transcript, command, tool result, or project content.
-    const audit = join(homedir(), '.codex', 'ai-sldc', 'events.jsonl');
+    const audit = join(homedir(), '.codex', 'ai-sdlc', 'events.jsonl');
     mkdirSync(dirname(audit), { recursive: true });
     appendFileSync(audit, JSON.stringify({ at: new Date().toISOString(), event: event.hook_event_name,
       session: event.session_id, decision: result.hookSpecificOutput?.permissionDecision || result.decision || 'continue' }) + '\n');
     process.stdout.write(JSON.stringify(result));
   } catch (error) {
     if (event?.hook_event_name === 'Stop') {
-      const reason = `AI.SLDC closeout unavailable: ${error.message}. Report PARTIAL and the precise error; do not retry indefinitely.`;
+      const reason = `AI.SDLC closeout unavailable: ${error.message}. Report PARTIAL and the precise error; do not retry indefinitely.`;
       process.stdout.write(JSON.stringify(event.stop_hook_active ? { systemMessage: reason } : { decision: 'block', reason }));
     } else {
     // Exit 2 is the documented blocking status; ordinary hook errors can fail open.
-    process.stderr.write(`AI.SLDC hook unavailable: ${error.message}\n`);
+    process.stderr.write(`AI.SDLC hook unavailable: ${error.message}\n`);
     process.exitCode = 2;
     }
   }

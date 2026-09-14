@@ -9,7 +9,7 @@ import { handleEvent, digest, readOnlyCommand } from './codex-hooks.mjs';
 
 const stamp = () => new Date().toISOString();
 function fixture() {
-  const root = mkdtempSync(join(tmpdir(), 'ai-sldc-hook-'));
+  const root = mkdtempSync(join(tmpdir(), 'ai-sdlc-hook-'));
   const git = (...args) => {
     const r = spawnSync('git', ['-C', root, ...args], { encoding: 'utf8', windowsHide: true });
     assert.equal(r.status, 0, r.stderr); return r.stdout.trim();
@@ -152,7 +152,7 @@ test('complete evidence + real Git remote parity closes the actual changed sourc
   const gate = { pass: true, generated_at: stamp(), work_id: 'TEST-1', claim_level_requested: 'tests_passed', manifest_path: 'evidence/manifest.json', manifest_sha256: digest(join(f.root, 'evidence/manifest.json')) };
   f.write('evidence/gate.json', gate);
   f.write('evidence/claim-copy.json', { ...gate, proof_pack: 'universal-claim-gate', claim_level: 'tests_passed', validation_results: [{ passed: true }] });
-  const remote = mkdtempSync(join(tmpdir(), 'ai-sldc-hook-remote-'));
+  const remote = mkdtempSync(join(tmpdir(), 'ai-sdlc-hook-remote-'));
   assert.equal(spawnSync('git', ['init', '--bare', remote], { windowsHide: true }).status, 0);
   f.git('remote', 'add', 'origin', remote); f.git('add', 'source.txt', 'evidence'); f.git('commit', '-m', 'changed'); f.git('push', 'origin', 'HEAD');
   const originalManifest = readFileSync(join(f.root, 'evidence/manifest.json'), 'utf8');

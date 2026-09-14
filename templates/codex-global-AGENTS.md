@@ -1,10 +1,10 @@
-# AI.SLDC — global agent working agreement
+# AI.SDLC — global agent working agreement
 
 The user's task sets the priority. Follow the applicable project AGENTS.md and
 canonical project controls; do not rely on another chat's remembered state.
 
 - Before substantive work, establish the exact workspace, branch, current job,
-  governing AI.SLDC version, proof requirements, and safe next action.
+  governing AI.SDLC version, proof requirements, and safe next action.
 - Read the project's current startup/canon and applicable skill instructions.
   Use Jeffrey's selector or a valid reusable selection where configured.
   Installed, selected, applied, and independently verified are different claims.

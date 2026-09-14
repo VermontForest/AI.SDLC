@@ -571,6 +571,13 @@ It also does not:
 - make financial, safety, profitability, or production-readiness claims; or
 - make rolling `latest` artifacts tamper-evident.
 
+
+## License
+
+This repository is released under the MIT License. See [LICENSE](LICENSE).
+
+Jeffrey's Skills.md packages remain separate proprietary works. An authorized subscriber installs them through `jsm`. This repository redistributes only the metadata lock in `jsm/official-skills.lock.json`, not premium skill bodies. See https://jeffreys-skills.md/terms.
+
 ## What Not To Commit To This Repository
 
 Do not commit live consumer-project state here:
