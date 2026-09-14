@@ -8,7 +8,8 @@
     "ai-sdlc": "bin/ai-sdlc.mjs"
   },
   "scripts": {
-    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test",
+    "test:hooks": "node --test src/codex-hooks.test.mjs",
+    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks",
     "self-test": "node src/cli.mjs self-test",
     "jsm:install": "node src/cli.mjs skills:install",
     "jsm:verify": "node src/cli.mjs skills:verify",
@@ -33,7 +34,7 @@
     "jsm/",
     "README.md"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/VermontForest/AI.SDLC.git"
