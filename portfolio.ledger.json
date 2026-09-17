@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T13:10:00.000Z",
+    "updated_at": "2026-09-17T13:41:03.227Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -16,188 +16,265 @@
       "owner": "AI.SDLC maintainers",
       "status": "active",
       "state_reason": "v0.2.3 metric-integrity implementation is verified locally; hosted GitHub publication and recorded release proof remain active.",
-      "updated_at": "2026-09-17T13:10:00.000Z",
+      "updated_at": "2026-09-17T13:41:03.227Z",
       "requirements": [
         {
           "id": "URS-001",
           "type": "user",
           "text": "A human project lead can see plans, requirements, work, verification, evidence, blockers, metrics, and releases in one portal.",
           "status": "verified",
-          "acceptance": ["The portal is generated from the same ledger that CI validates."]
+          "acceptance": [
+            "The portal is generated from the same ledger that CI validates."
+          ]
         },
         {
           "id": "URS-002",
           "type": "user",
           "text": "Required SDLC controls run automatically instead of relying on a person to remember them.",
           "status": "verified",
-          "acceptance": ["Local hooks and hosted CI fail with nonzero exit codes when applicable proof is missing."]
+          "acceptance": [
+            "Local hooks and hosted CI fail with nonzero exit codes when applicable proof is missing."
+          ]
         },
         {
           "id": "URS-003",
           "type": "user",
           "text": "A failed task blocks itself without unrelated legacy debt stopping all other work.",
           "status": "verified",
-          "acceptance": ["Task-scoped validation excludes unrelated transition debt while preserving it in the portal."]
+          "acceptance": [
+            "Task-scoped validation excludes unrelated transition debt while preserving it in the portal."
+          ]
         },
         {
           "id": "URS-004",
           "type": "user",
           "text": "The system cannot claim a visible or behavioral outcome from packaging, a new URL, or a changed filename alone.",
           "status": "verified",
-          "acceptance": ["Content revisions require artifact identity and passed before/after outcome evidence."]
+          "acceptance": [
+            "Content revisions require artifact identity and passed before/after outcome evidence."
+          ]
         },
         {
           "id": "URS-005",
           "type": "user",
           "text": "A human project lead sees current LEQ and JouleWork at task, project, and portfolio levels without manually copying scores.",
           "status": "verified",
-          "acceptance": ["Hooks and CI recompute transparent ledger-derived metrics and reject stale generated state."]
+          "acceptance": [
+            "Hooks and CI recompute transparent ledger-derived metrics and reject stale generated state."
+          ]
         },
         {
           "id": "URS-006",
           "type": "user",
           "text": "Invalid work cannot merge or publish through the authorized path, and successful lifecycle events update the ledger without bypassing review.",
           "status": "verified",
-          "acceptance": ["Protected main requires hosted checks; publication depends on a release gate; release and deployment events propose evidence-bound ledger updates through pull requests."]
+          "acceptance": [
+            "Protected main requires hosted checks; publication depends on a release gate; release and deployment events propose evidence-bound ledger updates through pull requests."
+          ]
         },
         {
           "id": "URS-007",
           "type": "user",
           "text": "A human project lead can distinguish a priority queue, a named dependency wait, active work, and a genuine actionable blocker.",
           "status": "verified",
-          "acceptance": ["Counts, filters, reasons, clearing actions, and owners represent the declared work state without treating unavailable data as blocked."]
+          "acceptance": [
+            "Counts, filters, reasons, clearing actions, and owners represent the declared work state without treating unavailable data as blocked."
+          ]
         },
         {
           "id": "URS-008",
           "type": "user",
           "text": "Every displayed LEQ, JouleWork, and release field explains whether it is valid, not applicable, awaiting named inputs, stale, or in error.",
           "status": "verified",
-          "acceptance": ["No missing input is rendered as zero, perfect, none, or unexplained unknown; source, scope, freshness, owner, and next action are visible when applicable."]
+          "acceptance": [
+            "No missing input is rendered as zero, perfect, none, or unexplained unknown; source, scope, freshness, owner, and next action are visible when applicable."
+          ]
         },
         {
           "id": "URS-009",
           "type": "user",
           "text": "Hosted validation runs on supported application and GitHub Action runtimes without a recurring Node.js 20 deprecation warning.",
           "status": "verified",
-          "acceptance": ["Pinned current actions and the Node.js 22/24 matrix pass on Windows and Linux; historical failed runs remain distinguishable from the current result."]
+          "acceptance": [
+            "Pinned current actions and the Node.js 22/24 matrix pass on Windows and Linux; historical failed runs remain distinguishable from the current result."
+          ]
         },
         {
           "id": "URS-010",
           "type": "user",
           "text": "A human project lead can distinguish lifecycle health from traceability coverage and inspect the exact formula, denominator, pending checks, source, and freshness behind every score.",
           "status": "verified",
-          "acceptance": ["Different metric models are labeled and aggregated separately; pending or undeclared checks and old evidence cannot produce a misleading perfect or fresh score."]
+          "acceptance": [
+            "Different metric models are labeled and aggregated separately; pending or undeclared checks and old evidence cannot produce a misleading perfect or fresh score."
+          ]
         },
         {
           "id": "URS-011",
           "type": "user",
           "text": "A public release is called published only after its hosted tag, downloadable asset, digest, and reviewable ledger event exist on GitHub.",
           "status": "active",
-          "acceptance": ["The protected publication workflow creates one hosted release and one ledger-update pull request; repository publication does not claim a product deployment."]
+          "acceptance": [
+            "The protected publication workflow creates one hosted release and one ledger-update pull request; repository publication does not claim a product deployment."
+          ]
         },
         {
           "id": "FRS-001",
           "type": "functional",
           "text": "Validate one strict machine-readable portfolio ledger with numbered requirements and linked work, tests, evidence, approvals, artifacts, and releases.",
           "status": "verified",
-          "derived_from": ["URS-001", "URS-002"],
-          "acceptance": ["Malformed, incomplete, contradictory, or incorrectly linked ledgers fail validation."]
+          "derived_from": [
+            "URS-001",
+            "URS-002"
+          ],
+          "acceptance": [
+            "Malformed, incomplete, contradictory, or incorrectly linked ledgers fail validation."
+          ]
         },
         {
           "id": "FRS-002",
           "type": "functional",
           "text": "Apply stage-specific change, release, post-deploy, and drift gates with selectable project, task, and release scope.",
           "status": "verified",
-          "derived_from": ["URS-002", "URS-003"],
-          "acceptance": ["Each lifecycle transition asks only for evidence appropriate to that transition."]
+          "derived_from": [
+            "URS-002",
+            "URS-003"
+          ],
+          "acceptance": [
+            "Each lifecycle transition asks only for evidence appropriate to that transition."
+          ]
         },
         {
           "id": "FRS-003",
           "type": "functional",
           "text": "Generate a responsive human portal from the authoritative ledger.",
           "status": "verified",
-          "derived_from": ["URS-001"],
-          "acceptance": ["The portal shows progress, verification, evidence, blockers, next actions, metrics, and release state."]
+          "derived_from": [
+            "URS-001"
+          ],
+          "acceptance": [
+            "The portal shows progress, verification, evidence, blockers, next actions, metrics, and release state."
+          ]
         },
         {
           "id": "FRS-004",
           "type": "functional",
           "text": "Run the gates from repository hooks and GitHub Actions for change, release, post-deploy, and scheduled drift transitions.",
           "status": "verified",
-          "derived_from": ["URS-002", "URS-003"],
-          "acceptance": ["Actual hosted workflow runs are distinguished from merely committing workflow files."]
+          "derived_from": [
+            "URS-002",
+            "URS-003"
+          ],
+          "acceptance": [
+            "Actual hosted workflow runs are distinguished from merely committing workflow files."
+          ]
         },
         {
           "id": "FRS-005",
           "type": "functional",
           "text": "Bind content-change claims to immutable artifact hashes and passed visual, motion, or behavioral comparison evidence.",
           "status": "verified",
-          "derived_from": ["URS-004"],
-          "acceptance": ["A delivery-only artifact fails any release that claims changed content."]
+          "derived_from": [
+            "URS-004"
+          ],
+          "acceptance": [
+            "A delivery-only artifact fails any release that claims changed content."
+          ]
         },
         {
           "id": "FRS-006",
           "type": "functional",
           "text": "Compute and publish deterministic traceability-v1 metrics from work, tests, evidence, blockers, and completion state at every ledger level.",
           "status": "verified",
-          "derived_from": ["URS-005"],
-          "acceptance": ["Task metrics roll up only from applicable valid inputs; missing, stale, and error states invalidate dependent aggregates without inventing scores."]
+          "derived_from": [
+            "URS-005"
+          ],
+          "acceptance": [
+            "Task metrics roll up only from applicable valid inputs; missing, stale, and error states invalidate dependent aggregates without inventing scores."
+          ]
         },
         {
           "id": "FRS-007",
           "type": "functional",
           "text": "Bind release and deployment automation to real lifecycle events and open reviewable ledger-update pull requests after the relevant gate passes.",
           "status": "verified",
-          "derived_from": ["URS-006"],
-          "acceptance": ["The authorized publish workflow cannot run before the release gate; production proof is never invented from deployment status alone."]
+          "derived_from": [
+            "URS-006"
+          ],
+          "acceptance": [
+            "The authorized publish workflow cannot run before the release gate; production proof is never invented from deployment status alone."
+          ]
         },
         {
           "id": "FRS-008",
           "type": "functional",
           "text": "Protect main with pull-request and required hosted-check rules.",
           "status": "verified",
-          "derived_from": ["URS-006"],
-          "acceptance": ["GitHub API evidence shows direct invalid merges and force/deletion operations are blocked."]
+          "derived_from": [
+            "URS-006"
+          ],
+          "acceptance": [
+            "GitHub API evidence shows direct invalid merges and force/deletion operations are blocked."
+          ]
         },
         {
           "id": "FRS-009",
           "type": "functional",
           "text": "Validate and render distinct queued, waiting_dependency, active, blocked, failed, deferred, and unverified work states with actionable blocker ownership.",
           "status": "verified",
-          "derived_from": ["URS-007"],
-          "acceptance": ["Only blocked and failed count as blockers; waiting dependencies name prerequisites; blocked impediments name a clearing action and owner."]
+          "derived_from": [
+            "URS-007"
+          ],
+          "acceptance": [
+            "Only blocked and failed count as blockers; waiting dependencies name prerequisites; blocked impediments name a clearing action and owner."
+          ]
         },
         {
           "id": "FRS-010",
           "type": "functional",
           "text": "Enforce explicit data-quality contracts and dependent invalidation for LEQ, JouleWork, and release state at schema, lifecycle-gate, sync, and serving time.",
           "status": "verified",
-          "derived_from": ["URS-008"],
-          "acceptance": ["Positive and negative tests prove explicit states, freshness propagation, named missing inputs, and stage-appropriate failure behavior."]
+          "derived_from": [
+            "URS-008"
+          ],
+          "acceptance": [
+            "Positive and negative tests prove explicit states, freshness propagation, named missing inputs, and stage-appropriate failure behavior."
+          ]
         },
         {
           "id": "FRS-011",
           "type": "functional",
           "text": "Use supported Node.js 22/24 application tests and current pinned GitHub Action runtimes with automated dependency maintenance.",
           "status": "verified",
-          "derived_from": ["URS-009"],
-          "acceptance": ["Fresh hosted jobs pass without the deprecated Node.js 20 action-runtime warning and Dependabot covers Actions and npm."]
+          "derived_from": [
+            "URS-009"
+          ],
+          "acceptance": [
+            "Fresh hosted jobs pass without the deprecated Node.js 20 action-runtime warning and Dependabot covers Actions and npm."
+          ]
         },
         {
           "id": "FRS-012",
           "type": "functional",
           "text": "Compute traceability-v2 from explicit verification obligations, keep metric models incomparable, and derive freshness from the oldest contributing evidence.",
           "status": "verified",
-          "derived_from": ["URS-010"],
-          "acceptance": ["Regression tests cover duplicate pending checks, undeclared required verification, mixed lifecycle/traceability models, and metadata edits that do not renew old evidence."]
+          "derived_from": [
+            "URS-010"
+          ],
+          "acceptance": [
+            "Regression tests cover duplicate pending checks, undeclared required verification, mixed lifecycle/traceability models, and metadata edits that do not renew old evidence."
+          ]
         },
         {
           "id": "FRS-013",
           "type": "functional",
           "text": "Publish the registered v0.2.3 artifact through the protected GitHub release path and record the hosted result through review.",
           "status": "active",
-          "derived_from": ["URS-011"],
-          "acceptance": ["GitHub hosts tag v0.2.3 and the registered tarball; the downloaded asset digest matches; the release event is merged into the ledger."]
+          "derived_from": [
+            "URS-011"
+          ],
+          "acceptance": [
+            "GitHub hosts tag v0.2.3 and the registered tarball; the downloaded asset digest matches; the release event is merged into the ledger."
+          ]
         }
       ],
       "work_items": [
@@ -205,15 +282,49 @@
           "id": "WBS-001",
           "title": "Executable ledger and transition validator",
           "status": "verified",
-          "implements": ["FRS-001", "FRS-002", "FRS-005"],
-          "affected_surfaces": ["schema", "CLI", "validation engine"],
-          "protected_contracts": ["stage-specific proof", "task-scoped failure", "artifact identity"],
-          "required_test_types": ["unit", "regression"],
-          "tests": [
-            { "id": "TST-001", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-001"] },
-            { "id": "TST-002", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001"] }
+          "implements": [
+            "FRS-001",
+            "FRS-002",
+            "FRS-005"
           ],
-          "changed_files": ["src/portfolio.mjs", "schemas/portfolio-ledger.schema.json"],
+          "affected_surfaces": [
+            "schema",
+            "CLI",
+            "validation engine"
+          ],
+          "protected_contracts": [
+            "stage-specific proof",
+            "task-scoped failure",
+            "artifact identity"
+          ],
+          "required_test_types": [
+            "unit",
+            "regression"
+          ],
+          "tests": [
+            {
+              "id": "TST-001",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-001"
+              ]
+            },
+            {
+              "id": "TST-002",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-001"
+              ]
+            }
+          ],
+          "changed_files": [
+            "src/portfolio.mjs",
+            "schemas/portfolio-ledger.schema.json"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -221,15 +332,42 @@
           "id": "WBS-002",
           "title": "Human-readable portfolio portal",
           "status": "verified",
-          "implements": ["FRS-003"],
-          "affected_surfaces": ["generated portal"],
-          "protected_contracts": ["same-ledger rendering", "missing data stays explicit"],
-          "required_test_types": ["unit", "visual"],
-          "tests": [
-            { "id": "TST-003", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-001"] },
-            { "id": "TST-004", "type": "visual", "status": "passed", "evidence_ids": ["EV-003"] }
+          "implements": [
+            "FRS-003"
           ],
-          "changed_files": ["src/portfolio.mjs"],
+          "affected_surfaces": [
+            "generated portal"
+          ],
+          "protected_contracts": [
+            "same-ledger rendering",
+            "missing data stays explicit"
+          ],
+          "required_test_types": [
+            "unit",
+            "visual"
+          ],
+          "tests": [
+            {
+              "id": "TST-003",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-001"
+              ]
+            },
+            {
+              "id": "TST-004",
+              "type": "visual",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-003"
+              ]
+            }
+          ],
+          "changed_files": [
+            "src/portfolio.mjs"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -237,15 +375,52 @@
           "id": "WBS-003",
           "title": "Automated hooks and hosted CI gates",
           "status": "verified",
-          "implements": ["FRS-004"],
-          "affected_surfaces": ["Git hooks", "GitHub Actions"],
-          "protected_contracts": ["failing exit codes", "least-privilege workflows", "hosted-run evidence"],
-          "required_test_types": ["integration", "regression"],
-          "tests": [
-            { "id": "TST-005", "type": "integration", "status": "passed", "command": "npm run plan:validate", "evidence_ids": ["EV-001", "EV-006"] },
-            { "id": "TST-006", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001", "EV-006"] }
+          "implements": [
+            "FRS-004"
           ],
-          "changed_files": [".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/ci.yml", ".github/workflows/release-gate.yml", ".github/workflows/post-deploy.yml", ".github/workflows/drift.yml"],
+          "affected_surfaces": [
+            "Git hooks",
+            "GitHub Actions"
+          ],
+          "protected_contracts": [
+            "failing exit codes",
+            "least-privilege workflows",
+            "hosted-run evidence"
+          ],
+          "required_test_types": [
+            "integration",
+            "regression"
+          ],
+          "tests": [
+            {
+              "id": "TST-005",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run plan:validate",
+              "evidence_ids": [
+                "EV-001",
+                "EV-006"
+              ]
+            },
+            {
+              "id": "TST-006",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-001",
+                "EV-006"
+              ]
+            }
+          ],
+          "changed_files": [
+            ".githooks/pre-commit",
+            ".githooks/pre-push",
+            ".github/workflows/ci.yml",
+            ".github/workflows/release-gate.yml",
+            ".github/workflows/post-deploy.yml",
+            ".github/workflows/drift.yml"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -253,32 +428,118 @@
           "id": "WBS-004",
           "title": "Public documentation and release proof",
           "status": "verified",
-          "implements": ["FRS-001", "FRS-002", "FRS-003", "FRS-004", "FRS-005"],
-          "affected_surfaces": ["README", "project plan", "release notes"],
-          "protected_contracts": ["public/private separation", "accurate capability claims"],
-          "required_test_types": ["regression", "human_acceptance"],
-          "tests": [
-            { "id": "TST-007", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001"] },
-            { "id": "TST-008", "type": "human_acceptance", "status": "passed", "evidence_ids": ["EV-004"] }
+          "implements": [
+            "FRS-001",
+            "FRS-002",
+            "FRS-003",
+            "FRS-004",
+            "FRS-005"
           ],
-          "changed_files": ["README.md", "docs/project-plan.md"],
+          "affected_surfaces": [
+            "README",
+            "project plan",
+            "release notes"
+          ],
+          "protected_contracts": [
+            "public/private separation",
+            "accurate capability claims"
+          ],
+          "required_test_types": [
+            "regression",
+            "human_acceptance"
+          ],
+          "tests": [
+            {
+              "id": "TST-007",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-001"
+              ]
+            },
+            {
+              "id": "TST-008",
+              "type": "human_acceptance",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-004"
+              ]
+            }
+          ],
+          "changed_files": [
+            "README.md",
+            "docs/project-plan.md"
+          ],
           "blockers": [],
-          "next_actions": ["Publish the verified branch and keep Vibe Mode explicitly future-only."]
+          "next_actions": [
+            "Publish the verified branch and keep Vibe Mode explicitly future-only."
+          ]
         },
         {
           "id": "WBS-005",
           "title": "Automatic portfolio metrics and current-clock board",
           "status": "verified",
-          "implements": ["FRS-006"],
-          "affected_surfaces": ["portfolio engine", "generated metrics", "human portal", "local hooks", "change and drift CI"],
-          "protected_contracts": ["missing data stays explicit", "single authoritative ledger", "deterministic generated artifacts", "current-clock staleness"],
-          "required_test_types": ["unit", "integration", "visual"],
-          "tests": [
-            { "id": "TST-009", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-007"] },
-            { "id": "TST-010", "type": "integration", "status": "passed", "command": "npm run portfolio:sync", "evidence_ids": ["EV-007", "EV-011"] },
-            { "id": "TST-011", "type": "visual", "status": "passed", "evidence_ids": ["EV-008"] }
+          "implements": [
+            "FRS-006"
           ],
-          "changed_files": ["src/portfolio.mjs", "src/cli.mjs", "ops/portfolio-metrics.json", "ops/portfolio-dashboard.html", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/ci.yml", ".github/workflows/drift.yml"],
+          "affected_surfaces": [
+            "portfolio engine",
+            "generated metrics",
+            "human portal",
+            "local hooks",
+            "change and drift CI"
+          ],
+          "protected_contracts": [
+            "missing data stays explicit",
+            "single authoritative ledger",
+            "deterministic generated artifacts",
+            "current-clock staleness"
+          ],
+          "required_test_types": [
+            "unit",
+            "integration",
+            "visual"
+          ],
+          "tests": [
+            {
+              "id": "TST-009",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-007"
+              ]
+            },
+            {
+              "id": "TST-010",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run portfolio:sync",
+              "evidence_ids": [
+                "EV-007",
+                "EV-011"
+              ]
+            },
+            {
+              "id": "TST-011",
+              "type": "visual",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-008"
+              ]
+            }
+          ],
+          "changed_files": [
+            "src/portfolio.mjs",
+            "src/cli.mjs",
+            "ops/portfolio-metrics.json",
+            "ops/portfolio-dashboard.html",
+            ".githooks/pre-commit",
+            ".githooks/pre-push",
+            ".github/workflows/ci.yml",
+            ".github/workflows/drift.yml"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -286,16 +547,64 @@
           "id": "WBS-006",
           "title": "Lifecycle-bound release, deployment, and merge enforcement",
           "status": "verified",
-          "implements": ["FRS-007", "FRS-008"],
-          "affected_surfaces": ["release workflow", "deployment workflow", "publish workflow", "GitHub repository rules"],
-          "protected_contracts": ["gate before publish", "no invented production proof", "reviewed ledger mutation", "required checks on main"],
-          "required_test_types": ["integration", "regression", "production"],
-          "tests": [
-            { "id": "TST-012", "type": "integration", "status": "passed", "command": "node --test tests/automation.test.mjs tests/portfolio.test.mjs", "evidence_ids": ["EV-007", "EV-011"] },
-            { "id": "TST-013", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-007", "EV-013"] },
-            { "id": "TST-014", "type": "production", "status": "passed", "evidence_ids": ["EV-009"] }
+          "implements": [
+            "FRS-007",
+            "FRS-008"
           ],
-          "changed_files": [".github/workflows/release-gate.yml", ".github/workflows/post-deploy.yml", ".github/workflows/publish-release.yml", "src/portfolio.mjs", "schemas/portfolio-ledger.schema.json"],
+          "affected_surfaces": [
+            "release workflow",
+            "deployment workflow",
+            "publish workflow",
+            "GitHub repository rules"
+          ],
+          "protected_contracts": [
+            "gate before publish",
+            "no invented production proof",
+            "reviewed ledger mutation",
+            "required checks on main"
+          ],
+          "required_test_types": [
+            "integration",
+            "regression",
+            "production"
+          ],
+          "tests": [
+            {
+              "id": "TST-012",
+              "type": "integration",
+              "status": "passed",
+              "command": "node --test tests/automation.test.mjs tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-007",
+                "EV-011"
+              ]
+            },
+            {
+              "id": "TST-013",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-007",
+                "EV-013"
+              ]
+            },
+            {
+              "id": "TST-014",
+              "type": "production",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-009"
+              ]
+            }
+          ],
+          "changed_files": [
+            ".github/workflows/release-gate.yml",
+            ".github/workflows/post-deploy.yml",
+            ".github/workflows/publish-release.yml",
+            "src/portfolio.mjs",
+            "schemas/portfolio-ledger.schema.json"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -304,52 +613,199 @@
           "title": "Truthful work-state semantics and dashboard counts",
           "owner": "AI.SDLC maintainers",
           "status": "verified",
-          "implements": ["FRS-009"],
-          "affected_surfaces": ["portfolio schema", "validator", "human portal", "private portfolio ledger"],
-          "protected_contracts": ["queue is not blocked", "dependency is named", "blocker has clearing action and owner"],
-          "required_test_types": ["unit", "integration", "visual"],
-          "tests": [
-            { "id": "TST-015", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-014", "EV-016"] },
-            { "id": "TST-016", "type": "integration", "status": "passed", "command": "npm run portfolio:sync", "evidence_ids": ["EV-014", "EV-016"] },
-            { "id": "TST-017", "type": "visual", "status": "passed", "evidence_ids": ["EV-015"] }
+          "implements": [
+            "FRS-009"
           ],
-          "changed_files": ["schemas/portfolio-ledger.schema.json", "src/portfolio.mjs", "tests/portfolio.test.mjs", "ops/portfolio-dashboard.html", "ops/portfolio-metrics.json"],
+          "affected_surfaces": [
+            "portfolio schema",
+            "validator",
+            "human portal",
+            "private portfolio ledger"
+          ],
+          "protected_contracts": [
+            "queue is not blocked",
+            "dependency is named",
+            "blocker has clearing action and owner"
+          ],
+          "required_test_types": [
+            "unit",
+            "integration",
+            "visual"
+          ],
+          "tests": [
+            {
+              "id": "TST-015",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-014",
+                "EV-016"
+              ]
+            },
+            {
+              "id": "TST-016",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run portfolio:sync",
+              "evidence_ids": [
+                "EV-014",
+                "EV-016"
+              ]
+            },
+            {
+              "id": "TST-017",
+              "type": "visual",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-015"
+              ]
+            }
+          ],
+          "changed_files": [
+            "schemas/portfolio-ledger.schema.json",
+            "src/portfolio.mjs",
+            "tests/portfolio.test.mjs",
+            "ops/portfolio-dashboard.html",
+            "ops/portfolio-metrics.json"
+          ],
           "blockers": [],
-          "next_actions": ["Verify corrected public and private dashboard counts, filters, reasons, and mobile rendering."]
+          "next_actions": [
+            "Verify corrected public and private dashboard counts, filters, reasons, and mobile rendering."
+          ]
         },
         {
           "id": "WBS-008",
           "title": "Metric and release data-quality contract",
           "owner": "AI.SDLC maintainers",
           "status": "verified",
-          "implements": ["FRS-010"],
-          "affected_surfaces": ["portfolio schema", "metric engine", "lifecycle gates", "generated metrics", "human portal"],
-          "protected_contracts": ["no invented scores", "dependent invalidation", "stage-appropriate gating", "ledger validity is not completion"],
-          "required_test_types": ["unit", "integration", "regression"],
-          "tests": [
-            { "id": "TST-018", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-014", "EV-016"] },
-            { "id": "TST-019", "type": "integration", "status": "passed", "command": "npm run plan:validate && npm run portfolio:sync", "evidence_ids": ["EV-014", "EV-016"] },
-            { "id": "TST-020", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-014"] }
+          "implements": [
+            "FRS-010"
           ],
-          "changed_files": ["schemas/portfolio-ledger.schema.json", "src/portfolio.mjs", "tests/portfolio.test.mjs", "README.md", "docs/project-plan.md", "docs/test-release-plan.md"],
+          "affected_surfaces": [
+            "portfolio schema",
+            "metric engine",
+            "lifecycle gates",
+            "generated metrics",
+            "human portal"
+          ],
+          "protected_contracts": [
+            "no invented scores",
+            "dependent invalidation",
+            "stage-appropriate gating",
+            "ledger validity is not completion"
+          ],
+          "required_test_types": [
+            "unit",
+            "integration",
+            "regression"
+          ],
+          "tests": [
+            {
+              "id": "TST-018",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-014",
+                "EV-016"
+              ]
+            },
+            {
+              "id": "TST-019",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run plan:validate && npm run portfolio:sync",
+              "evidence_ids": [
+                "EV-014",
+                "EV-016"
+              ]
+            },
+            {
+              "id": "TST-020",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-014"
+              ]
+            }
+          ],
+          "changed_files": [
+            "schemas/portfolio-ledger.schema.json",
+            "src/portfolio.mjs",
+            "tests/portfolio.test.mjs",
+            "README.md",
+            "docs/project-plan.md",
+            "docs/test-release-plan.md"
+          ],
           "blockers": [],
-          "next_actions": ["Run positive and negative state, freshness, aggregation, and lifecycle-gate tests."]
+          "next_actions": [
+            "Run positive and negative state, freshness, aggregation, and lifecycle-gate tests."
+          ]
         },
         {
           "id": "WBS-009",
           "title": "Supported hosted runtime maintenance",
           "owner": "AI.SDLC maintainers",
           "status": "verified",
-          "implements": ["FRS-011"],
-          "affected_surfaces": ["GitHub Actions", "Node.js package contract", "dependency maintenance"],
-          "protected_contracts": ["supported action runtime", "Windows and Linux coverage", "application/action runtime separation"],
-          "required_test_types": ["integration", "regression", "production"],
-          "tests": [
-            { "id": "TST-021", "type": "integration", "status": "passed", "command": "node --test tests/automation.test.mjs", "evidence_ids": ["EV-014"] },
-            { "id": "TST-022", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-014"] },
-            { "id": "TST-023", "type": "production", "status": "passed", "evidence_ids": ["EV-023"] }
+          "implements": [
+            "FRS-011"
           ],
-          "changed_files": [".github/workflows/ci.yml", ".github/workflows/validate.yml", ".github/workflows/drift.yml", ".github/workflows/post-deploy.yml", ".github/workflows/publish-release.yml", ".github/workflows/release-gate.yml", ".github/dependabot.yml", "package.json", "package-lock.json"],
+          "affected_surfaces": [
+            "GitHub Actions",
+            "Node.js package contract",
+            "dependency maintenance"
+          ],
+          "protected_contracts": [
+            "supported action runtime",
+            "Windows and Linux coverage",
+            "application/action runtime separation"
+          ],
+          "required_test_types": [
+            "integration",
+            "regression",
+            "production"
+          ],
+          "tests": [
+            {
+              "id": "TST-021",
+              "type": "integration",
+              "status": "passed",
+              "command": "node --test tests/automation.test.mjs",
+              "evidence_ids": [
+                "EV-014"
+              ]
+            },
+            {
+              "id": "TST-022",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-014"
+              ]
+            },
+            {
+              "id": "TST-023",
+              "type": "production",
+              "status": "passed",
+              "evidence_ids": [
+                "EV-023"
+              ]
+            }
+          ],
+          "changed_files": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/validate.yml",
+            ".github/workflows/drift.yml",
+            ".github/workflows/post-deploy.yml",
+            ".github/workflows/publish-release.yml",
+            ".github/workflows/release-gate.yml",
+            ".github/dependabot.yml",
+            "package.json",
+            "package-lock.json"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -358,16 +814,64 @@
           "title": "Metric-model, denominator, and freshness integrity",
           "owner": "AI.SDLC maintainers",
           "status": "verified",
-          "implements": ["FRS-012"],
-          "affected_surfaces": ["portfolio schema", "metric engine", "human portal", "public documentation"],
-          "protected_contracts": ["no cross-model averaging", "every verification obligation counts", "evidence time is not generation time", "release state stays separate"],
-          "required_test_types": ["unit", "integration", "regression"],
-          "tests": [
-            { "id": "TST-024", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-024"] },
-            { "id": "TST-025", "type": "integration", "status": "passed", "command": "npm run portfolio:sync", "evidence_ids": ["EV-024", "EV-025"] },
-            { "id": "TST-026", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-024"] }
+          "implements": [
+            "FRS-012"
           ],
-          "changed_files": ["src/portfolio.mjs", "schemas/portfolio-ledger.schema.json", "tests/portfolio.test.mjs", "README.md", "docs/project-plan.md", "docs/test-release-plan.md"],
+          "affected_surfaces": [
+            "portfolio schema",
+            "metric engine",
+            "human portal",
+            "public documentation"
+          ],
+          "protected_contracts": [
+            "no cross-model averaging",
+            "every verification obligation counts",
+            "evidence time is not generation time",
+            "release state stays separate"
+          ],
+          "required_test_types": [
+            "unit",
+            "integration",
+            "regression"
+          ],
+          "tests": [
+            {
+              "id": "TST-024",
+              "type": "unit",
+              "status": "passed",
+              "command": "node --test tests/portfolio.test.mjs",
+              "evidence_ids": [
+                "EV-024"
+              ]
+            },
+            {
+              "id": "TST-025",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run portfolio:sync",
+              "evidence_ids": [
+                "EV-024",
+                "EV-025"
+              ]
+            },
+            {
+              "id": "TST-026",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-024"
+              ]
+            }
+          ],
+          "changed_files": [
+            "src/portfolio.mjs",
+            "schemas/portfolio-ledger.schema.json",
+            "tests/portfolio.test.mjs",
+            "README.md",
+            "docs/project-plan.md",
+            "docs/test-release-plan.md"
+          ],
           "blockers": [],
           "next_actions": []
         },
@@ -376,16 +880,42 @@
           "title": "Publish and record the hosted v0.2.3 GitHub release",
           "owner": "AI.SDLC maintainers",
           "status": "active",
-          "implements": ["FRS-013"],
-          "affected_surfaces": ["GitHub release", "hosted artifact", "lifecycle ledger"],
-          "protected_contracts": ["gate before publish", "hosted digest proof", "one reviewable release event", "no deployment claim"],
-          "required_test_types": ["production"],
-          "tests": [
-            { "id": "TST-027", "type": "production", "status": "planned", "evidence_ids": [] }
+          "implements": [
+            "FRS-013"
           ],
-          "changed_files": [".github/workflows/publish-release.yml", "tests/automation.test.mjs", "portfolio.ledger.json", "ops/portfolio-dashboard.html", "ops/portfolio-metrics.json"],
+          "affected_surfaces": [
+            "GitHub release",
+            "hosted artifact",
+            "lifecycle ledger"
+          ],
+          "protected_contracts": [
+            "gate before publish",
+            "hosted digest proof",
+            "one reviewable release event",
+            "no deployment claim"
+          ],
+          "required_test_types": [
+            "production"
+          ],
+          "tests": [
+            {
+              "id": "TST-027",
+              "type": "production",
+              "status": "planned",
+              "evidence_ids": []
+            }
+          ],
+          "changed_files": [
+            ".github/workflows/publish-release.yml",
+            "tests/automation.test.mjs",
+            "portfolio.ledger.json",
+            "ops/portfolio-dashboard.html",
+            "ops/portfolio-metrics.json"
+          ],
           "blockers": [],
-          "next_actions": ["Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update."]
+          "next_actions": [
+            "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update."
+          ]
         }
       ],
       "evidence": [
@@ -396,7 +926,9 @@
           "created_at": "2026-09-17T10:34:07.000Z",
           "summary": "The repository contract, built-in self-test, 24 lifecycle-hook tests, and 14 portfolio/automation tests passed with zero failures, including positive and intentional negative transition cases.",
           "uri": "evidence/v0.2.0-verification.json",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-002",
@@ -405,7 +937,9 @@
           "created_at": "2026-09-17T10:34:07.000Z",
           "summary": "The implemented validator passes complete linked work and rejects malformed, contradictory, stale, unapproved, unproven, or incorrectly packaged states.",
           "uri": "tests/portfolio.test.mjs",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-003",
@@ -414,7 +948,9 @@
           "created_at": "2026-09-17T10:34:07.000Z",
           "summary": "The public and private portals rendered at desktop and 390x844 mobile widths with zero browser console errors; private portfolio data remains outside the public repository.",
           "uri": "evidence/v0.2.0-verification.json",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-004",
@@ -423,7 +959,9 @@
           "created_at": "2026-09-17T10:34:07.000Z",
           "summary": "The operator explicitly authorized implementation, verification, and public GitHub promotion of the AI.SDLC upgrade.",
           "uri": "docs/project-plan.md",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-005",
@@ -433,7 +971,9 @@
           "summary": "The v0.2.0 npm tarball identity was calculated from its actual bytes.",
           "uri": "dist/ai-sdlc-0.2.0.tgz",
           "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-006",
@@ -442,7 +982,9 @@
           "created_at": "2026-09-17T10:52:44.000Z",
           "summary": "Hosted GitHub Actions passed the executable change gate and the Ubuntu/Windows Node.js 20/24 validation matrix for commit 56831973820d5eb63846a1234b3bd38e4e87dbda.",
           "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
-          "artifact_ids": ["ART-001"]
+          "artifact_ids": [
+            "ART-001"
+          ]
         },
         {
           "id": "EV-007",
@@ -451,7 +993,9 @@
           "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The repository contract, built-in self-test, 24 lifecycle-hook tests, and 17 portfolio/automation tests passed; protected regression and YAML lint also passed.",
           "uri": "evidence/v0.2.1-completion-audit.json",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-008",
@@ -460,7 +1004,9 @@
           "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The live local portal rendered its task/project/portfolio metrics at desktop and 390x844 mobile widths with zero console errors or warnings.",
           "uri": "evidence/v0.2.1-completion-audit.json",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-009",
@@ -469,7 +1015,9 @@
           "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The live GitHub API confirms protected main requires pull requests, five hosted checks, current-base strictness, conversation resolution, and admin enforcement; force pushes and deletion are disabled.",
           "uri": "https://api.github.com/repos/VermontForest/AI.SDLC/branches/main/protection",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-010",
@@ -479,7 +1027,9 @@
           "summary": "The v0.2.1 npm tarball identity was calculated from its actual bytes.",
           "uri": "dist/ai-sdlc-0.2.1.tgz",
           "sha256": "9e109af08ca365f23a04d932b3483f5357c9cc291124c97744f9af6044df0f47",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-011",
@@ -488,7 +1038,9 @@
           "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "Regression cases prove ledger-derived metric rollups, deterministic board sync, lifecycle-event recording, rejection without production proof, and publish-job dependency on the release gate.",
           "uri": "tests/portfolio.test.mjs",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-012",
@@ -497,7 +1049,9 @@
           "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The operator required the final completion audit, correction of public release quality, closure of authorized automation gaps, and public promotion only after proof.",
           "uri": "docs/project-plan.md",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-013",
@@ -506,7 +1060,9 @@
           "created_at": "2026-09-17T11:34:18.893Z",
           "summary": "GitHub pull request 4 passed the protected change gate and the Ubuntu/Windows Node.js 20/24 validation matrix for commit 3a3714b19c439ad175aebee39acdfa37f9ae5323.",
           "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35216261112",
-          "artifact_ids": ["ART-002"]
+          "artifact_ids": [
+            "ART-002"
+          ]
         },
         {
           "id": "EV-014",
@@ -515,7 +1071,9 @@
           "created_at": "2026-09-17T12:20:00.000Z",
           "summary": "The repository contract, self-test, 24 hook tests, and 21 portfolio/automation tests passed; protected regression passed with explicit positive and negative state/data-quality cases.",
           "uri": "evidence/v0.2.2-state-semantics.json",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-015",
@@ -524,7 +1082,9 @@
           "created_at": "2026-09-17T12:20:00.000Z",
           "summary": "The restarted private portal rendered at desktop and 390x844 mobile widths with 9 projects, 0 blocked, 1 queued, 1 dependency wait, explicit metric/release states, and zero console errors or warnings.",
           "uri": "evidence/v0.2.2-state-semantics.json",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-016",
@@ -533,7 +1093,9 @@
           "created_at": "2026-09-17T12:20:00.000Z",
           "summary": "Regression cases prove queued work does not inflate blockers, dependency waits name inputs, blockers require clearing ownership, and missing or stale data cannot become invented scores.",
           "uri": "tests/portfolio.test.mjs",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-017",
@@ -543,7 +1105,9 @@
           "summary": "The v0.2.2 npm tarball identity was calculated from its actual bytes.",
           "uri": "dist/ai-sdlc-0.2.2.tgz",
           "sha256": "581a6cbc6329a4d864dd96b3b032b2fa6cc415313c75b49971fad2d2efcc582c",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-018",
@@ -584,7 +1148,9 @@
           "created_at": "2026-09-17T12:20:00.000Z",
           "summary": "The operator directed correction of dashboard state semantics, metric/release integrity, and recurring Node.js 20 action-runtime warnings, with verified public promotion.",
           "uri": "docs/project-plan.md",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-023",
@@ -593,7 +1159,9 @@
           "created_at": "2026-09-17T12:30:00.000Z",
           "summary": "Pull request 5 passed the protected change gate and Ubuntu/Windows Node.js 22/24 matrix. The hosted logs contain no deprecated Node.js 20 action-runtime warning, and main protection now requires the Node.js 22/24 contexts.",
           "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35221324987",
-          "artifact_ids": ["ART-003"]
+          "artifact_ids": [
+            "ART-003"
+          ]
         },
         {
           "id": "EV-024",
@@ -602,7 +1170,9 @@
           "created_at": "2026-09-17T13:10:00.000Z",
           "summary": "Metric-integrity tests passed for duplicate pending checks, undeclared required verification, model separation, evidence-derived freshness, schema details, deterministic sync, and the complete repository regression suite.",
           "uri": "evidence/v0.2.3-metric-release-integrity.json",
-          "artifact_ids": ["ART-004"]
+          "artifact_ids": [
+            "ART-004"
+          ]
         },
         {
           "id": "EV-025",
@@ -611,7 +1181,9 @@
           "created_at": "2026-09-17T13:10:00.000Z",
           "summary": "traceability-v2 exposes every verification obligation and keeps lifecycle-v1 scores separate; dashboard regeneration and unrelated metadata no longer refresh contributing evidence time.",
           "uri": "tests/portfolio.test.mjs",
-          "artifact_ids": ["ART-004"]
+          "artifact_ids": [
+            "ART-004"
+          ]
         },
         {
           "id": "EV-026",
@@ -620,7 +1192,20 @@
           "created_at": "2026-09-17T13:10:00.000Z",
           "summary": "The operator authorized correction of misleading LEQ/JouleWork presentation and completion of a real protected GitHub release.",
           "uri": "docs/project-plan.md",
-          "artifact_ids": ["ART-004"]
+          "artifact_ids": [
+            "ART-004"
+          ]
+        },
+        {
+          "id": "EV-RELEASE-v0.2.3",
+          "type": "release_record",
+          "status": "passed",
+          "created_at": "2026-09-17T13:41:03.227Z",
+          "summary": "GitHub release v0.2.3 was published and the registered release gate passed.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35228559982",
+          "artifact_ids": [
+            "ART-004"
+          ]
         }
       ],
       "artifacts": [
@@ -630,7 +1215,10 @@
           "uri": "dist/ai-sdlc-0.2.0.tgz",
           "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
           "revision_type": "content",
-          "comparison_evidence_ids": ["EV-002", "EV-003"]
+          "comparison_evidence_ids": [
+            "EV-002",
+            "EV-003"
+          ]
         },
         {
           "id": "ART-002",
@@ -639,7 +1227,10 @@
           "sha256": "9e109af08ca365f23a04d932b3483f5357c9cc291124c97744f9af6044df0f47",
           "revision_type": "content",
           "supersedes": "ART-001",
-          "comparison_evidence_ids": ["EV-008", "EV-011"]
+          "comparison_evidence_ids": [
+            "EV-008",
+            "EV-011"
+          ]
         },
         {
           "id": "ART-003",
@@ -648,7 +1239,10 @@
           "sha256": "581a6cbc6329a4d864dd96b3b032b2fa6cc415313c75b49971fad2d2efcc582c",
           "revision_type": "content",
           "supersedes": "ART-002",
-          "comparison_evidence_ids": ["EV-015", "EV-016"]
+          "comparison_evidence_ids": [
+            "EV-015",
+            "EV-016"
+          ]
         },
         {
           "id": "ART-004",
@@ -657,7 +1251,9 @@
           "sha256": "0ed304d902edbd6f1323ed382585cb926e15d06f6f1bf22c25ee5dca6ccdf077",
           "revision_type": "content",
           "supersedes": "ART-003",
-          "comparison_evidence_ids": ["EV-025"]
+          "comparison_evidence_ids": [
+            "EV-025"
+          ]
         }
       ],
       "approvals": [
@@ -700,15 +1296,24 @@
           "title": "Executable traceability and human portal",
           "tag": "v0.2.0",
           "status": "ready",
-          "work_item_ids": ["WBS-001", "WBS-002", "WBS-003", "WBS-004"],
+          "work_item_ids": [
+            "WBS-001",
+            "WBS-002",
+            "WBS-003",
+            "WBS-004"
+          ],
           "artifact_id": "ART-001",
           "content_change_claimed": true,
-          "approval_ids": ["APP-001"],
+          "approval_ids": [
+            "APP-001"
+          ],
           "rollback": {
             "status": "ready",
             "reference": "Revert the release commit or restore base commit 7efd19d8062ee1eed96732455f3cff68faa45942."
           },
-          "deployment": { "status": "not_started" },
+          "deployment": {
+            "status": "not_started"
+          },
           "production_test_ids": []
         },
         {
@@ -716,15 +1321,22 @@
           "title": "Automated portfolio metrics and lifecycle enforcement",
           "tag": "v0.2.1",
           "status": "ready",
-          "work_item_ids": ["WBS-005", "WBS-006"],
+          "work_item_ids": [
+            "WBS-005",
+            "WBS-006"
+          ],
           "artifact_id": "ART-002",
           "content_change_claimed": true,
-          "approval_ids": ["APP-002"],
+          "approval_ids": [
+            "APP-002"
+          ],
           "rollback": {
             "status": "ready",
             "reference": "Revert the completion-automation merge and restore main commit 4ea787cb425afc3fa0223656b3efba7135612057."
           },
-          "deployment": { "status": "not_started" },
+          "deployment": {
+            "status": "not_started"
+          },
           "production_test_ids": []
         },
         {
@@ -732,40 +1344,66 @@
           "title": "Truthful portfolio state and supported hosted runtimes",
           "tag": "v0.2.2",
           "status": "ready",
-          "work_item_ids": ["WBS-007", "WBS-008", "WBS-009"],
+          "work_item_ids": [
+            "WBS-007",
+            "WBS-008",
+            "WBS-009"
+          ],
           "artifact_id": "ART-003",
           "content_change_claimed": true,
-          "approval_ids": ["APP-003"],
+          "approval_ids": [
+            "APP-003"
+          ],
           "rollback": {
             "status": "ready",
             "reference": "Revert the v0.2.2 state-semantics merge and restore main commit aa5504e0ceb6ec4142d02d1944e242160e54f989."
           },
-          "deployment": { "status": "not_started" },
+          "deployment": {
+            "status": "not_started"
+          },
           "production_test_ids": []
         },
         {
           "id": "REL-004",
           "title": "Metric and publication integrity",
           "tag": "v0.2.3",
-          "status": "ready",
-          "work_item_ids": ["WBS-010"],
+          "status": "released",
+          "work_item_ids": [
+            "WBS-010"
+          ],
           "artifact_id": "ART-004",
           "content_change_claimed": true,
-          "approval_ids": ["APP-004"],
+          "approval_ids": [
+            "APP-004"
+          ],
           "rollback": {
             "status": "ready",
             "reference": "Revert the v0.2.3 metric-integrity merge and restore main commit 8156db440c44ce3be15a4b56ea780669a1a05b7c."
           },
-          "deployment": { "status": "not_started" },
+          "deployment": {
+            "status": "not_started"
+          },
           "production_test_ids": []
         }
       ],
       "metrics": {
-        "leq": { "status": "not_applicable", "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.", "scope": "Stored project override", "reason": "The synchronized dashboard derives LEQ from registered work items rather than this override." },
-        "joulework": { "status": "not_applicable", "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.", "scope": "Stored project override", "reason": "The synchronized dashboard derives JouleWork from registered work items rather than this override." }
+        "leq": {
+          "status": "not_applicable",
+          "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
+          "scope": "Stored project override",
+          "reason": "The synchronized dashboard derives LEQ from registered work items rather than this override."
+        },
+        "joulework": {
+          "status": "not_applicable",
+          "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
+          "scope": "Stored project override",
+          "reason": "The synchronized dashboard derives JouleWork from registered work items rather than this override."
+        }
       },
       "blockers": [],
-      "next_actions": ["Pass protected checks, publish v0.2.3, verify the hosted asset digest, and merge the release-event ledger update."]
+      "next_actions": [
+        "Pass protected checks, publish v0.2.3, verify the hosted asset digest, and merge the release-event ledger update."
+      ]
     }
   ]
 }
