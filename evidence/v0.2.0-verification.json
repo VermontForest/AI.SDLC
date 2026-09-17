@@ -42,7 +42,10 @@
     }
   ],
   "hosted_ci": {
-    "status": "pending",
-    "note": "A workflow file is not hosted proof. Record the GitHub Actions run only after the branch is pushed and the run is observed."
+    "status": "passed",
+    "head_sha": "56831973820d5eb63846a1234b3bd38e4e87dbda",
+    "change_gate_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
+    "cross_platform_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628920",
+    "result": "The hosted change gate passed. The existing validation matrix also passed on Ubuntu and Windows with Node.js 20 and 24."
   }
 }

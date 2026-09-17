@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T10:34:07.000Z",
+    "updated_at": "2026-09-17T10:52:44.000Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -14,7 +14,7 @@
       "name": "AI.SDLC",
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "status": "verified",
-      "updated_at": "2026-09-17T10:34:07.000Z",
+      "updated_at": "2026-09-17T10:52:44.000Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -127,12 +127,12 @@
           "protected_contracts": ["failing exit codes", "least-privilege workflows", "hosted-run evidence"],
           "required_test_types": ["integration", "regression"],
           "tests": [
-            { "id": "TST-005", "type": "integration", "status": "passed", "command": "npm run plan:validate", "evidence_ids": ["EV-001"] },
-            { "id": "TST-006", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001"] }
+            { "id": "TST-005", "type": "integration", "status": "passed", "command": "npm run plan:validate", "evidence_ids": ["EV-001", "EV-006"] },
+            { "id": "TST-006", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001", "EV-006"] }
           ],
           "changed_files": [".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/ci.yml", ".github/workflows/release-gate.yml", ".github/workflows/post-deploy.yml", ".github/workflows/drift.yml"],
           "blockers": [],
-          "next_actions": ["Push the branch and attach the actual GitHub Actions run to the release record."]
+          "next_actions": []
         },
         {
           "id": "WBS-004",
@@ -197,6 +197,15 @@
           "uri": "dist/ai-sdlc-0.2.0.tgz",
           "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
           "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-006",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T10:52:44.000Z",
+          "summary": "Hosted GitHub Actions passed the executable change gate and the Ubuntu/Windows Node.js 20/24 validation matrix for commit 56831973820d5eb63846a1234b3bd38e4e87dbda.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
+          "artifact_ids": ["ART-001"]
         }
       ],
       "artifacts": [
@@ -241,7 +250,7 @@
         "joulework": { "status": "unknown" }
       },
       "blockers": [],
-      "next_actions": ["Push the public branch, observe the hosted GitHub Actions change gate, and attach its run URL before calling hosted enforcement verified."]
+      "next_actions": ["Merge the green public pull request; use the release and post-deploy workflows when a specific downstream release or production deployment is registered."]
     }
   ]
 }
