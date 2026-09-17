@@ -42,6 +42,7 @@ test("release, post-deploy, and drift workflows enforce distinct transitions", a
   assert.match(drift, /npm run portfolio:sync/);
   assert.match(publish, /uses: \.\/.github\/workflows\/release-gate\.yml/);
   assert.match(publish, /needs: release-gate/);
+  assert.match(publish, /^permissions:\r?\n(?:  #.*\r?\n)+  contents: write\r?\n  pull-requests: write/m);
   assert.match(publish, /gh release create/);
   assert.match(publish, /plan:record-event/);
   assert.match(publish, /gh pr create/);

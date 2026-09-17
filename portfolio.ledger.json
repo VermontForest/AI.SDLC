@@ -383,9 +383,9 @@
           "tests": [
             { "id": "TST-027", "type": "production", "status": "planned", "evidence_ids": [] }
           ],
-          "changed_files": ["portfolio.ledger.json", "ops/portfolio-dashboard.html", "ops/portfolio-metrics.json"],
+          "changed_files": [".github/workflows/publish-release.yml", "tests/automation.test.mjs", "portfolio.ledger.json", "ops/portfolio-dashboard.html", "ops/portfolio-metrics.json"],
           "blockers": [],
-          "next_actions": ["Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update."]
+          "next_actions": ["Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update."]
         }
       ],
       "evidence": [

@@ -12,7 +12,7 @@
       "missing_inputs": [
         "production verification evidence"
       ],
-      "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+      "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
       "owner": "Portfolio owners"
     },
     "joulework": {
@@ -23,7 +23,7 @@
       "missing_inputs": [
         "production verification evidence"
       ],
-      "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+      "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
       "owner": "Portfolio owners"
     },
     "metric_families": [
@@ -37,7 +37,7 @@
           "missing_inputs": [
             "production verification evidence"
           ],
-          "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+          "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
           "owner": "Portfolio owners"
         },
         "joulework": {
@@ -48,7 +48,7 @@
           "missing_inputs": [
             "production verification evidence"
           ],
-          "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+          "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
           "owner": "Portfolio owners"
         }
       }
@@ -73,7 +73,7 @@
         "missing_inputs": [
           "production verification evidence"
         ],
-        "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+        "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
         "owner": "AI.SDLC maintainers"
       },
       "joulework": {
@@ -84,7 +84,7 @@
         "missing_inputs": [
           "production verification evidence"
         ],
-        "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+        "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
         "owner": "AI.SDLC maintainers"
       },
       "source": "computed from ledger work, tests, evidence, and blockers",
@@ -425,7 +425,7 @@
             "missing_inputs": [
               "production verification evidence"
             ],
-            "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+            "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
             "owner": "AI.SDLC maintainers"
           },
           "joulework": {
@@ -436,7 +436,7 @@
             "missing_inputs": [
               "production verification evidence"
             ],
-            "next_action": "Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update.",
+            "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
             "owner": "AI.SDLC maintainers"
           }
         }
