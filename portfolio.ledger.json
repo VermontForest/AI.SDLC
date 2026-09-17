@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T12:20:00.000Z",
+    "updated_at": "2026-09-17T12:30:00.000Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -14,8 +14,8 @@
       "name": "AI.SDLC",
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "owner": "AI.SDLC maintainers",
-      "status": "active",
-      "updated_at": "2026-09-17T12:20:00.000Z",
+      "status": "verified",
+      "updated_at": "2026-09-17T12:30:00.000Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -77,7 +77,7 @@
           "id": "URS-009",
           "type": "user",
           "text": "Hosted validation runs on supported application and GitHub Action runtimes without a recurring Node.js 20 deprecation warning.",
-          "status": "active",
+          "status": "verified",
           "acceptance": ["Pinned current actions and the Node.js 22/24 matrix pass on Windows and Linux; historical failed runs remain distinguishable from the current result."]
         },
         {
@@ -164,7 +164,7 @@
           "id": "FRS-011",
           "type": "functional",
           "text": "Use supported Node.js 22/24 application tests and current pinned GitHub Action runtimes with automated dependency maintenance.",
-          "status": "active",
+          "status": "verified",
           "derived_from": ["URS-009"],
           "acceptance": ["Fresh hosted jobs pass without the deprecated Node.js 20 action-runtime warning and Dependabot covers Actions and npm."]
         }
@@ -308,7 +308,7 @@
           "id": "WBS-009",
           "title": "Supported hosted runtime maintenance",
           "owner": "AI.SDLC maintainers",
-          "status": "active",
+          "status": "verified",
           "implements": ["FRS-011"],
           "affected_surfaces": ["GitHub Actions", "Node.js package contract", "dependency maintenance"],
           "protected_contracts": ["supported action runtime", "Windows and Linux coverage", "application/action runtime separation"],
@@ -316,11 +316,11 @@
           "tests": [
             { "id": "TST-021", "type": "integration", "status": "passed", "command": "node --test tests/automation.test.mjs", "evidence_ids": ["EV-014"] },
             { "id": "TST-022", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-014"] },
-            { "id": "TST-023", "type": "production", "status": "planned", "evidence_ids": [] }
+            { "id": "TST-023", "type": "production", "status": "passed", "evidence_ids": ["EV-023"] }
           ],
           "changed_files": [".github/workflows/ci.yml", ".github/workflows/validate.yml", ".github/workflows/drift.yml", ".github/workflows/post-deploy.yml", ".github/workflows/publish-release.yml", ".github/workflows/release-gate.yml", ".github/dependabot.yml", "package.json", "package-lock.json"],
           "blockers": [],
-          "next_actions": ["Verify fresh protected hosted runs and confirm the deprecated action-runtime warning is absent."]
+          "next_actions": []
         }
       ],
       "evidence": [
@@ -520,6 +520,15 @@
           "summary": "The operator directed correction of dashboard state semantics, metric/release integrity, and recurring Node.js 20 action-runtime warnings, with verified public promotion.",
           "uri": "docs/project-plan.md",
           "artifact_ids": ["ART-003"]
+        },
+        {
+          "id": "EV-023",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T12:30:00.000Z",
+          "summary": "Pull request 5 passed the protected change gate and Ubuntu/Windows Node.js 22/24 matrix. The hosted logs contain no deprecated Node.js 20 action-runtime warning, and main protection now requires the Node.js 22/24 contexts.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35221324987",
+          "artifact_ids": ["ART-003"]
         }
       ],
       "artifacts": [
@@ -613,7 +622,7 @@
           "id": "REL-003",
           "title": "Truthful portfolio state and supported hosted runtimes",
           "tag": "v0.2.2",
-          "status": "draft",
+          "status": "ready",
           "work_item_ids": ["WBS-007", "WBS-008", "WBS-009"],
           "artifact_id": "ART-003",
           "content_change_claimed": true,
@@ -631,7 +640,7 @@
         "joulework": { "status": "not_applicable", "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.", "scope": "Stored project override", "reason": "The synchronized dashboard derives JouleWork from registered work items rather than this override." }
       },
       "blockers": [],
-      "next_actions": ["Push the v0.2.2 branch, verify protected Windows/Linux Node.js 22/24 runs without the deprecated action-runtime warning, then merge and refresh the private portal."]
+      "next_actions": ["Merge pull request 5 after its final evidence commit passes the protected checks, then refresh the private operator portal from the merged result."]
     }
   ]
 }

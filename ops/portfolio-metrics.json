@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T12:20:00.000Z",
+  "generated_at": "2026-09-17T12:30:00.000Z",
   "formula_version": "traceability-v1",
   "portfolio": {
     "id": "ai-sdlc-public",
     "leq": {
       "status": "valid",
-      "score": 99,
+      "score": 100,
       "classification": "healthy",
-      "measured_at": "2026-09-17T12:20:00.000Z",
+      "measured_at": "2026-09-17T12:30:00.000Z",
       "source": "average of 1 applicable child record",
       "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
       "scope": "AI.SDLC Public Framework"
     },
     "joulework": {
       "status": "valid",
-      "score": 96,
+      "score": 100,
       "classification": "productive",
-      "measured_at": "2026-09-17T12:20:00.000Z",
+      "measured_at": "2026-09-17T12:30:00.000Z",
       "source": "average of 1 applicable child record",
       "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
       "scope": "AI.SDLC Public Framework"
@@ -36,18 +36,18 @@
       "name": "AI.SDLC",
       "leq": {
         "status": "valid",
-        "score": 99,
+        "score": 100,
         "classification": "healthy",
-        "measured_at": "2026-09-17T12:20:00.000Z",
+        "measured_at": "2026-09-17T12:30:00.000Z",
         "source": "average of 9 applicable child records",
         "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
         "scope": "AI.SDLC"
       },
       "joulework": {
         "status": "valid",
-        "score": 96,
+        "score": 100,
         "classification": "productive",
-        "measured_at": "2026-09-17T12:20:00.000Z",
+        "measured_at": "2026-09-17T12:30:00.000Z",
         "source": "average of 9 applicable child records",
         "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
         "scope": "AI.SDLC"
@@ -59,9 +59,9 @@
         "scope": "AI.SDLC",
         "source": "ledger release REL-003 (v0.2.2)",
         "missing_inputs": [
-          "release readiness evidence"
+          "published release event"
         ],
-        "next_action": "Complete release verification and mark the release ready.",
+        "next_action": "Publish the release and record the hosted release event.",
         "owner": "AI.SDLC maintainers"
       },
       "work_items": [
@@ -72,7 +72,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-001"
@@ -81,7 +81,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-001"
@@ -94,7 +94,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-002"
@@ -103,7 +103,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-002"
@@ -116,7 +116,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-003"
@@ -125,7 +125,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-003"
@@ -138,7 +138,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-004"
@@ -147,7 +147,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-004"
@@ -160,7 +160,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-005"
@@ -169,7 +169,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-005"
@@ -182,7 +182,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-006"
@@ -191,7 +191,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-006"
@@ -204,7 +204,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-007"
@@ -213,7 +213,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-007"
@@ -226,7 +226,7 @@
             "status": "valid",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-008"
@@ -235,7 +235,7 @@
             "status": "valid",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-008"
@@ -243,21 +243,21 @@
         },
         {
           "id": "WBS-009",
-          "status": "active",
+          "status": "verified",
           "leq": {
             "status": "valid",
-            "score": 88,
+            "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered requirement links, declared tests, passed evidence, failures, and blockers",
             "definition": "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-009"
           },
           "joulework": {
             "status": "valid",
-            "score": 65,
-            "classification": "watch",
-            "measured_at": "2026-09-17T12:20:00.000Z",
+            "score": 100,
+            "classification": "productive",
+            "measured_at": "2026-09-17T12:30:00.000Z",
             "source": "computed from registered completed outcomes, passed evidence, failures, and blockers",
             "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-009"
