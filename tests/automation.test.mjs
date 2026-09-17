@@ -62,6 +62,20 @@ test("local hooks fail closed on ledger or portal drift", async () => {
   assert.match(prePush, /npm run portfolio:sync/);
 });
 
+test("hosted validation uses supported Node and current action runtimes", async () => {
+  const validate = await text(".github/workflows/validate.yml");
+  const change = await text(".github/workflows/ci.yml");
+  const dependabot = await text(".github/dependabot.yml");
+  assert.match(validate, /node: \[22, 24\]/);
+  assert.doesNotMatch(validate, /node: \[[^\]]*20/);
+  for (const workflow of [validate, change]) {
+    assert.match(workflow, /actions\/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1/);
+    assert.match(workflow, /actions\/setup-node@820762786026740c76f36085b0efc47a31fe5020/);
+  }
+  assert.match(dependabot, /package-ecosystem: ["']?github-actions["']?/);
+  assert.match(dependabot, /package-ecosystem: ["']?npm["']?/);
+});
+
 function assertPinnedActions(workflow, minimum = 2) {
   const uses = workflow.match(/^\s*uses:\s*([^\s#]+)/gm) || [];
   assert.ok(uses.length >= minimum, `expected at least ${minimum} pinned external action(s)`);

@@ -10,6 +10,11 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const schemaPath = join(packageRoot, "schemas", "portfolio-ledger.schema.json");
 const COMPLETED = new Set(["passed", "verified", "complete", "ready", "released", "production_proven"]);
 const REVISION_PROOF = new Set(["visual_comparison", "motion_comparison", "behavioral_comparison"]);
+const NON_EXECUTING = new Set(["planned", "queued", "deferred"]);
+const METRIC_DEFINITIONS = {
+  leq: "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
+  joulework: "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties."
+};
 
 export async function validatePortfolio(argv = [], options = {}) {
   const args = parseArgs(argv);
@@ -232,10 +237,12 @@ export async function validateLedger(ledger, options = {}) {
   } else {
     issues.push(issue("unknown_stage", "portfolio", options.stage, `Unknown validation stage ${options.stage}.`));
   }
+  validateDataQualityStage(ledger, selectedProjects, options, issues);
   return reportFor(ledger, options, issues);
 }
 
 function validateProjectLinks(project, issues) {
+  validateStateContract(project, project, issues);
   const ids = new Map();
   const add = (id, kind) => {
     if (ids.has(id)) issues.push(issue("duplicate_id", project.id, "change", `${id} is used by both ${ids.get(id)} and ${kind}.`));
@@ -268,6 +275,7 @@ function validateProjectLinks(project, issues) {
     }
   }
   for (const workItem of project.work_items) {
+    validateStateContract(project, workItem, issues);
     for (const requirementId of workItem.implements) {
       const requirement = requirements.get(requirementId);
       if (!requirement || requirement.type !== "functional") issues.push(issue("bad_link", project.id, "change", `${workItem.id} implements missing or non-functional requirement ${requirementId}.`, workItem.id));
@@ -310,6 +318,40 @@ function validateProjectLinks(project, issues) {
       if (!tests.has(id)) issues.push(issue("bad_link", project.id, "change", `${release.id} references missing production test ${id}.`));
     });
     if (release.deployment.evidence_id && !evidence.has(release.deployment.evidence_id)) issues.push(issue("bad_link", project.id, "change", `${release.id} references missing deployment evidence ${release.deployment.evidence_id}.`));
+  }
+}
+
+function validateStateContract(project, subject, issues) {
+  const blockers = subject.blockers || [];
+  const actions = subject.blocker_actions || [];
+  const label = subject.id || project.id;
+  const isBlocked = ["blocked", "failed"].includes(subject.status);
+  if (subject.status === "queued" && !subject.state_reason) {
+    issues.push(issue("missing_state_reason", project.id, "change", `${label} is queued without a queue reason.`, subject === project ? null : subject.id));
+  }
+  if (subject.status === "waiting_dependency" && (!(subject.waiting_on || []).length || !subject.state_reason)) {
+    issues.push(issue("missing_dependency", project.id, "change", `${label} is waiting on a dependency without naming the dependency and reason.`, subject === project ? null : subject.id));
+  }
+  if (subject.status === "unknown" && !subject.state_reason) {
+    issues.push(issue("unknown_without_reason", project.id, "change", `${label} is unknown without an explanation.`, subject === project ? null : subject.id));
+  }
+  if (isBlocked && !blockers.length) {
+    issues.push(issue("blocked_without_impediment", project.id, "change", `${label} is ${subject.status} without an evidenced impediment.`, subject === project ? null : subject.id));
+  }
+  if (!isBlocked && blockers.length) {
+    issues.push(issue("misclassified_blocker", project.id, "change", `${label} lists blockers but is ${subject.status}; use queued, waiting_dependency, unknown, or a real blocked state accurately.`, subject === project ? null : subject.id));
+  }
+  if (!isBlocked && actions.length) {
+    issues.push(issue("orphan_blocker_action", project.id, "change", `${label} has blocker-clearing actions without a blocked or failed state.`, subject === project ? null : subject.id));
+  }
+  if (isBlocked) {
+    const byBlocker = new Map(actions.map((item) => [item.blocker, item]));
+    for (const blocker of blockers) {
+      const action = byBlocker.get(blocker);
+      if (!action?.clear_action || !action?.owner) {
+        issues.push(issue("blocker_without_clear_action", project.id, "change", `${label} blocker “${blocker}” has no clearing action and owner.`, subject === project ? null : subject.id));
+      }
+    }
   }
 }
 
@@ -405,7 +447,7 @@ function validateDriftStage(ledger, projects, options, issues) {
   for (const project of projects) {
     if (ageDays(project.updated_at, now) > maxAge) issues.push(issue("stale_project", project.id, "drift", `${project.id} has not been updated within ${maxAge} days.`));
     for (const [name, metric] of Object.entries(project.metrics)) {
-      if (metric.status === "measured" && ageDays(metric.measured_at, now) > maxAge) issues.push(issue("stale_metric", project.id, "drift", `${project.id} ${name} evidence is stale.`));
+      if (["valid", "stale"].includes(metric.status) && ageDays(metric.measured_at, now) > maxAge) issues.push(issue("stale_metric", project.id, "drift", `${project.id} ${name} evidence is stale.`));
     }
   }
 }
@@ -426,11 +468,54 @@ function selectReleases(project, options, issues, stage) {
   return selected;
 }
 
+function validateDataQualityStage(ledger, projects, options, issues) {
+  const now = options.now || new Date();
+  const computed = computePortfolioMetrics({ ...ledger, projects }, now);
+  const byProject = new Map(computed.projects.map((project) => [project.id, project]));
+  for (const project of projects) {
+    const quality = byProject.get(project.id);
+    if (!quality) continue;
+    for (const [kind, metric] of [["LEQ", quality.leq], ["JouleWork", quality.joulework]]) {
+      if (metric.status === "valid" || metric.status === "not_applicable") continue;
+      const requiredNow = ["release", "post-deploy"].includes(options.stage)
+        || (["verified", "complete", "production_proven"].includes(project.status) && metric.status !== "valid")
+        || (options.stage === "drift" && ["stale", "error"].includes(metric.status));
+      const missing = metric.missing_inputs?.length ? ` Missing: ${metric.missing_inputs.join(", ")}.` : "";
+      issues.push(issue(
+        `metric_${metric.status}`,
+        project.id,
+        options.stage || "change",
+        `${project.id} ${kind} is ${metric.status}.${missing} ${metric.next_action || metric.reason || ""}`.trim(),
+        null,
+        options.releaseId || null,
+        requiredNow
+      ));
+    }
+    const release = quality.release;
+    if (release && !["valid", "not_applicable"].includes(release.status)) {
+      const requiredNow = options.stage === "post-deploy"
+        || (project.status === "production_proven" && release.status !== "valid")
+        || (options.stage === "drift" && ["stale", "error"].includes(release.status));
+      const missing = release.missing_inputs?.length ? ` Missing: ${release.missing_inputs.join(", ")}.` : "";
+      issues.push(issue(
+        `release_${release.status}`,
+        project.id,
+        options.stage || "change",
+        `${project.id} release state is ${release.status}.${missing} ${release.next_action || release.reason || ""}`.trim(),
+        null,
+        options.releaseId || null,
+        requiredNow
+      ));
+    }
+  }
+}
+
 function reportFor(ledger, options, issues) {
   const projectId = options.projectId || null;
   const workItemId = options.workItemId || null;
   const releaseId = options.releaseId || null;
   const errors = issues.filter((item) => {
+    if (item.blocking === false) return false;
     if (item.code === "schema" || item.code === "duplicate_id" || item.code === "bad_link") return true;
     if (projectId && item.project_id !== projectId) return false;
     if (workItemId && item.work_item_id && item.work_item_id !== workItemId) return false;
@@ -451,21 +536,20 @@ function reportFor(ledger, options, issues) {
 
 export function computePortfolioMetrics(ledger, now = new Date(ledger.portfolio.updated_at)) {
   const projects = ledger.projects.map((project) => {
-    const workItems = project.work_items.map((workItem) => scoreWorkItem(project, workItem));
+    const workItems = project.work_items.map((workItem) => scoreWorkItem(project, workItem, ledger.portfolio.stale_after_days, now));
     const computed = workItems.length
       ? {
-          leq: aggregateMetric(workItems.map((item) => item.leq), "leq", now),
-          joulework: aggregateMetric(workItems.map((item) => item.joulework), "joulework", now),
+          leq: aggregateMetric(workItems.map((item) => item.leq), "leq", now, project.name, project.owner),
+          joulework: aggregateMetric(workItems.map((item) => item.joulework), "joulework", now, project.name, project.owner),
           source: "computed from ledger work, tests, evidence, and blockers"
         }
       : {
-          leq: normalizeReportedMetric(project.metrics.leq),
-          joulework: normalizeReportedMetric(project.metrics.joulework),
-          source: project.metrics.leq.status === "measured" || project.metrics.joulework.status === "measured"
-            ? "reported project metric source"
-            : "unavailable: no recorded work items or measured project source"
+          leq: normalizeReportedMetric(project.metrics.leq, "leq", project, ledger.portfolio.stale_after_days, now),
+          joulework: normalizeReportedMetric(project.metrics.joulework, "joulework", project, ledger.portfolio.stale_after_days, now),
+          source: "reported project metric source"
         };
-    return { id: project.id, name: project.name, ...computed, work_items: workItems };
+    const release = releaseQuality(project, ledger.portfolio.stale_after_days, now);
+    return { id: project.id, name: project.name, ...computed, release, work_items: workItems };
   });
   return {
     schema_version: 1,
@@ -473,8 +557,9 @@ export function computePortfolioMetrics(ledger, now = new Date(ledger.portfolio.
     formula_version: "traceability-v1",
     portfolio: {
       id: ledger.portfolio.id,
-      leq: aggregateMetric(projects.map((item) => item.leq).filter(isMeasuredMetric), "leq", now),
-      joulework: aggregateMetric(projects.map((item) => item.joulework).filter(isMeasuredMetric), "joulework", now)
+      leq: aggregateMetric(projects.map((item) => item.leq), "leq", now, ledger.portfolio.name, "Portfolio owners"),
+      joulework: aggregateMetric(projects.map((item) => item.joulework), "joulework", now, ledger.portfolio.name, "Portfolio owners"),
+      data_quality: summarizeDataQuality(projects.flatMap((item) => [item.leq, item.joulework, item.release]))
     },
     projects
   };
@@ -488,11 +573,10 @@ function renderPortfolioPortal(ledger, validation, now, metrics = computePortfol
     const tests = project.work_items.flatMap((item) => item.tests);
     const passedTests = tests.filter((item) => ["passed", "not_applicable"].includes(item.status)).length;
     const stale = ageDays(project.updated_at, now) > ledger.portfolio.stale_after_days;
-    const release = project.releases.find((item) => item.status === "production_proven") || project.releases.at(-1);
     const computedMetrics = metricsByProject.get(project.id);
-    return `<article class="project ${stale ? "stale" : ""}" data-updated-at="${escapeHtml(project.updated_at)}">
-      <div class="project-head"><div><p class="eyebrow">${escapeHtml(project.id)}</p><h2>${escapeHtml(project.name)}</h2></div><span class="pill ${statusClass(project.status)}">${escapeHtml(project.status)}</span></div>
-      <p class="outcome">${escapeHtml(project.outcome)}</p>
+    return `<article class="project ${stale ? "stale" : ""}" data-updated-at="${escapeHtml(project.updated_at)}" data-status="${escapeHtml(project.status)}">
+      <div class="project-head"><div><p class="eyebrow">${escapeHtml(project.id)}</p><h2>${escapeHtml(project.name)}</h2></div><span class="pill ${statusClass(project.status)}">${escapeHtml(statusLabel(project.status))}</span></div>
+      <p class="outcome">${escapeHtml(project.outcome)}</p>${stateContext(project)}
       <div class="progress-grid">
         ${progress("Requirements", completeRequirements, totalRequirements)}
         ${progress("Tests", passedTests, tests.length)}
@@ -500,18 +584,20 @@ function renderPortfolioPortal(ledger, validation, now, metrics = computePortfol
       <dl class="metrics">
         ${metricRow("LEQ", computedMetrics?.leq || project.metrics.leq)}
         ${metricRow("JouleWork", computedMetrics?.joulework || project.metrics.joulework)}
-        <div><dt>Release</dt><dd>${escapeHtml(release?.status || "none")}</dd></div>
+        ${releaseRow(computedMetrics?.release)}
         <div><dt>Updated</dt><dd class="project-updated">${escapeHtml(formatDate(project.updated_at))}${stale ? " · stale" : ""}</dd></div>
       </dl>
-      ${listBlock("Blockers", project.blockers, "blockers")}
-      ${listBlock("Next actions", project.next_actions, "actions")}
+      ${blockerBlock(project)}${listBlock("Next actions", project.next_actions, "actions")}${recentEvidence(project)}
       <details><summary>Traceability</summary>${traceTable(project)}</details>
     </article>`;
   }).join("\n");
   const allTests = ledger.projects.flatMap((project) => project.work_items.flatMap((item) => item.tests));
   const allWork = ledger.projects.flatMap((project) => project.work_items);
   const allEvidence = ledger.projects.flatMap((project) => project.evidence);
-  const blockingProjects = ledger.projects.filter((project) => project.blockers.length || ["blocked", "failed"].includes(project.status)).length;
+  const blockingProjects = ledger.projects.filter((project) => ["blocked", "failed"].includes(project.status)).length;
+  const queuedProjects = ledger.projects.filter((project) => project.status === "queued").length;
+  const waitingProjects = ledger.projects.filter((project) => project.status === "waiting_dependency").length;
+  const quality = metrics.portfolio.data_quality;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -519,26 +605,30 @@ function renderPortfolioPortal(ledger, validation, now, metrics = computePortfol
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(ledger.portfolio.name)} · AI.SDLC</title>
   <style>
-    :root{color-scheme:light;--ink:#182019;--muted:#667067;--paper:#f5f1e7;--card:#fffdf7;--line:#d8d0be;--green:#1d6b4b;--gold:#9d6d00;--red:#9c372d;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#faf7ef 0,#f0eadc 100%);color:var(--ink)}main{max-width:1240px;margin:auto;padding:32px 20px 72px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:20px}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 7px}h1{font-size:clamp(34px,5vw,58px);line-height:.98;margin:0;letter-spacing:-.035em}h2{margin:0;font-size:24px}p{line-height:1.5}.updated{color:var(--muted);text-align:right}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.card,.project{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px rgba(45,37,20,.06)}.card{padding:18px}.card strong{display:block;font-size:34px;margin-top:5px}.validation{padding:14px 18px;border-radius:14px;background:${validation.ok ? "#e9f4ed" : "#f8e7e2"};border:1px solid ${validation.ok ? "#bad5c5" : "#e1b4aa"};margin-bottom:18px}.validation.stale{background:#f8e7e2;border-color:#e1b4aa}.projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.project{padding:22px}.project.stale{border-color:#d8a55d}.project-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.pill{font-size:12px;font-weight:800;padding:6px 9px;border-radius:999px;background:#ece7da}.pill.good{background:#dfeee5;color:var(--green)}.pill.warn{background:#f4e9c8;color:#795200}.pill.bad{background:#f3dcd7;color:var(--red)}.outcome{min-height:48px;color:#39423b}.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}.bar{height:8px;background:#e8e2d5;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.metrics div{padding:10px;background:#f5f1e8;border-radius:10px}.metrics dt{font-size:11px;color:var(--muted);text-transform:uppercase}.metrics dd{margin:4px 0 0;font-weight:750}.blockers{color:#6e2923}.actions{color:#224e39}.compact{margin:6px 0 14px;padding-left:20px}.compact li{margin:5px 0}details{border-top:1px solid var(--line);padding-top:12px}summary{font-weight:750;cursor:pointer}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{text-align:left;padding:8px;border-bottom:1px solid #e5ded0;vertical-align:top}code{background:#eee8dc;padding:2px 5px;border-radius:5px}.foot{margin-top:20px;color:var(--muted);font-size:13px}@media(max-width:840px){.projects{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}.hero{display:block}.updated{text-align:left}.metrics{grid-template-columns:repeat(2,1fr)}}
+    :root{color-scheme:light;--ink:#182019;--muted:#667067;--paper:#f5f1e7;--card:#fffdf7;--line:#d8d0be;--green:#1d6b4b;--gold:#9d6d00;--red:#9c372d;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#faf7ef 0,#f0eadc 100%);color:var(--ink)}main{max-width:1240px;margin:auto;padding:32px 20px 72px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:20px}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 7px}h1{font-size:clamp(34px,5vw,58px);line-height:.98;margin:0;letter-spacing:-.035em}h2{margin:0;font-size:24px}p{line-height:1.5}.updated{color:var(--muted);text-align:right}.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:20px 0}.card,.project{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px rgba(45,37,20,.06)}.card{padding:16px}.card strong{display:block;font-size:30px;margin-top:5px}.validation,.data-quality{padding:14px 18px;border-radius:14px;margin-bottom:12px}.validation{background:${validation.ok ? "#e9f4ed" : "#f8e7e2"};border:1px solid ${validation.ok ? "#bad5c5" : "#e1b4aa"}}.data-quality{background:#f7f0d8;border:1px solid #ddc98b}.validation.stale{background:#f8e7e2;border-color:#e1b4aa}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0}.toolbar label{font-weight:750}.toolbar select{margin-left:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card)}.projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.project{padding:22px}.project[hidden]{display:none}.project.stale{border-color:#d8a55d}.project-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.pill{font-size:12px;font-weight:800;padding:6px 9px;border-radius:999px;background:#ece7da}.pill.good{background:#dfeee5;color:var(--green)}.pill.warn{background:#f4e9c8;color:#795200}.pill.bad{background:#f3dcd7;color:var(--red)}.outcome{min-height:48px;color:#39423b}.state-context{padding:10px 12px;background:#f7f0dd;border-left:3px solid var(--gold);margin:10px 0}.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}.bar{height:8px;background:#e8e2d5;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.metrics>div{padding:10px;background:#f5f1e8;border-radius:10px;min-width:0}.metrics dt{font-size:11px;color:var(--muted);text-transform:uppercase}.metrics dd{margin:4px 0 0;font-weight:750}.metric-detail{border:0;padding:0;margin-top:6px;font-size:11px;color:var(--muted)}.metric-detail summary{font-size:11px;font-weight:700}.metric-detail p{margin:5px 0}.blockers{color:#6e2923}.actions{color:#224e39}.compact{margin:6px 0 14px;padding-left:20px}.compact li{margin:5px 0}.project>details{border-top:1px solid var(--line);padding-top:12px}.project>details>summary{font-weight:750;cursor:pointer}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{text-align:left;padding:8px;border-bottom:1px solid #e5ded0;vertical-align:top}code{background:#eee8dc;padding:2px 5px;border-radius:5px}.foot{margin-top:20px;color:var(--muted);font-size:13px}@media(max-width:1000px){.summary{grid-template-columns:repeat(3,1fr)}}@media(max-width:840px){.projects{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}.hero{display:block}.updated{text-align:left}.metrics{grid-template-columns:repeat(2,1fr)}.toolbar{align-items:start;flex-direction:column}}
   </style>
 </head>
 <body><main id="human-dashboard" data-portfolio-updated-at="${escapeHtml(ledger.portfolio.updated_at)}" data-stale-after-days="${ledger.portfolio.stale_after_days}">
   <header class="hero"><div><p class="eyebrow">AI.SDLC · ${escapeHtml(ledger.portfolio.mode)} mode</p><h1>${escapeHtml(ledger.portfolio.name)}</h1></div><p class="updated">Updated ${escapeHtml(formatDate(ledger.portfolio.updated_at))}<br>Generated ${escapeHtml(formatDate(now.toISOString()))}</p></header>
   <div class="summary">
     <div class="card"><span class="eyebrow">Projects</span><strong>${ledger.projects.length}</strong></div>
+    <div class="card"><span class="eyebrow">Blocked</span><strong>${blockingProjects}</strong></div>
+    <div class="card"><span class="eyebrow">Queued</span><strong>${queuedProjects}</strong></div>
+    <div class="card"><span class="eyebrow">Waiting</span><strong>${waitingProjects}</strong></div>
     <div class="card"><span class="eyebrow">Portfolio LEQ</span><strong>${metricValue(metrics.portfolio.leq)}</strong></div>
     <div class="card"><span class="eyebrow">Portfolio JouleWork</span><strong>${metricValue(metrics.portfolio.joulework)}</strong></div>
-    <div class="card"><span class="eyebrow">Blocked projects</span><strong>${blockingProjects}</strong></div>
   </div>
-  <div class="validation" id="ledger-validation"><strong>${validation.ok ? "Ledger passes current checks" : `Ledger has ${validation.errors.length} blocking issue(s)`}</strong><div>${validation.ok ? "Plan, requirements, work, tests, evidence links, and current drift state are consistent." : escapeHtml(validation.errors.slice(0, 4).map((item) => item.message).join(" · "))}</div></div>
+  <div class="validation" id="ledger-validation"><strong>${validation.ok ? "Ledger structure is valid" : `Ledger validation found ${validation.errors.length} blocking issue(s)`}</strong><div>${validation.ok ? "Schema, links, declared states, and freshness rules are internally consistent. This does not mean every project is tested, complete, or unblocked." : escapeHtml(validation.errors.slice(0, 4).map((item) => item.message).join(" · "))}</div></div>
+  <div class="data-quality" id="data-quality"><strong>Dashboard data quality: ${quality.valid} current · ${quality.awaiting_inputs} awaiting inputs · ${quality.not_applicable} not applicable · ${quality.stale + quality.error} needs attention</strong><div>LEQ, JouleWork, and release fields identify their source, scope, freshness, and next action. Missing inputs are never converted to zero or a perfect score.</div></div>
+  <div class="toolbar"><label for="status-filter">Show projects<select id="status-filter"><option value="all">All statuses</option><option value="blocked">Blocked / failed</option><option value="queued">Queued</option><option value="waiting_dependency">Waiting on dependency</option><option value="active">Active</option><option value="verified">Verified / complete</option><option value="unknown">Unknown</option></select></label><span id="visible-count">${ledger.projects.length} shown</span></div>
   <section class="projects">${projectCards}</section>
-  <p class="foot">${allTests.filter((item) => item.status === "passed").length} passed tests of ${allTests.length} declared across ${allWork.length} work items and ${allEvidence.length} evidence records. Metrics use traceability-v1 when work is recorded; otherwise an explicit measured source is required and unavailable input stays unknown.</p>
-  <script>(()=>{const root=document.getElementById('human-dashboard');const max=Number(root.dataset.staleAfterDays)*86400000;const now=Date.now();let stale=now-Date.parse(root.dataset.portfolioUpdatedAt)>max;document.querySelectorAll('.project').forEach(card=>{const isStale=now-Date.parse(card.dataset.updatedAt)>max;card.classList.toggle('stale',isStale);const label=card.querySelector('.project-updated');if(label){label.textContent=label.textContent.replace(/ · stale$/,'')+(isStale?' · stale':'')}stale||=isStale});if(stale){const box=document.getElementById('ledger-validation');box.classList.add('stale');box.querySelector('strong').textContent='Ledger drift is stale';box.querySelector('div').textContent='The current clock is beyond the registered freshness window. Run the drift gate and refresh the ledger.'}})();</script>
+  <p class="foot">${allTests.filter((item) => item.status === "passed").length} passed tests of ${allTests.length} declared across ${allWork.length} work items and ${allEvidence.length} evidence records. Metrics use traceability-v1 when work is recorded; otherwise every unavailable value is labeled not applicable, awaiting named inputs, stale, or error with its reason and next action.</p>
+  <script>(()=>{const root=document.getElementById('human-dashboard');const max=Number(root.dataset.staleAfterDays)*86400000;const now=Date.now();let stale=now-Date.parse(root.dataset.portfolioUpdatedAt)>max;const cards=[...document.querySelectorAll('.project')];cards.forEach(card=>{const isStale=now-Date.parse(card.dataset.updatedAt)>max;card.classList.toggle('stale',isStale);const label=card.querySelector('.project-updated');if(label){label.textContent=label.textContent.replace(/ · stale$/,'')+(isStale?' · stale':'')}stale||=isStale});if(stale){const box=document.getElementById('data-quality');box.classList.add('stale');box.querySelector('strong').textContent='Dashboard data freshness needs attention';box.querySelector('div').textContent='The current clock is beyond the registered freshness window. This does not change ledger structure validity or prove that every project is blocked.'}const filter=document.getElementById('status-filter');const count=document.getElementById('visible-count');const matches=(status,value)=>value==='all'||(value==='blocked'&&['blocked','failed'].includes(status))||(value==='verified'&&['verified','complete','production_proven'].includes(status))||status===value;filter.addEventListener('change',()=>{let shown=0;cards.forEach(card=>{card.hidden=!matches(card.dataset.status,filter.value);if(!card.hidden)shown+=1});count.textContent=shown+' shown'});})();</script>
 </main></body></html>`;
 }
 
 function traceTable(project) {
-  const metrics = computePortfolioMetrics({ portfolio: { id: "trace", updated_at: project.updated_at }, projects: [project] }, new Date(project.updated_at)).projects[0];
+  const metrics = computePortfolioMetrics({ portfolio: { id: "trace", name: "Trace", updated_at: project.updated_at, stale_after_days: 30 }, projects: [project] }, new Date(project.updated_at)).projects[0];
   const byWork = new Map(metrics.work_items.map((item) => [item.id, item]));
   const rows = project.work_items.map((work) => {
     const requirements = work.implements.join(", ");
@@ -556,15 +646,61 @@ function progress(label, value, total) {
 }
 
 function metricRow(label, metric) {
-  const value = metric.status === "measured" ? `${metric.score} · ${metric.classification || "measured"}` : "unknown";
-  return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`;
+  const value = metric?.status === "valid" || metric?.status === "stale"
+    ? `${metric.score} · ${metric.classification}${metric.status === "stale" ? " · stale" : ""}`
+    : metricStateLabel(metric?.status);
+  return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>${metricDetails(metric)}</div>`;
 }
 
 function metricValue(metric) {
-  return metric?.status === "measured" ? escapeHtml(String(metric.score)) : "unknown";
+  if (metric?.status === "valid") return escapeHtml(String(metric.score));
+  if (metric?.status === "stale") return `${escapeHtml(String(metric.score))} · stale`;
+  return escapeHtml(metricStateLabel(metric?.status));
 }
 
-function scoreWorkItem(project, workItem) {
+function releaseRow(release) {
+  const value = release?.status === "valid" || release?.status === "stale"
+    ? `${release.value}${release.status === "stale" ? " · stale" : ""}`
+    : metricStateLabel(release?.status);
+  return `<div><dt>Release</dt><dd>${escapeHtml(value)}</dd>${metricDetails(release)}</div>`;
+}
+
+function metricDetails(metric) {
+  if (!metric) return "";
+  const details = [];
+  if (metric.definition) details.push(`<p><strong>Definition:</strong> ${escapeHtml(metric.definition)}</p>`);
+  if (metric.scope) details.push(`<p><strong>Scope:</strong> ${escapeHtml(metric.scope)}</p>`);
+  if (metric.source) details.push(`<p><strong>Source:</strong> ${escapeHtml(metric.source)}</p>`);
+  if (metric.measured_at) details.push(`<p><strong>Updated:</strong> ${escapeHtml(formatDate(metric.measured_at))}</p>`);
+  if (metric.reason) details.push(`<p><strong>Why:</strong> ${escapeHtml(metric.reason)}</p>`);
+  if (metric.missing_inputs?.length) details.push(`<p><strong>Missing:</strong> ${escapeHtml(metric.missing_inputs.join(", "))}</p>`);
+  if (metric.next_action) details.push(`<p><strong>Next:</strong> ${escapeHtml(metric.next_action)}</p>`);
+  if (metric.owner) details.push(`<p><strong>Owner:</strong> ${escapeHtml(metric.owner)}</p>`);
+  return details.length ? `<details class="metric-detail"><summary>Evidence and state</summary>${details.join("")}</details>` : "";
+}
+
+function scoreWorkItem(project, workItem, staleDays, now) {
+  const scope = `${project.name} / ${workItem.id}`;
+  const owner = workItem.owner || project.owner;
+  if (NON_EXECUTING.has(workItem.status)) {
+    const reason = workItem.state_reason || `${workItem.title} has not entered execution.`;
+    return {
+      id: workItem.id,
+      status: workItem.status,
+      leq: notApplicableMetric("leq", scope, reason),
+      joulework: notApplicableMetric("joulework", scope, reason)
+    };
+  }
+  if (["waiting_dependency", "unknown"].includes(workItem.status)) {
+    const missing = workItem.waiting_on?.length ? workItem.waiting_on : ["confirmed execution state and verification inputs"];
+    const next = workItem.next_actions?.[0] || "Resolve the named dependency and register current verification evidence.";
+    return {
+      id: workItem.id,
+      status: workItem.status,
+      leq: awaitingMetric("leq", scope, owner, missing, next),
+      joulework: awaitingMetric("joulework", scope, owner, missing, next)
+    };
+  }
   const evidence = new Map(project.evidence.map((item) => [item.id, item]));
   const requiredTypes = new Set(workItem.required_test_types);
   const testsByType = new Map([...requiredTypes].map((type) => [type, workItem.tests.filter((test) => test.type === type)]));
@@ -572,6 +708,17 @@ function scoreWorkItem(project, workItem) {
   const declaredRatio = ratio([...testsByType.values()].filter((tests) => tests.length).length);
   const passedRatio = ratio([...testsByType.values()].filter((tests) => tests.some((test) => ["passed", "not_applicable"].includes(test.status))).length);
   const passedTests = workItem.tests.filter((test) => test.status === "passed");
+  const failedTests = workItem.tests.filter((test) => test.status === "failed");
+  if (!passedTests.length && !failedTests.length) {
+    const missing = workItem.required_test_types.map((type) => `${type} verification evidence`);
+    const next = workItem.next_actions?.[0] || "Run the declared verification and attach passed or failed evidence.";
+    return {
+      id: workItem.id,
+      status: workItem.status,
+      leq: awaitingMetric("leq", scope, owner, missing, next),
+      joulework: awaitingMetric("joulework", scope, owner, missing, next)
+    };
+  }
   const evidenceRatio = passedTests.length
     ? passedTests.filter((test) => test.evidence_ids.length && test.evidence_ids.every((id) => evidence.get(id)?.status === "passed")).length / passedTests.length
     : 0;
@@ -581,37 +728,116 @@ function scoreWorkItem(project, workItem) {
   const completed = ["verified", "complete", "production_proven"].includes(workItem.status) ? 1 : 0;
   const leqScore = boundedScore(20 * linked + 15 * declaredRatio + 35 * passedRatio + 20 * evidenceRatio + 10 * blockerFree - failurePenalty);
   const jouleworkScore = boundedScore(20 * linked + 30 * passedRatio + 25 * evidenceRatio + 25 * completed - failurePenalty);
+  const leq = validMetric(leqScore, "leq", project.updated_at, "computed from registered requirement links, declared tests, passed evidence, failures, and blockers", scope);
+  const joulework = validMetric(jouleworkScore, "joulework", project.updated_at, "computed from registered completed outcomes, passed evidence, failures, and blockers", scope);
+  const stale = ageDays(project.updated_at, now) > staleDays;
   return {
     id: workItem.id,
     status: workItem.status,
-    leq: measuredMetric(leqScore, "leq", project.updated_at, "computed from required verification and evidence links"),
-    joulework: measuredMetric(jouleworkScore, "joulework", project.updated_at, "computed from completed evidence-backed useful work minus failure and blocker penalties")
+    leq: stale ? staleMetric(leq, owner, `Work-item inputs are older than ${staleDays} days.`, "Refresh tests and evidence, then recompute the ledger.") : leq,
+    joulework: stale ? staleMetric(joulework, owner, `Work-item inputs are older than ${staleDays} days.`, "Refresh tests and evidence, then recompute the ledger.") : joulework
   };
 }
 
-function aggregateMetric(metrics, kind, now) {
-  const measured = metrics.filter(isMeasuredMetric);
-  if (!measured.length) return { status: "unknown" };
-  const score = boundedScore(measured.reduce((sum, metric) => sum + metric.score, 0) / measured.length);
-  return measuredMetric(score, kind, now.toISOString(), `average of ${measured.length} measured child ${measured.length === 1 ? "record" : "records"}`);
+function aggregateMetric(metrics, kind, now, scope, owner) {
+  const applicable = metrics.filter((metric) => metric?.status !== "not_applicable");
+  if (!applicable.length) return notApplicableMetric(kind, scope, "No child work is currently applicable to this metric.");
+  const errors = applicable.filter((metric) => metric.status === "error");
+  if (errors.length) {
+    return errorMetric(kind, scope, owner, errors.map((metric) => metric.reason).filter(Boolean).join("; ") || "A child metric is in error.", "Repair the child metric inputs and recompute the ledger.");
+  }
+  const awaiting = applicable.filter((metric) => metric.status === "awaiting_inputs");
+  if (awaiting.length) {
+    const missing = [...new Set(awaiting.flatMap((metric) => metric.missing_inputs || []))];
+    return awaitingMetric(kind, scope, owner, missing.length ? missing : ["child metric inputs"], awaiting[0].next_action || "Supply the named child inputs and recompute the ledger.");
+  }
+  const scored = applicable.filter((metric) => ["valid", "stale"].includes(metric.status) && Number.isFinite(metric.score));
+  if (scored.length !== applicable.length) {
+    return errorMetric(kind, scope, owner, "One or more child metrics have an invalid state or no score.", "Correct the child data-quality state and recompute the ledger.");
+  }
+  const score = boundedScore(scored.reduce((sum, metric) => sum + metric.score, 0) / scored.length);
+  const source = `average of ${scored.length} applicable child ${scored.length === 1 ? "record" : "records"}`;
+  const valid = validMetric(score, kind, now.toISOString(), source, scope);
+  if (scored.some((metric) => metric.status === "stale")) {
+    return staleMetric(valid, owner, "One or more dependent child metrics are stale.", "Refresh stale child inputs and recompute the aggregate.");
+  }
+  return valid;
 }
 
-function normalizeReportedMetric(metric) {
-  if (!isMeasuredMetric(metric)) return { status: "unknown" };
+function normalizeReportedMetric(metric, kind, project, staleDays, now) {
+  if (!metric || !["valid", "not_applicable", "awaiting_inputs", "stale", "error"].includes(metric.status)) {
+    return errorMetric(kind, project.name, project.owner, "The recorded metric state is invalid.", "Record an explicit valid, not applicable, awaiting inputs, stale, or error state.");
+  }
+  if (metric.status === "valid" && ageDays(metric.measured_at, now) > staleDays) {
+    return staleMetric(metric, project.owner, `Recorded evidence is older than ${staleDays} days.`, "Refresh the named source and update measured_at.");
+  }
   return { ...metric };
 }
 
-function isMeasuredMetric(metric) {
-  return metric?.status === "measured" && Number.isFinite(metric.score);
-}
-
-function measuredMetric(score, kind, measuredAt, source) {
+function validMetric(score, kind, measuredAt, source, scope) {
   const healthy = kind === "leq" ? 85 : 70;
   const watch = kind === "leq" ? 60 : 40;
   const classification = score >= healthy
     ? (kind === "leq" ? "healthy" : "productive")
     : score >= watch ? "watch" : (kind === "leq" ? "critical" : "stalled");
-  return { status: "measured", score, classification, measured_at: measuredAt, source };
+  return { status: "valid", score, classification, measured_at: measuredAt, source, definition: METRIC_DEFINITIONS[kind], scope };
+}
+
+function notApplicableMetric(kind, scope, reason) {
+  return { status: "not_applicable", definition: METRIC_DEFINITIONS[kind], scope, reason };
+}
+
+function awaitingMetric(kind, scope, owner, missingInputs, nextAction) {
+  return { status: "awaiting_inputs", definition: METRIC_DEFINITIONS[kind], scope, missing_inputs: [...new Set(missingInputs)], next_action: nextAction, owner };
+}
+
+function staleMetric(metric, owner, reason, nextAction) {
+  return { ...metric, status: "stale", reason, next_action: nextAction, owner };
+}
+
+function errorMetric(kind, scope, owner, reason, nextAction) {
+  return { status: "error", definition: METRIC_DEFINITIONS[kind], scope, reason, next_action: nextAction, owner };
+}
+
+function releaseQuality(project, staleDays, now) {
+  const definition = "Latest registered release identity and its publication, deployment, and production-verification state.";
+  const scope = project.name;
+  const releases = project.releases || [];
+  if (!releases.length) {
+    if (NON_EXECUTING.has(project.status)) {
+      return { status: "not_applicable", definition, scope, reason: `No release is applicable while the project is ${statusLabel(project.status).toLowerCase()}.` };
+    }
+    return { status: "awaiting_inputs", definition, scope, missing_inputs: ["registered release record"], next_action: "Register the release candidate, artifact identity, and verification plan.", owner: project.owner };
+  }
+  const release = releases.at(-1);
+  const source = `ledger release ${release.id}${release.tag ? ` (${release.tag})` : ""}`;
+  const measuredAt = release.deployment?.deployed_at || project.updated_at;
+  if (release.status === "blocked") {
+    return { status: "error", definition, scope, source, reason: "The latest registered release is blocked.", next_action: "Resolve the release gate failures and record new evidence.", owner: project.owner };
+  }
+  if (["draft", "ready"].includes(release.status)) {
+    const missing = release.status === "draft" ? ["release readiness evidence"] : ["published release event"];
+    return { status: "awaiting_inputs", definition, scope, source, missing_inputs: missing, next_action: release.status === "draft" ? "Complete release verification and mark the release ready." : "Publish the release and record the hosted release event.", owner: project.owner };
+  }
+  const productionProven = release.status === "production_proven" && release.deployment?.status === "deployed" && release.production_test_ids?.length;
+  const value = productionProven ? `${release.tag || release.id} · production proven` : `${release.tag || release.id} · released`;
+  const valid = { status: "valid", value, definition, scope, measured_at: measuredAt, source, owner: project.owner };
+  if (ageDays(measuredAt, now) > staleDays) {
+    return { ...valid, status: "stale", reason: `Release evidence is older than ${staleDays} days.`, next_action: "Confirm the current live release and refresh production evidence.", owner: project.owner };
+  }
+  return valid;
+}
+
+function summarizeDataQuality(metrics) {
+  return metrics.reduce((summary, metric) => {
+    const state = metric?.status || "error";
+    summary[state] = (summary[state] || 0) + 1;
+    return summary;
+  }, { valid: 0, not_applicable: 0, awaiting_inputs: 0, stale: 0, error: 0 });
+}
+
+function metricStateLabel(status) {
+  return ({ valid: "current", not_applicable: "not applicable", awaiting_inputs: "awaiting inputs", stale: "stale", error: "error" })[status] || "invalid state";
 }
 
 function boundedScore(value) {
@@ -654,14 +880,66 @@ function listBlock(title, items, className) {
   return `<div class="${className}"><strong>${escapeHtml(title)}</strong><ul class="compact">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>`;
 }
 
+function recentEvidence(project) {
+  const items = [...(project.evidence || [])]
+    .sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at))
+    .slice(0, 4);
+  if (!items.length) return "";
+  const rows = items.map((item) => {
+    const label = `${formatDate(item.created_at)} · ${item.status}`;
+    const summary = item.uri
+      ? `<a href="${escapeHtml(item.uri)}">${escapeHtml(item.summary)}</a>`
+      : escapeHtml(item.summary);
+    return `<li><strong>${escapeHtml(label)}</strong><br>${summary}</li>`;
+  });
+  return `<details class="recent-evidence"><summary>Recent evidence</summary><ul class="compact">${rows.join("")}</ul></details>`;
+}
+
+function stateContext(subject) {
+  const lines = [];
+  if (subject.state_reason) lines.push(`<strong>${escapeHtml(statusLabel(subject.status))}:</strong> ${escapeHtml(subject.state_reason)}`);
+  if (subject.waiting_on?.length) lines.push(`<strong>Waiting on:</strong> ${escapeHtml(subject.waiting_on.join(", "))}`);
+  return lines.length ? `<div class="state-context">${lines.join("<br>")}</div>` : "";
+}
+
+function blockerBlock(subject) {
+  if (!subject.blockers?.length) return "";
+  const actions = new Map((subject.blocker_actions || []).map((item) => [item.blocker, item]));
+  const rows = subject.blockers.map((blocker) => {
+    const action = actions.get(blocker);
+    const resolution = action ? `<br><strong>Clear by:</strong> ${escapeHtml(action.clear_action)} <strong>Owner:</strong> ${escapeHtml(action.owner)}` : "";
+    return `<li>${escapeHtml(blocker)}${resolution}</li>`;
+  });
+  return `<div class="blockers"><strong>Actionable blockers</strong><ul class="compact">${rows.join("")}</ul></div>`;
+}
+
+function statusLabel(status) {
+  return ({
+    planned: "Planned",
+    queued: "Queued by priority",
+    waiting_dependency: "Waiting on dependency",
+    active: "In progress",
+    blocked: "Blocked",
+    failed: "Failed",
+    passed: "Passed",
+    verified: "Verified",
+    complete: "Complete",
+    ready: "Ready",
+    released: "Released",
+    production_proven: "Production proven",
+    deferred: "Deferred",
+    unknown: "Unverified state"
+  })[status] || status;
+}
+
 function statusClass(status) {
   if (["passed", "verified", "complete", "released", "production_proven"].includes(status)) return "good";
   if (["blocked", "failed"].includes(status)) return "bad";
   return "warn";
 }
 
-function issue(code, projectId, stage, message, workItemId = null, releaseId = null) {
-  return { code, project_id: projectId, stage, work_item_id: workItemId, release_id: releaseId, message };
+function issue(code, projectId, stage, message, workItemId = null, releaseId = null, blocking = true) {
+  return { code, project_id: projectId, stage, work_item_id: workItemId, release_id: releaseId, message, blocking };
 }
 
 function localArtifactPath(root, uri) {

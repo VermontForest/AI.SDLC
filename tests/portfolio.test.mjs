@@ -47,6 +47,7 @@ test("a failed task blocks itself but not an unrelated scoped task", async () =>
   ledger.projects[0].work_items.push({
     id: "WBS-002",
     title: "Legacy failed task",
+    owner: "Demo owner",
     status: "failed",
     implements: ["FRS-001"],
     affected_surfaces: ["legacy"],
@@ -55,6 +56,7 @@ test("a failed task blocks itself but not an unrelated scoped task", async () =>
     tests: [{ id: "TST-003", type: "unit", status: "failed", evidence_ids: [] }],
     changed_files: [],
     blockers: ["Known legacy defect"],
+    blocker_actions: [{ blocker: "Known legacy defect", clear_action: "Repair the legacy defect.", owner: "Demo owner" }],
     next_actions: ["Repair separately"]
   });
   const scoped = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
@@ -120,10 +122,12 @@ test("portal is generated from the validated ledger", async () => {
   assert.match(html, /id="human-dashboard"/);
   assert.match(html, /Demo Project/);
   assert.match(html, /WBS-001/);
-  assert.match(html, /Ledger passes current checks/);
+  assert.match(html, /Ledger structure is valid/);
+  assert.match(html, /This does not mean every project is tested, complete, or unblocked/);
+  assert.match(html, /Dashboard data quality/);
   assert.match(html, /UTC/);
   assert.match(html, /data-portfolio-updated-at/);
-  assert.match(html, /Ledger drift is stale/);
+  assert.match(html, /Dashboard data freshness needs attention/);
 });
 
 test("saved portal output is deterministic for an unchanged ledger", async () => {
@@ -138,7 +142,7 @@ test("saved portal output is deterministic for an unchanged ledger", async () =>
 test("task, project, and portfolio metrics are computed from recorded traceability", async () => {
   const { ledger } = await fixture();
   const metrics = computePortfolioMetrics(ledger, NOW);
-  assert.equal(metrics.portfolio.leq.status, "measured");
+  assert.equal(metrics.portfolio.leq.status, "valid");
   assert.equal(metrics.portfolio.leq.score, 100);
   assert.equal(metrics.projects[0].leq.score, 100);
   assert.equal(metrics.projects[0].joulework.score, 100);
@@ -150,6 +154,95 @@ test("task, project, and portfolio metrics are computed from recorded traceabili
   const degraded = computePortfolioMetrics(ledger, NOW);
   assert.ok(degraded.projects[0].work_items[0].leq.score < 100);
   assert.ok(degraded.projects[0].work_items[0].joulework.score < 100);
+});
+
+test("queue, dependency wait, and true blocker states remain distinct", async () => {
+  const queued = await fixture();
+  const queuedProject = queued.ledger.projects[0];
+  queuedProject.status = "queued";
+  queuedProject.state_reason = "Queued behind the current priority lane.";
+  queuedProject.releases = [];
+  queuedProject.work_items[0].status = "queued";
+  queuedProject.work_items[0].state_reason = "Starts when the priority lane opens.";
+  let report = await validateLedger(queued.ledger, { root: queued.root, stage: "change", now: NOW });
+  assert.equal(report.ok, true, report.errors.map((item) => item.message).join("; "));
+  const queuedMetrics = computePortfolioMetrics(queued.ledger, NOW);
+  assert.equal(queuedMetrics.projects[0].leq.status, "not_applicable");
+  await writeFile(join(queued.root, "portfolio.json"), `${JSON.stringify(queued.ledger, null, 2)}\n`, "utf8");
+  await buildPortfolioPortal(["--ledger", "portfolio.json", "--output", "dashboard.html"], { root: queued.root, now: NOW });
+  const html = await readFile(join(queued.root, "dashboard.html"), "utf8");
+  assert.match(html, /Blocked<\/span><strong>0/);
+  assert.match(html, /Queued<\/span><strong>1/);
+  assert.match(html, /Queued by priority/);
+
+  const waiting = await fixture();
+  const waitingProject = waiting.ledger.projects[0];
+  waitingProject.status = "waiting_dependency";
+  waitingProject.state_reason = "A named external input is required.";
+  waitingProject.waiting_on = ["Source acceptance criteria"];
+  waitingProject.releases = [];
+  waitingProject.work_items[0].status = "waiting_dependency";
+  waitingProject.work_items[0].state_reason = "Cannot execute without source acceptance criteria.";
+  waitingProject.work_items[0].waiting_on = ["Source acceptance criteria"];
+  report = await validateLedger(waiting.ledger, { root: waiting.root, stage: "change", now: NOW });
+  assert.equal(report.ok, true, report.errors.map((item) => item.message).join("; "));
+  assert.equal(computePortfolioMetrics(waiting.ledger, NOW).projects[0].leq.status, "awaiting_inputs");
+
+  const blocked = await fixture();
+  blocked.ledger.projects[0].status = "blocked";
+  blocked.ledger.projects[0].blockers = ["Provider denied required access"];
+  report = await validateLedger(blocked.ledger, { root: blocked.root, stage: "change", now: NOW });
+  assert.ok(report.errors.some((item) => item.code === "blocker_without_clear_action"));
+  blocked.ledger.projects[0].blocker_actions = [{ blocker: "Provider denied required access", clear_action: "Provider grants access.", owner: "Provider owner" }];
+  report = await validateLedger(blocked.ledger, { root: blocked.root, stage: "change", now: NOW });
+  assert.equal(report.errors.some((item) => item.code === "blocker_without_clear_action"), false);
+});
+
+test("missing, stale, and dependent metric inputs never become invented scores", async () => {
+  const active = await fixture();
+  active.ledger.projects[0].status = "active";
+  active.ledger.projects[0].releases = [];
+  for (const candidate of active.ledger.projects[0].work_items[0].tests) {
+    candidate.status = "planned";
+    candidate.evidence_ids = [];
+  }
+  let metrics = computePortfolioMetrics(active.ledger, NOW);
+  assert.equal(metrics.projects[0].leq.status, "awaiting_inputs");
+  assert.equal("score" in metrics.projects[0].leq, false);
+  assert.ok(metrics.projects[0].leq.missing_inputs.includes("unit verification evidence"));
+
+  const stale = await fixture();
+  stale.ledger.projects[0].updated_at = "2026-01-01T00:00:00.000Z";
+  metrics = computePortfolioMetrics(stale.ledger, NOW);
+  assert.equal(metrics.projects[0].leq.status, "stale");
+  assert.equal(metrics.portfolio.leq.status, "stale");
+
+  const completed = await fixture();
+  const project = completed.ledger.projects[0];
+  project.status = "complete";
+  project.work_items = [];
+  project.releases = [];
+  project.metrics.leq = { status: "awaiting_inputs", definition: "Current LEQ.", scope: "Demo Project", missing_inputs: ["verification evidence"], next_action: "Run verification.", owner: "Demo owner" };
+  project.metrics.joulework = { status: "awaiting_inputs", definition: "Current JouleWork.", scope: "Demo Project", missing_inputs: ["completed outcome evidence"], next_action: "Record outcome evidence.", owner: "Demo owner" };
+  const report = await validateLedger(completed.ledger, { root: completed.root, stage: "change", now: NOW });
+  assert.ok(report.errors.some((item) => item.code === "metric_awaiting_inputs"));
+});
+
+test("release display distinguishes awaiting, recorded, and unavailable states", async () => {
+  const pending = await fixture();
+  pending.ledger.projects[0].status = "active";
+  pending.ledger.projects[0].releases = [];
+  await writeFile(join(pending.root, "portfolio.json"), `${JSON.stringify(pending.ledger, null, 2)}\n`, "utf8");
+  await buildPortfolioPortal(["--ledger", "portfolio.json", "--output", "dashboard.html"], { root: pending.root, now: NOW });
+  const html = await readFile(join(pending.root, "dashboard.html"), "utf8");
+  assert.match(html, /Release<\/dt><dd>awaiting inputs/);
+  assert.doesNotMatch(html, /Release<\/dt><dd>(none|unknown)/i);
+
+  const released = await fixture();
+  const release = computePortfolioMetrics(released.ledger, NOW).projects[0].release;
+  assert.equal(release.status, "valid");
+  assert.match(release.value, /production proven/);
+  assert.match(release.source, /REL-001/);
 });
 
 test("portfolio sync writes deterministic board and metrics from one ledger", async () => {
@@ -228,6 +321,7 @@ async function fixture() {
       id: "demo",
       name: "Demo Project",
       outcome: "Prove executable traceability.",
+      owner: "Demo owner",
       status: "production_proven",
       updated_at: "2026-09-17T10:00:00.000Z",
       requirements: [
@@ -237,6 +331,7 @@ async function fixture() {
       work_items: [{
         id: "WBS-001",
         title: "Build proven outcome",
+        owner: "Demo owner",
         status: "complete",
         implements: ["FRS-001"],
         affected_surfaces: ["app"],
@@ -248,6 +343,7 @@ async function fixture() {
         ],
         changed_files: ["artifact.txt"],
         blockers: [],
+        blocker_actions: [],
         next_actions: []
       }],
       evidence: [
@@ -277,10 +373,11 @@ async function fixture() {
         production_test_ids: ["TST-002"]
       }],
       metrics: {
-        leq: { status: "measured", score: 96, classification: "healthy", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture" },
-        joulework: { status: "measured", score: 90, classification: "productive", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture" }
+        leq: { status: "valid", score: 96, classification: "healthy", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture", definition: "Fixture LEQ definition.", scope: "Demo Project" },
+        joulework: { status: "valid", score: 90, classification: "productive", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture", definition: "Fixture JouleWork definition.", scope: "Demo Project" }
       },
       blockers: [],
+      blocker_actions: [],
       next_actions: []
     }]
   };
