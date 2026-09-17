@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T12:30:00.000Z",
+  "generated_at": "2026-09-17T11:34:18.893Z",
   "formula_version": "traceability-v1",
   "portfolio": {
     "id": "ai-sdlc-public",
@@ -8,14 +8,14 @@
       "status": "measured",
       "score": 100,
       "classification": "healthy",
-      "measured_at": "2026-09-17T12:30:00.000Z",
+      "measured_at": "2026-09-17T11:34:18.893Z",
       "source": "average of 1 measured child record"
     },
     "joulework": {
       "status": "measured",
       "score": 100,
       "classification": "productive",
-      "measured_at": "2026-09-17T12:30:00.000Z",
+      "measured_at": "2026-09-17T11:34:18.893Z",
       "source": "average of 1 measured child record"
     }
   },
@@ -27,14 +27,14 @@
         "status": "measured",
         "score": 100,
         "classification": "healthy",
-        "measured_at": "2026-09-17T12:30:00.000Z",
+        "measured_at": "2026-09-17T11:34:18.893Z",
         "source": "average of 6 measured child records"
       },
       "joulework": {
         "status": "measured",
         "score": 100,
         "classification": "productive",
-        "measured_at": "2026-09-17T12:30:00.000Z",
+        "measured_at": "2026-09-17T11:34:18.893Z",
         "source": "average of 6 measured child records"
       },
       "source": "computed from ledger work, tests, evidence, and blockers",
@@ -46,14 +46,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         },
@@ -64,14 +64,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         },
@@ -82,14 +82,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         },
@@ -100,14 +100,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         },
@@ -118,14 +118,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         },
@@ -136,14 +136,14 @@
             "status": "measured",
             "score": 100,
             "classification": "healthy",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from required verification and evidence links"
           },
           "joulework": {
             "status": "measured",
             "score": 100,
             "classification": "productive",
-            "measured_at": "2026-09-17T12:30:00.000Z",
+            "measured_at": "2026-09-17T11:34:18.893Z",
             "source": "computed from completed evidence-backed useful work minus failure and blocker penalties"
           }
         }

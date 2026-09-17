@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T12:30:00.000Z",
+    "updated_at": "2026-09-17T11:34:18.893Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -14,7 +14,7 @@
       "name": "AI.SDLC",
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "status": "verified",
-      "updated_at": "2026-09-17T12:30:00.000Z",
+      "updated_at": "2026-09-17T11:34:18.893Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -215,7 +215,7 @@
           "required_test_types": ["integration", "regression", "production"],
           "tests": [
             { "id": "TST-012", "type": "integration", "status": "passed", "command": "node --test tests/automation.test.mjs tests/portfolio.test.mjs", "evidence_ids": ["EV-007", "EV-011"] },
-            { "id": "TST-013", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-007"] },
+            { "id": "TST-013", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-007", "EV-013"] },
             { "id": "TST-014", "type": "production", "status": "passed", "evidence_ids": ["EV-009"] }
           ],
           "changed_files": [".github/workflows/release-gate.yml", ".github/workflows/post-deploy.yml", ".github/workflows/publish-release.yml", "src/portfolio.mjs", "schemas/portfolio-ledger.schema.json"],
@@ -283,7 +283,7 @@
           "id": "EV-007",
           "type": "test_report",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The repository contract, built-in self-test, 24 lifecycle-hook tests, and 17 portfolio/automation tests passed; protected regression and YAML lint also passed.",
           "uri": "evidence/v0.2.1-completion-audit.json",
           "artifact_ids": ["ART-002"]
@@ -292,7 +292,7 @@
           "id": "EV-008",
           "type": "visual_comparison",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The live local portal rendered its task/project/portfolio metrics at desktop and 390x844 mobile widths with zero console errors or warnings.",
           "uri": "evidence/v0.2.1-completion-audit.json",
           "artifact_ids": ["ART-002"]
@@ -301,7 +301,7 @@
           "id": "EV-009",
           "type": "production_check",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The live GitHub API confirms protected main requires pull requests, five hosted checks, current-base strictness, conversation resolution, and admin enforcement; force pushes and deletion are disabled.",
           "uri": "https://api.github.com/repos/VermontForest/AI.SDLC/branches/main/protection",
           "artifact_ids": ["ART-002"]
@@ -310,7 +310,7 @@
           "id": "EV-010",
           "type": "artifact_identity",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The v0.2.1 npm tarball identity was calculated from its actual bytes.",
           "uri": "dist/ai-sdlc-0.2.1.tgz",
           "sha256": "9e109af08ca365f23a04d932b3483f5357c9cc291124c97744f9af6044df0f47",
@@ -320,7 +320,7 @@
           "id": "EV-011",
           "type": "behavioral_comparison",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "Regression cases prove ledger-derived metric rollups, deterministic board sync, lifecycle-event recording, rejection without production proof, and publish-job dependency on the release gate.",
           "uri": "tests/portfolio.test.mjs",
           "artifact_ids": ["ART-002"]
@@ -329,9 +329,18 @@
           "id": "EV-012",
           "type": "approval_record",
           "status": "passed",
-          "created_at": "2026-09-17T12:30:00.000Z",
+          "created_at": "2026-09-17T11:30:00.000Z",
           "summary": "The operator required the final completion audit, correction of public release quality, closure of authorized automation gaps, and public promotion only after proof.",
           "uri": "docs/project-plan.md",
+          "artifact_ids": ["ART-002"]
+        },
+        {
+          "id": "EV-013",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T11:34:18.893Z",
+          "summary": "GitHub pull request 4 passed the protected change gate and the Ubuntu/Windows Node.js 20/24 validation matrix for commit 3a3714b19c439ad175aebee39acdfa37f9ae5323.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35216261112",
           "artifact_ids": ["ART-002"]
         }
       ],
@@ -368,7 +377,7 @@
           "scope": "Complete, verify, and publicly promote the AI.SDLC completion-automation audit.",
           "required": true,
           "status": "approved",
-          "decided_at": "2026-09-17T12:30:00.000Z",
+          "decided_at": "2026-09-17T11:30:00.000Z",
           "evidence_id": "EV-012"
         }
       ],
@@ -411,7 +420,7 @@
         "joulework": { "status": "unknown" }
       },
       "blockers": [],
-      "next_actions": ["Run hosted pull-request and main-branch verification for REL-002; preserve Vibe Mode as future-only work."]
+      "next_actions": ["Merge pull request 4 after its protected checks pass, then verify the protected main-branch run; preserve Vibe Mode as future-only work."]
     }
   ]
 }

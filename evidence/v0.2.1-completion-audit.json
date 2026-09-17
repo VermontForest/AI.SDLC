@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release": "0.2.1",
-  "recorded_at": "2026-09-17T12:15:00.000Z",
+  "recorded_at": "2026-09-17T11:34:18.893Z",
   "local_verification": {
     "repository_contract": "passed",
     "built_in_self_test": "passed",
@@ -39,8 +39,18 @@
     "sha256": "9e109af08ca365f23a04d932b3483f5357c9cc291124c97744f9af6044df0f47"
   },
   "hosted_verification": {
-    "status": "pending",
-    "note": "This record will be updated after the audit branch runs on GitHub."
+    "status": "passed",
+    "pull_request": "https://github.com/VermontForest/AI.SDLC/pull/4",
+    "commit": "3a3714b19c439ad175aebee39acdfa37f9ae5323",
+    "change_gate": "https://github.com/VermontForest/AI.SDLC/actions/runs/35216261112",
+    "validation_matrix": "https://github.com/VermontForest/AI.SDLC/actions/runs/35216261186",
+    "required_checks": {
+      "validate": "passed",
+      "ubuntu_node_20": "passed",
+      "ubuntu_node_24": "passed",
+      "windows_node_20": "passed",
+      "windows_node_24": "passed"
+    }
   },
   "limits": [
     "Lifecycle event automation refuses to fabricate production tests or acceptance evidence.",
