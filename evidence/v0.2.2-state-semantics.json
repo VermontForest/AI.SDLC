@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "release": "v0.2.2",
+  "generated_at": "2026-09-17T12:30:00.000Z",
+  "scope": "Truthful work-state semantics, metric/release data quality, and supported hosted runtimes",
+  "local_verification": {
+    "status": "passed",
+    "commands": [
+      "npm test",
+      "node --test tests/automation.test.mjs tests/portfolio.test.mjs",
+      "npm run plan:validate",
+      "npm run portfolio:sync",
+      "npm run regress:protected -- --applied-skill testing-real-service-e2e-no-mocks"
+    ],
+    "portfolio_and_automation_tests": 21,
+    "hook_tests": 24,
+    "browser": {
+      "desktop": "passed",
+      "mobile_390x844": "passed",
+      "console_errors_or_warnings": 0,
+      "private_dashboard_http_status": 200,
+      "observed_counts": {
+        "projects": 9,
+        "blocked": 0,
+        "queued": 1,
+        "waiting_dependency": 1
+      }
+    }
+  },
+  "runtime_contract": {
+    "application_matrix": [22, 24],
+    "actions_checkout": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "actions_setup_node": "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+    "dependabot": ["github-actions", "npm"]
+  },
+  "historical_failures": [
+    {
+      "run_id": 35212370450,
+      "status": "resolved",
+      "cause": "The Windows Node.js 20 job received an unexpanded tests/*.test.mjs glob.",
+      "resolution": "Commit 5683197 changed the test command to explicit portable test paths; later Windows jobs passed.",
+      "url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212370450"
+    },
+    {
+      "run_id": 35212154194,
+      "status": "resolved",
+      "cause": "Generated portal timestamps depended on the executing timezone and caused a drift diff.",
+      "resolution": "Commit fca1963 made portal output deterministic; later change gates passed.",
+      "url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212154194"
+    }
+  ],
+  "artifact": {
+    "path": "dist/ai-sdlc-0.2.2.tgz",
+    "sha256": "581a6cbc6329a4d864dd96b3b032b2fa6cc415313c75b49971fad2d2efcc582c"
+  },
+  "hosted_verification": {
+    "status": "passed",
+    "pull_request": "https://github.com/VermontForest/AI.SDLC/pull/5",
+    "change_gate_run": "https://github.com/VermontForest/AI.SDLC/actions/runs/35221324916",
+    "validation_run": "https://github.com/VermontForest/AI.SDLC/actions/runs/35221324987",
+    "matrix": [
+      "ubuntu-latest / Node.js 22",
+      "ubuntu-latest / Node.js 24",
+      "windows-latest / Node.js 22",
+      "windows-latest / Node.js 24"
+    ],
+    "deprecated_node20_action_runtime_warning": false,
+    "required_status_checks_updated": [
+      "validate",
+      "validation (ubuntu-latest, 22)",
+      "validation (ubuntu-latest, 24)",
+      "validation (windows-latest, 22)",
+      "validation (windows-latest, 24)"
+    ]
+  }
+}

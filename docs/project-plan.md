@@ -8,10 +8,11 @@ tests, evidence, and releases can be traced back to an explicit plan.
 
 ## Current Priority: Executable Traceability And CI Enforcement
 
-**Implementation status:** v0.2.0 was publicly verified and merged. The v0.2.1
-completion audit adds automatic task/project/portfolio metric rollups,
-current-clock portal staleness, pre-publication release dependency, event-bound
-lifecycle recording through pull requests, and repository merge enforcement.
+**Implementation status:** v0.2.0 was publicly verified and merged. v0.2.1 added
+automatic task/project/portfolio metric rollups, current-clock portal staleness,
+event-bound lifecycle recording through pull requests, and repository merge
+enforcement. v0.2.2 hardens work-state semantics, metric/release data quality,
+and the supported hosted CI runtime.
 
 AI.SDLC will make the project plan the root record for delivery. The plan will
 define numbered user requirements, functional requirements, work breakdown,
@@ -63,6 +64,33 @@ record a passed release gate. A successful deployment event may record a
 deployment only when the ledger already contains passed production tests and
 evidence. Each event produces a pull request so branch rules and ordinary CI
 remain in control of the authoritative ledger.
+
+## v0.2.2 State And Data-Quality Contract
+
+The dashboard separates delivery state from the quality of the data displayed:
+
+- `queued` is a priority or capacity queue, not a blocker;
+- `waiting_dependency` names the prerequisite and why work cannot proceed;
+- `blocked` and `failed` require an evidenced impediment, a clearing action, and
+  an owner;
+- unverified or missing facts never count as blocked merely because they are
+  unknown;
+- LEQ, JouleWork, and release each declare definition, scope, source or missing
+  inputs, freshness, owner, and next action through `valid`, `not_applicable`,
+  `awaiting_inputs`, `stale`, or `error` states; and
+- dependent aggregates remain awaiting, stale, or error until every applicable
+  child is valid.
+
+Hooks, pull-request CI, main CI, lifecycle-event updates, and the serving-time
+portal recompute or invalidate derived state. Completion and post-deploy gates
+require valid values only when those values are required at that lifecycle
+stage. Ledger structure validity remains a separate claim and cannot imply
+tested, complete, released, or production-proven work.
+
+The hosted matrix is Node.js 22 and 24. Action execution uses pinned v7 action
+commits so the deprecated Node.js 20 action runtime is removed independently of
+the application test matrix. Weekly Dependabot checks keep both Action pins and
+npm dependencies visible for maintenance.
 
 ## Planned: Optional Vibe Mode
 

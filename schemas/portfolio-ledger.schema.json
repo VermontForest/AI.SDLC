@@ -32,7 +32,7 @@
     "dateTime": { "type": "string", "format": "date-time" },
     "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "status": {
-      "enum": ["planned", "active", "blocked", "failed", "passed", "verified", "complete", "ready", "released", "production_proven", "deferred", "unknown"]
+      "enum": ["planned", "queued", "waiting_dependency", "active", "blocked", "failed", "passed", "verified", "complete", "ready", "released", "production_proven", "deferred", "unknown"]
     },
     "requirement": {
       "type": "object",
@@ -66,7 +66,10 @@
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "title": { "$ref": "#/$defs/nonEmpty" },
+        "owner": { "$ref": "#/$defs/nonEmpty" },
         "status": { "$ref": "#/$defs/status" },
+        "state_reason": { "$ref": "#/$defs/nonEmpty" },
+        "waiting_on": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
         "implements": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
         "affected_surfaces": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
         "protected_contracts": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
@@ -74,7 +77,18 @@
         "tests": { "type": "array", "items": { "$ref": "#/$defs/test" } },
         "changed_files": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
         "blockers": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "blocker_actions": { "type": "array", "items": { "$ref": "#/$defs/blockerAction" } },
         "next_actions": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } }
+      }
+    },
+    "blockerAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocker", "clear_action", "owner"],
+      "properties": {
+        "blocker": { "$ref": "#/$defs/nonEmpty" },
+        "clear_action": { "$ref": "#/$defs/nonEmpty" },
+        "owner": { "$ref": "#/$defs/nonEmpty" }
       }
     },
     "evidence": {
@@ -159,24 +173,40 @@
     "metric": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status"],
+      "required": ["status", "definition", "scope"],
       "properties": {
-        "status": { "enum": ["measured", "unknown"] },
+        "status": { "enum": ["valid", "not_applicable", "awaiting_inputs", "stale", "error"] },
         "score": { "type": "number", "minimum": 0, "maximum": 100 },
         "classification": { "type": "string" },
         "measured_at": { "$ref": "#/$defs/dateTime" },
-        "source": { "type": "string" }
-      }
+        "source": { "$ref": "#/$defs/nonEmpty" },
+        "definition": { "$ref": "#/$defs/nonEmpty" },
+        "scope": { "$ref": "#/$defs/nonEmpty" },
+        "reason": { "$ref": "#/$defs/nonEmpty" },
+        "missing_inputs": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
+        "next_action": { "$ref": "#/$defs/nonEmpty" },
+        "owner": { "$ref": "#/$defs/nonEmpty" }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "const": "valid" } } }, "then": { "required": ["score", "classification", "measured_at", "source"] } },
+        { "if": { "properties": { "status": { "const": "not_applicable" } } }, "then": { "required": ["reason"] } },
+        { "if": { "properties": { "status": { "const": "awaiting_inputs" } } }, "then": { "required": ["missing_inputs", "next_action", "owner"] } },
+        { "if": { "properties": { "status": { "const": "stale" } } }, "then": { "required": ["score", "classification", "measured_at", "source", "reason", "next_action", "owner"] } },
+        { "if": { "properties": { "status": { "const": "error" } } }, "then": { "required": ["reason", "next_action", "owner"] } }
+      ]
     },
     "project": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name", "outcome", "status", "updated_at", "requirements", "work_items", "evidence", "artifacts", "approvals", "releases", "metrics", "blockers", "next_actions"],
+      "required": ["id", "name", "outcome", "owner", "status", "updated_at", "requirements", "work_items", "evidence", "artifacts", "approvals", "releases", "metrics", "blockers", "next_actions"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "name": { "$ref": "#/$defs/nonEmpty" },
         "outcome": { "$ref": "#/$defs/nonEmpty" },
+        "owner": { "$ref": "#/$defs/nonEmpty" },
         "status": { "$ref": "#/$defs/status" },
+        "state_reason": { "$ref": "#/$defs/nonEmpty" },
+        "waiting_on": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
         "updated_at": { "$ref": "#/$defs/dateTime" },
         "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
         "work_items": { "type": "array", "items": { "$ref": "#/$defs/workItem" } },
@@ -194,6 +224,7 @@
           }
         },
         "blockers": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "blocker_actions": { "type": "array", "items": { "$ref": "#/$defs/blockerAction" } },
         "next_actions": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } }
       }
     }

@@ -12,11 +12,16 @@ Last updated: 2026-09-13
 | SDLC-6: Portfolio LEQ/JouleWork are continuously derived across task, project, and portfolio | portfolio sync tests, generated metrics diff gate, local hooks, PR/main CI, and daily drift |
 | SDLC-7: Release and deployment transitions are gated and recorded | reusable workflow-call gates, pre-publication publish dependency, lifecycle-event tests, and automation-branch pull requests |
 | SDLC-8: Invalid changes cannot merge directly to main | GitHub branch protection/ruleset API evidence plus required hosted checks |
+| SDLC-9: Queued, dependency-waiting, active, and genuinely blocked work stay distinct | positive/negative state-contract tests, blocker-action ownership tests, portal counts and filters |
+| SDLC-10: LEQ, JouleWork, and release fields never invent missing values | explicit data-quality schema, stale/dependency propagation tests, completion-stage failure tests, portal detail proof |
+| SDLC-11: Hosted maintenance uses supported runtimes | pinned checkout/setup-node v7 assertions, Windows/Linux Node 22/24 matrix, Dependabot configuration, clean hosted run |
 
-Run `npm test` on Node 20 or newer. It validates maintained-file spelling,
+Run `npm test` on Node 22 or newer. It validates maintained-file spelling,
 configuration routing, package/launcher references, and real temporary-project
 lifecycle behavior. GitHub Actions runs the same command on Windows and Linux,
-with Node 20 and 24, for pushes and pull requests. It needs no premium skill
+with Node 22 and 24, for pushes and pull requests. GitHub Action execution uses
+pinned v7 action commits; that runtime is separate from the application matrix.
+It needs no premium skill
 bodies or credentials. CI fixture attestations are explicitly test data.
 
 Real work requires `npm run jsm:verify`, Assess before implementation, Regress

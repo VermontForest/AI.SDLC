@@ -52,9 +52,17 @@ ai-sdlc portal:serve --ledger /private/portfolio.json --host 127.0.0.1 --port 51
 
 The portal is then available at `http://127.0.0.1:5190/#human-dashboard`.
 When a project has recorded work, task scores roll up to project scores and
-project scores roll up to the portfolio. A project with neither recorded work
-nor an explicit measured source remains `unknown`; the tool does not invent
-input data or convert missing proof into a green status.
+project scores roll up to the portfolio. Every displayed LEQ, JouleWork, and
+release field has an explicit data-quality state: `valid`, `not_applicable`,
+`awaiting_inputs`, `stale`, or `error`. Missing inputs name their owner and next
+action; they never become zero, a perfect score, or a vague `unknown`.
+
+Work state is separate from data quality. `queued` means priority/capacity has
+not opened, `waiting_dependency` names a prerequisite, and `blocked` is reserved
+for an evidenced impediment with a clearing action and owner. Passing ledger
+validation means only that schema, links, declared states, and freshness rules
+are internally consistent; it does not mean every project is complete, tested,
+or unblocked.
 
 ### Transition Gates
 
@@ -63,7 +71,7 @@ input data or convert missing proof into a green status.
 | `change` | Invalid schema, broken traceability, contradictory completion, or a failed scoped task |
 | `release` | Incomplete work, missing approvals, wrong artifact hashes, unready rollback, or content claims without comparison evidence |
 | `post-deploy` | Missing deployment records or absent evidence-backed production checks |
-| `drift` | Stale portfolio, project, or measured-metric state |
+| `drift` | Stale portfolio, project, metric, release, or dependent aggregate state |
 
 Validation can be scoped to one project, work item, or release. A failed task
 blocks its own transition while remaining visible as debt; it does not silently
@@ -360,10 +368,11 @@ scores:
   blocker-free state (10), with explicit failure/blocker penalties;
 - task JouleWork weighs requirement linkage (20), passed verification (30),
   passed evidence (25), and completed useful work (25), with the same penalties;
-- project scores average recorded tasks, and the portfolio averages projects
-  with measured input;
-- projects without recorded work fall back only to a named measured source;
-  otherwise they remain `unknown`.
+- project scores average applicable task records, and the portfolio averages
+  applicable projects only when every dependent input is valid;
+- stale, error, or awaiting child state invalidates its dependent aggregate;
+- projects without recorded work use an explicit reported source or state why
+  the metric is not applicable, which inputs are awaited, or what failed.
 
 `npm run portfolio:sync` regenerates both `ops/portfolio-metrics.json` and
 `ops/portfolio-dashboard.html`. Local hooks, pull-request CI, `main` CI, and the
@@ -563,7 +572,7 @@ A project using an installed AI.SDLC package needs:
 | The files named by every configured pack command | Real project tests and validation commands |
 | `<skill-root>/<skill-name>/SKILL.md` for every routed method | JSM package presence |
 | An authorized `jsm` installation matching `jsm/official-skills.lock.json` | Licensed delivery and integrity of the complete official dependency collection |
-| Node.js 20 or newer | CLI runtime |
+| Node.js 22 or newer | CLI runtime |
 
 Package scripts are convenient but optional; direct `ai-sdlc` commands work.
 
@@ -603,7 +612,10 @@ gate as protected packs.
 ## Verification
 
 `npm test` runs the repository contract validator and real temporary-project
-self-test. GitHub Actions runs it on Windows/Linux with Node 20/24. The validator
+self-test. GitHub Actions runs it on Windows/Linux with Node 22/24. Hosted action
+execution uses current pinned `actions/checkout` and `actions/setup-node` v7
+commits; that action runtime is distinct from the application compatibility
+matrix. Dependabot checks both Actions and npm dependencies weekly. The validator
 checks canonical spelling, package entry points, locked staged skill routing,
 protected test commands, and durable responsibility guidance. No premium skill
 bodies are distributed in CI. Fixture attestations test the harness; actual
@@ -641,6 +653,11 @@ The portfolio tests additionally prove:
 - schema and trace-link failures block;
 - required test classes and evidence are enforced;
 - a failed scoped task blocks itself without blocking an unrelated task;
+- queued, dependency-waiting, and genuinely blocked work remain distinct;
+- blocked work must name an impediment, clearing action, and owner;
+- missing, stale, and dependent metric inputs cannot become invented scores;
+- release state distinguishes not applicable, awaiting publication, recorded,
+  and production-proven evidence;
 - approvals, rollback, deployment, and production proof are stage-specific;
 - incorrect artifact hashes block release;
 - delivery-only artifacts cannot masquerade as content changes;
