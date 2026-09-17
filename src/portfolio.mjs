@@ -439,7 +439,9 @@ function ageDays(value, now) {
 
 function formatDate(value) {
   const date = value instanceof Date ? value : new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toLocaleString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "unknown";
+  return Number.isFinite(date.getTime())
+    ? date.toLocaleString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC", timeZoneName: "short" })
+    : "unknown";
 }
 
 function parseArgs(argv) {

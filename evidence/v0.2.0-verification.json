@@ -38,7 +38,7 @@
       "id": "release-artifact",
       "command": "npm pack --pack-destination dist",
       "status": "passed",
-      "result": "dist/ai-sdlc-0.2.0.tgz was created with SHA-256 01501ee0a522bc38f5dac893621d36faefb3c1fdba999cdc903366650565a230."
+      "result": "dist/ai-sdlc-0.2.0.tgz was created with SHA-256 613593e8a441538bca0cfd09c71300d83581a863746b4ce57fd461cba69b66f3."
     }
   ],
   "hosted_ci": {

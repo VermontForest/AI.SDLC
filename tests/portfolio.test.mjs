@@ -121,6 +121,7 @@ test("portal is generated from the validated ledger", async () => {
   assert.match(html, /Demo Project/);
   assert.match(html, /WBS-001/);
   assert.match(html, /Ledger passes the change gate/);
+  assert.match(html, /UTC/);
 });
 
 test("saved portal output is deterministic for an unchanged ledger", async () => {
