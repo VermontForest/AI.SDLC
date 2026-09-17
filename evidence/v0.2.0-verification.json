@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "release": "v0.2.0",
+  "created_at": "2026-09-17T10:34:07.000Z",
+  "base_commit": "7efd19d8062ee1eed96732455f3cff68faa45942",
+  "checks": [
+    {
+      "id": "behavioral-suite",
+      "command": "npm test",
+      "status": "passed",
+      "result": "14 tests passed, 0 failed. The suite includes valid transition passage plus intentional failures for malformed schema, broken links, missing test classes and evidence, scoped failed work, missing approval and rollback, delivery-only content claims, absent comparisons, wrong artifact hash, missing deployment proof, stale state, hook definitions, workflow definitions, and nondeterministic saved portal output."
+    },
+    {
+      "id": "change-gate",
+      "command": "npm run plan:validate",
+      "status": "passed",
+      "result": "The public AI.SLDC ledger passed the change gate."
+    },
+    {
+      "id": "drift-gate",
+      "command": "npm run plan:drift",
+      "status": "passed",
+      "result": "The public AI.SLDC ledger passed the drift gate."
+    },
+    {
+      "id": "public-portal-browser",
+      "command": "Playwright CLI against http://127.0.0.1:5191/#human-dashboard",
+      "status": "passed",
+      "result": "The public portal rendered from the authoritative ledger at desktop and 390x844 mobile widths with zero console errors."
+    },
+    {
+      "id": "private-portfolio-browser",
+      "command": "Playwright CLI against http://127.0.0.1:5190/#human-dashboard",
+      "status": "passed",
+      "result": "The private local portfolio rendered nine current workstreams at desktop and 390x844 mobile widths with zero console errors; private data remains outside the public repository."
+    },
+    {
+      "id": "release-artifact",
+      "command": "npm pack --pack-destination dist",
+      "status": "passed",
+      "result": "dist/ai-sldc-0.2.0.tgz was created with SHA-256 fe2689bf21858960146a6fb95435fe6224e50efaea13bf9b99ec35c9004aec1b."
+    }
+  ],
+  "hosted_ci": {
+    "status": "pending",
+    "note": "A workflow file is not hosted proof. Record the GitHub Actions run only after the branch is pushed and the run is observed."
+  }
+}

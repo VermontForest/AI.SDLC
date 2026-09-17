@@ -9,3 +9,4 @@ ops/dashboard.html
 docs/status.md
 .DS_Store
 Thumbs.db
+.playwright-cli/

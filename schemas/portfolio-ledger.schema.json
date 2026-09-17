@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/VermontForest/AI.SLDC/schemas/portfolio-ledger.schema.json",
+  "title": "AI.SLDC portfolio traceability ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "portfolio", "projects"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "portfolio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "updated_at", "stale_after_days", "mode"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/nonEmpty" },
+        "updated_at": { "$ref": "#/$defs/dateTime" },
+        "stale_after_days": { "type": "integer", "minimum": 1 },
+        "mode": { "const": "standard" },
+        "notes": { "type": "string" }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/project" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{1,79}$" },
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "dateTime": { "type": "string", "format": "date-time" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "status": {
+      "enum": ["planned", "active", "blocked", "failed", "passed", "verified", "complete", "ready", "released", "production_proven", "deferred", "unknown"]
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "text", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["user", "functional"] },
+        "text": { "$ref": "#/$defs/nonEmpty" },
+        "status": { "$ref": "#/$defs/status" },
+        "derived_from": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+        "acceptance": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "minItems": 1 }
+      }
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "status", "evidence_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["unit", "integration", "regression", "visual", "provider", "human_acceptance", "production"] },
+        "status": { "enum": ["planned", "blocked", "failed", "passed", "not_applicable"] },
+        "command": { "type": "string" },
+        "evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+      }
+    },
+    "workItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "implements", "affected_surfaces", "protected_contracts", "required_test_types", "tests"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "$ref": "#/$defs/nonEmpty" },
+        "status": { "$ref": "#/$defs/status" },
+        "implements": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+        "affected_surfaces": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
+        "protected_contracts": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
+        "required_test_types": { "type": "array", "minItems": 1, "items": { "enum": ["unit", "integration", "regression", "visual", "provider", "human_acceptance", "production"] }, "uniqueItems": true },
+        "tests": { "type": "array", "items": { "$ref": "#/$defs/test" } },
+        "changed_files": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
+        "blockers": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "next_actions": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "status", "created_at", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["test_report", "artifact_identity", "visual_comparison", "motion_comparison", "behavioral_comparison", "approval_record", "deployment_record", "production_check"] },
+        "status": { "enum": ["pending", "failed", "passed"] },
+        "created_at": { "$ref": "#/$defs/dateTime" },
+        "summary": { "$ref": "#/$defs/nonEmpty" },
+        "uri": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "artifact_ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "uri", "sha256", "revision_type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmpty" },
+        "uri": { "$ref": "#/$defs/nonEmpty" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "revision_type": { "enum": ["content", "delivery"] },
+        "supersedes": { "$ref": "#/$defs/id" },
+        "comparison_evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "required", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "scope": { "$ref": "#/$defs/nonEmpty" },
+        "required": { "type": "boolean" },
+        "status": { "enum": ["pending", "approved", "rejected", "not_required"] },
+        "decided_at": { "$ref": "#/$defs/dateTime" },
+        "evidence_id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "work_item_ids", "artifact_id", "content_change_claimed", "approval_ids", "rollback", "deployment", "production_test_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "$ref": "#/$defs/nonEmpty" },
+        "status": { "enum": ["draft", "ready", "released", "production_proven", "blocked"] },
+        "work_item_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+        "artifact_id": { "$ref": "#/$defs/id" },
+        "content_change_claimed": { "type": "boolean" },
+        "approval_ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
+        "rollback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reference"],
+          "properties": {
+            "status": { "enum": ["planned", "ready", "tested"] },
+            "reference": { "$ref": "#/$defs/nonEmpty" }
+          }
+        },
+        "deployment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["not_started", "deployed", "failed", "rolled_back"] },
+            "environment": { "type": "string" },
+            "deployed_at": { "$ref": "#/$defs/dateTime" },
+            "evidence_id": { "$ref": "#/$defs/id" }
+          }
+        },
+        "production_test_ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "uniqueItems": true }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["measured", "unknown"] },
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "classification": { "type": "string" },
+        "measured_at": { "$ref": "#/$defs/dateTime" },
+        "source": { "type": "string" }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "outcome", "status", "updated_at", "requirements", "work_items", "evidence", "artifacts", "approvals", "releases", "metrics", "blockers", "next_actions"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/nonEmpty" },
+        "outcome": { "$ref": "#/$defs/nonEmpty" },
+        "status": { "$ref": "#/$defs/status" },
+        "updated_at": { "$ref": "#/$defs/dateTime" },
+        "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
+        "work_items": { "type": "array", "items": { "$ref": "#/$defs/workItem" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/artifact" } },
+        "approvals": { "type": "array", "items": { "$ref": "#/$defs/approval" } },
+        "releases": { "type": "array", "items": { "$ref": "#/$defs/release" } },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["leq", "joulework"],
+          "properties": {
+            "leq": { "$ref": "#/$defs/metric" },
+            "joulework": { "$ref": "#/$defs/metric" }
+          }
+        },
+        "blockers": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "next_actions": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } }
+      }
+    }
+  }
+}

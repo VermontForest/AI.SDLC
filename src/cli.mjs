@@ -12,6 +12,12 @@ import {
   installJsmDependencies,
   verifyJsmDependencies
 } from "./jsm-dependencies.mjs";
+import {
+  buildPortfolioPortal,
+  hashArtifact,
+  servePortfolioPortal,
+  validatePortfolio
+} from "./portfolio.mjs";
 
 const raw = process.argv.slice(2);
 const command = normalizeCommand(raw[0]);
@@ -47,6 +53,18 @@ try {
     case "skills:verify":
       result = await verifyJsmDependencies(args);
       break;
+    case "plan:validate":
+      result = await validatePortfolio(args);
+      break;
+    case "portal:build":
+      result = await buildPortfolioPortal(args);
+      break;
+    case "portal:serve":
+      result = await servePortfolioPortal(args);
+      break;
+    case "artifact:hash":
+      result = await hashArtifact(args);
+      break;
     case "help":
       printHelp();
       process.exit(0);
@@ -80,6 +98,10 @@ function normalizeCommand(value) {
   if (["manage:metrics:test", "test"].includes(normalized)) return "self-test";
   if (["jsm:install", "skills-install"].includes(normalized)) return "skills:install";
   if (["jsm:verify", "skills-verify"].includes(normalized)) return "skills:verify";
+  if (["validate", "trace:validate", "portfolio:validate"].includes(normalized)) return "plan:validate";
+  if (["portfolio:build", "dashboard:build"].includes(normalized)) return "portal:build";
+  if (["portfolio:serve", "dashboard:serve"].includes(normalized)) return "portal:serve";
+  if (["hash", "hash:artifact"].includes(normalized)) return "artifact:hash";
   return normalized;
 }
 
@@ -96,6 +118,10 @@ Usage:
   ai-sldc self-test
   ai-sldc skills:install [--json]
   ai-sldc skills:verify [--json]
+  ai-sldc plan:validate --ledger portfolio.ledger.json --stage change|release|post-deploy|drift [--project id] [--work-item id] [--release id]
+  ai-sldc portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html
+  ai-sldc portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190
+  ai-sldc artifact:hash --file dist/release.zip
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.
 Applied skills accept comma-separated or repeated --applied-skill flags.
