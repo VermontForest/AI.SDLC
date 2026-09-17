@@ -11,8 +11,10 @@ tests, evidence, and releases can be traced back to an explicit plan.
 **Implementation status:** v0.2.0 was publicly verified and merged. v0.2.1 added
 automatic task/project/portfolio metric rollups, current-clock portal staleness,
 event-bound lifecycle recording through pull requests, and repository merge
-enforcement. v0.2.2 hardens work-state semantics, metric/release data quality,
-and the supported hosted CI runtime.
+enforcement. v0.2.2 hardened work-state semantics, metric/release data quality,
+and the supported hosted CI runtime. v0.2.3 separates lifecycle and traceability
+metric models, exposes exact denominators and freshness, closes the duplicate-
+test loophole, and publishes a real hosted GitHub release with recorded proof.
 
 AI.SDLC will make the project plan the root record for delivery. The plan will
 define numbered user requirements, functional requirements, work breakdown,
@@ -91,6 +93,22 @@ The hosted matrix is Node.js 22 and 24. Action execution uses pinned v7 action
 commits so the deprecated Node.js 20 action runtime is removed independently of
 the application test matrix. Weekly Dependabot checks keep both Action pins and
 npm dependencies visible for maintenance.
+
+## v0.2.3 Metric And Publication Integrity
+
+The portfolio portal must not present different scoring systems as the same
+measure. Harness lifecycle LEQ/JW_proxy and portfolio traceability LEQ/JW proxy
+retain distinct model names, formulas, denominators, sources, and observation
+times. Aggregates never average across metric models. Every declared check and
+every undeclared required verification type remains visible in the denominator;
+completed work fails if any declared check is still planned, blocked, or failed.
+
+Evidence freshness is based on contributing evidence timestamps. Refreshing a
+dashboard or editing release metadata does not make old verification current.
+Release state remains separate from implementation metrics. The project stays
+active until the v0.2.3 GitHub release, tag, asset, and digest are hosted and
+recorded through the protected ledger-update path. No product deployment is
+claimed by publishing the repository release.
 
 ## Planned: Optional Vibe Mode
 

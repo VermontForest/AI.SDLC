@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T12:30:00.000Z",
+    "updated_at": "2026-09-17T13:10:00.000Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -14,8 +14,9 @@
       "name": "AI.SDLC",
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "owner": "AI.SDLC maintainers",
-      "status": "verified",
-      "updated_at": "2026-09-17T12:30:00.000Z",
+      "status": "active",
+      "state_reason": "v0.2.3 metric-integrity implementation is verified locally; hosted GitHub publication and recorded release proof remain active.",
+      "updated_at": "2026-09-17T13:10:00.000Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -79,6 +80,20 @@
           "text": "Hosted validation runs on supported application and GitHub Action runtimes without a recurring Node.js 20 deprecation warning.",
           "status": "verified",
           "acceptance": ["Pinned current actions and the Node.js 22/24 matrix pass on Windows and Linux; historical failed runs remain distinguishable from the current result."]
+        },
+        {
+          "id": "URS-010",
+          "type": "user",
+          "text": "A human project lead can distinguish lifecycle health from traceability coverage and inspect the exact formula, denominator, pending checks, source, and freshness behind every score.",
+          "status": "verified",
+          "acceptance": ["Different metric models are labeled and aggregated separately; pending or undeclared checks and old evidence cannot produce a misleading perfect or fresh score."]
+        },
+        {
+          "id": "URS-011",
+          "type": "user",
+          "text": "A public release is called published only after its hosted tag, downloadable asset, digest, and reviewable ledger event exist on GitHub.",
+          "status": "active",
+          "acceptance": ["The protected publication workflow creates one hosted release and one ledger-update pull request; repository publication does not claim a product deployment."]
         },
         {
           "id": "FRS-001",
@@ -167,6 +182,22 @@
           "status": "verified",
           "derived_from": ["URS-009"],
           "acceptance": ["Fresh hosted jobs pass without the deprecated Node.js 20 action-runtime warning and Dependabot covers Actions and npm."]
+        },
+        {
+          "id": "FRS-012",
+          "type": "functional",
+          "text": "Compute traceability-v2 from explicit verification obligations, keep metric models incomparable, and derive freshness from the oldest contributing evidence.",
+          "status": "verified",
+          "derived_from": ["URS-010"],
+          "acceptance": ["Regression tests cover duplicate pending checks, undeclared required verification, mixed lifecycle/traceability models, and metadata edits that do not renew old evidence."]
+        },
+        {
+          "id": "FRS-013",
+          "type": "functional",
+          "text": "Publish the registered v0.2.3 artifact through the protected GitHub release path and record the hosted result through review.",
+          "status": "active",
+          "derived_from": ["URS-011"],
+          "acceptance": ["GitHub hosts tag v0.2.3 and the registered tarball; the downloaded asset digest matches; the release event is merged into the ledger."]
         }
       ],
       "work_items": [
@@ -321,6 +352,40 @@
           "changed_files": [".github/workflows/ci.yml", ".github/workflows/validate.yml", ".github/workflows/drift.yml", ".github/workflows/post-deploy.yml", ".github/workflows/publish-release.yml", ".github/workflows/release-gate.yml", ".github/dependabot.yml", "package.json", "package-lock.json"],
           "blockers": [],
           "next_actions": []
+        },
+        {
+          "id": "WBS-010",
+          "title": "Metric-model, denominator, and freshness integrity",
+          "owner": "AI.SDLC maintainers",
+          "status": "verified",
+          "implements": ["FRS-012"],
+          "affected_surfaces": ["portfolio schema", "metric engine", "human portal", "public documentation"],
+          "protected_contracts": ["no cross-model averaging", "every verification obligation counts", "evidence time is not generation time", "release state stays separate"],
+          "required_test_types": ["unit", "integration", "regression"],
+          "tests": [
+            { "id": "TST-024", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-024"] },
+            { "id": "TST-025", "type": "integration", "status": "passed", "command": "npm run portfolio:sync", "evidence_ids": ["EV-024", "EV-025"] },
+            { "id": "TST-026", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-024"] }
+          ],
+          "changed_files": ["src/portfolio.mjs", "schemas/portfolio-ledger.schema.json", "tests/portfolio.test.mjs", "README.md", "docs/project-plan.md", "docs/test-release-plan.md"],
+          "blockers": [],
+          "next_actions": []
+        },
+        {
+          "id": "WBS-011",
+          "title": "Publish and record the hosted v0.2.3 GitHub release",
+          "owner": "AI.SDLC maintainers",
+          "status": "active",
+          "implements": ["FRS-013"],
+          "affected_surfaces": ["GitHub release", "hosted artifact", "lifecycle ledger"],
+          "protected_contracts": ["gate before publish", "hosted digest proof", "one reviewable release event", "no deployment claim"],
+          "required_test_types": ["production"],
+          "tests": [
+            { "id": "TST-027", "type": "production", "status": "planned", "evidence_ids": [] }
+          ],
+          "changed_files": ["portfolio.ledger.json", "ops/portfolio-dashboard.html", "ops/portfolio-metrics.json"],
+          "blockers": [],
+          "next_actions": ["Publish v0.2.3 after protected checks pass, verify the hosted asset digest, and merge the release-event ledger update."]
         }
       ],
       "evidence": [
@@ -529,6 +594,33 @@
           "summary": "Pull request 5 passed the protected change gate and Ubuntu/Windows Node.js 22/24 matrix. The hosted logs contain no deprecated Node.js 20 action-runtime warning, and main protection now requires the Node.js 22/24 contexts.",
           "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35221324987",
           "artifact_ids": ["ART-003"]
+        },
+        {
+          "id": "EV-024",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T13:10:00.000Z",
+          "summary": "Metric-integrity tests passed for duplicate pending checks, undeclared required verification, model separation, evidence-derived freshness, schema details, deterministic sync, and the complete repository regression suite.",
+          "uri": "evidence/v0.2.3-metric-release-integrity.json",
+          "artifact_ids": ["ART-004"]
+        },
+        {
+          "id": "EV-025",
+          "type": "behavioral_comparison",
+          "status": "passed",
+          "created_at": "2026-09-17T13:10:00.000Z",
+          "summary": "traceability-v2 exposes every verification obligation and keeps lifecycle-v1 scores separate; dashboard regeneration and unrelated metadata no longer refresh contributing evidence time.",
+          "uri": "tests/portfolio.test.mjs",
+          "artifact_ids": ["ART-004"]
+        },
+        {
+          "id": "EV-026",
+          "type": "approval_record",
+          "status": "passed",
+          "created_at": "2026-09-17T13:10:00.000Z",
+          "summary": "The operator authorized correction of misleading LEQ/JouleWork presentation and completion of a real protected GitHub release.",
+          "uri": "docs/project-plan.md",
+          "artifact_ids": ["ART-004"]
         }
       ],
       "artifacts": [
@@ -557,6 +649,15 @@
           "revision_type": "content",
           "supersedes": "ART-002",
           "comparison_evidence_ids": ["EV-015", "EV-016"]
+        },
+        {
+          "id": "ART-004",
+          "label": "AI.SDLC v0.2.3 metric and publication integrity package",
+          "uri": "dist/ai-sdlc-0.2.3.tgz",
+          "sha256": "0ed304d902edbd6f1323ed382585cb926e15d06f6f1bf22c25ee5dca6ccdf077",
+          "revision_type": "content",
+          "supersedes": "ART-003",
+          "comparison_evidence_ids": ["EV-025"]
         }
       ],
       "approvals": [
@@ -583,6 +684,14 @@
           "status": "approved",
           "decided_at": "2026-09-17T12:20:00.000Z",
           "evidence_id": "EV-022"
+        },
+        {
+          "id": "APP-004",
+          "scope": "Correct metric semantics, verify the package, and publish v0.2.3 through protected GitHub release automation.",
+          "required": true,
+          "status": "approved",
+          "decided_at": "2026-09-17T13:10:00.000Z",
+          "evidence_id": "EV-026"
         }
       ],
       "releases": [
@@ -633,6 +742,22 @@
           },
           "deployment": { "status": "not_started" },
           "production_test_ids": []
+        },
+        {
+          "id": "REL-004",
+          "title": "Metric and publication integrity",
+          "tag": "v0.2.3",
+          "status": "ready",
+          "work_item_ids": ["WBS-010"],
+          "artifact_id": "ART-004",
+          "content_change_claimed": true,
+          "approval_ids": ["APP-004"],
+          "rollback": {
+            "status": "ready",
+            "reference": "Revert the v0.2.3 metric-integrity merge and restore main commit 8156db440c44ce3be15a4b56ea780669a1a05b7c."
+          },
+          "deployment": { "status": "not_started" },
+          "production_test_ids": []
         }
       ],
       "metrics": {
@@ -640,7 +765,7 @@
         "joulework": { "status": "not_applicable", "definition": "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.", "scope": "Stored project override", "reason": "The synchronized dashboard derives JouleWork from registered work items rather than this override." }
       },
       "blockers": [],
-      "next_actions": ["Merge pull request 5 after its final evidence commit passes the protected checks, then refresh the private operator portal from the merged result."]
+      "next_actions": ["Pass protected checks, publish v0.2.3, verify the hosted asset digest, and merge the release-event ledger update."]
     }
   ]
 }

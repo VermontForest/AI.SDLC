@@ -15,6 +15,8 @@ Last updated: 2026-09-13
 | SDLC-9: Queued, dependency-waiting, active, and genuinely blocked work stay distinct | positive/negative state-contract tests, blocker-action ownership tests, portal counts and filters |
 | SDLC-10: LEQ, JouleWork, and release fields never invent missing values | explicit data-quality schema, stale/dependency propagation tests, completion-stage failure tests, portal detail proof |
 | SDLC-11: Hosted maintenance uses supported runtimes | pinned checkout/setup-node v7 assertions, Windows/Linux Node 22/24 matrix, Dependabot configuration, clean hosted run |
+| SDLC-12: Metric models, denominators, pending checks, and freshness are honest | duplicate-type and undeclared-required-type regressions, model-separation tests, evidence-timestamp freshness tests, and portal detail assertions |
+| SDLC-13: A release is not complete until hosted publication evidence exists | active publication work item, protected release gate, hosted tag and asset digest verification, and one reviewable ledger-update pull request |
 
 Run `npm test` on Node 22 or newer. It validates maintained-file spelling,
 configuration routing, package/launcher references, and real temporary-project
