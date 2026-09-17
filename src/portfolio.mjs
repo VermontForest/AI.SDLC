@@ -11,9 +11,14 @@ const schemaPath = join(packageRoot, "schemas", "portfolio-ledger.schema.json");
 const COMPLETED = new Set(["passed", "verified", "complete", "ready", "released", "production_proven"]);
 const REVISION_PROOF = new Set(["visual_comparison", "motion_comparison", "behavioral_comparison"]);
 const NON_EXECUTING = new Set(["planned", "queued", "deferred"]);
+const TRACEABILITY_FORMULA_VERSION = "traceability-v2";
 const METRIC_DEFINITIONS = {
-  leq: "Loop Evidence Quality: requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
-  joulework: "JouleWork proxy: evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties."
+  leq: "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
+  joulework: "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties."
+};
+const METRIC_FORMULAS = {
+  leq: "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
+  joulework: "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20)."
 };
 
 export async function validatePortfolio(argv = [], options = {}) {
@@ -378,12 +383,13 @@ function validateCompletedWorkItem(project, workItem, issues, stage) {
   const required = new Set(workItem.required_test_types);
   for (const type of required) {
     const matching = workItem.tests.filter((test) => test.type === type);
-    if (!matching.some((test) => ["passed", "not_applicable"].includes(test.status))) {
+    if (!matching.length) {
       issues.push(issue("test_not_passed", project.id, stage, `${workItem.id} lacks passed ${type} verification.`, workItem.id));
     }
   }
-  for (const test of workItem.tests.filter((item) => item.status === "failed")) {
-    issues.push(issue("test_failed", project.id, stage, `${workItem.id} has failed test ${test.id}.`, workItem.id));
+  for (const test of workItem.tests.filter((item) => !["passed", "not_applicable"].includes(item.status))) {
+    const code = test.status === "failed" ? "test_failed" : "test_not_passed";
+    issues.push(issue(code, project.id, stage, `${workItem.id} has ${test.status} test ${test.id}; completed work requires every declared check to pass or be explicitly not applicable.`, workItem.id));
   }
 }
 
@@ -470,7 +476,14 @@ function selectReleases(project, options, issues, stage) {
 
 function validateDataQualityStage(ledger, projects, options, issues) {
   const now = options.now || new Date();
-  const computed = computePortfolioMetrics({ ...ledger, projects }, now);
+  const metricProjects = projects.map((project) => {
+    if (!["release", "post-deploy"].includes(options.stage) || !options.releaseId) return project;
+    const release = project.releases.find((item) => item.id === options.releaseId);
+    if (!release) return project;
+    const included = new Set(release.work_item_ids);
+    return { ...project, work_items: project.work_items.filter((item) => included.has(item.id)) };
+  });
+  const computed = computePortfolioMetrics({ ...ledger, projects: metricProjects }, now);
   const byProject = new Map(computed.projects.map((project) => [project.id, project]));
   for (const project of projects) {
     const quality = byProject.get(project.id);
@@ -537,6 +550,10 @@ function reportFor(ledger, options, issues) {
 export function computePortfolioMetrics(ledger, now = new Date(ledger.portfolio.updated_at)) {
   const projects = ledger.projects.map((project) => {
     const workItems = project.work_items.map((workItem) => scoreWorkItem(project, workItem, ledger.portfolio.stale_after_days, now));
+    const reportedMetrics = {
+      leq: normalizeReportedMetric(project.metrics.leq, "leq", project, ledger.portfolio.stale_after_days, now),
+      joulework: normalizeReportedMetric(project.metrics.joulework, "joulework", project, ledger.portfolio.stale_after_days, now)
+    };
     const computed = workItems.length
       ? {
           leq: aggregateMetric(workItems.map((item) => item.leq), "leq", now, project.name, project.owner),
@@ -544,21 +561,23 @@ export function computePortfolioMetrics(ledger, now = new Date(ledger.portfolio.
           source: "computed from ledger work, tests, evidence, and blockers"
         }
       : {
-          leq: normalizeReportedMetric(project.metrics.leq, "leq", project, ledger.portfolio.stale_after_days, now),
-          joulework: normalizeReportedMetric(project.metrics.joulework, "joulework", project, ledger.portfolio.stale_after_days, now),
+          leq: reportedMetrics.leq,
+          joulework: reportedMetrics.joulework,
           source: "reported project metric source"
         };
     const release = releaseQuality(project, ledger.portfolio.stale_after_days, now);
-    return { id: project.id, name: project.name, ...computed, release, work_items: workItems };
+    return { id: project.id, name: project.name, ...computed, reported_metrics: workItems.length ? reportedMetrics : null, release, work_items: workItems };
   });
+  const metricFamilies = aggregateMetricFamilies(projects, now, ledger.portfolio.name);
   return {
     schema_version: 1,
     generated_at: now.toISOString(),
-    formula_version: "traceability-v1",
+    formula_version: TRACEABILITY_FORMULA_VERSION,
     portfolio: {
       id: ledger.portfolio.id,
       leq: aggregateMetric(projects.map((item) => item.leq), "leq", now, ledger.portfolio.name, "Portfolio owners"),
       joulework: aggregateMetric(projects.map((item) => item.joulework), "joulework", now, ledger.portfolio.name, "Portfolio owners"),
+      metric_families: metricFamilies,
       data_quality: summarizeDataQuality(projects.flatMap((item) => [item.leq, item.joulework, item.release]))
     },
     projects
@@ -582,8 +601,9 @@ function renderPortfolioPortal(ledger, validation, now, metrics = computePortfol
         ${progress("Tests", passedTests, tests.length)}
       </div>
       <dl class="metrics">
-        ${metricRow("LEQ", computedMetrics?.leq || project.metrics.leq)}
-        ${metricRow("JouleWork", computedMetrics?.joulework || project.metrics.joulework)}
+        ${metricRow("leq", computedMetrics?.leq || project.metrics.leq)}
+        ${metricRow("joulework", computedMetrics?.joulework || project.metrics.joulework)}
+        ${reportedMetricRows(computedMetrics)}
         ${releaseRow(computedMetrics?.release)}
         <div><dt>Updated</dt><dd class="project-updated">${escapeHtml(formatDate(project.updated_at))}${stale ? " · stale" : ""}</dd></div>
       </dl>
@@ -615,14 +635,14 @@ function renderPortfolioPortal(ledger, validation, now, metrics = computePortfol
     <div class="card"><span class="eyebrow">Blocked</span><strong>${blockingProjects}</strong></div>
     <div class="card"><span class="eyebrow">Queued</span><strong>${queuedProjects}</strong></div>
     <div class="card"><span class="eyebrow">Waiting</span><strong>${waitingProjects}</strong></div>
-    <div class="card"><span class="eyebrow">Portfolio LEQ</span><strong>${metricValue(metrics.portfolio.leq)}</strong></div>
-    <div class="card"><span class="eyebrow">Portfolio JouleWork</span><strong>${metricValue(metrics.portfolio.joulework)}</strong></div>
+    ${metricFamilyCards(metrics.portfolio.metric_families, metrics.portfolio)}
   </div>
+  <div class="data-quality"><strong>Metric boundary: traceability evidence coverage, not lifecycle health or physical energy.</strong><div>The scores below use ${TRACEABILITY_FORMULA_VERSION}. A project’s lifecycle LEQ/JW_proxy remains a separate harness measurement; open release and deployment state is shown separately and is not silently credited inside these scores.</div></div>
   <div class="validation" id="ledger-validation"><strong>${validation.ok ? "Ledger structure is valid" : `Ledger validation found ${validation.errors.length} blocking issue(s)`}</strong><div>${validation.ok ? "Schema, links, declared states, and freshness rules are internally consistent. This does not mean every project is tested, complete, or unblocked." : escapeHtml(validation.errors.slice(0, 4).map((item) => item.message).join(" · "))}</div></div>
   <div class="data-quality" id="data-quality"><strong>Dashboard data quality: ${quality.valid} current · ${quality.awaiting_inputs} awaiting inputs · ${quality.not_applicable} not applicable · ${quality.stale + quality.error} needs attention</strong><div>LEQ, JouleWork, and release fields identify their source, scope, freshness, and next action. Missing inputs are never converted to zero or a perfect score.</div></div>
   <div class="toolbar"><label for="status-filter">Show projects<select id="status-filter"><option value="all">All statuses</option><option value="blocked">Blocked / failed</option><option value="queued">Queued</option><option value="waiting_dependency">Waiting on dependency</option><option value="active">Active</option><option value="verified">Verified / complete</option><option value="unknown">Unknown</option></select></label><span id="visible-count">${ledger.projects.length} shown</span></div>
   <section class="projects">${projectCards}</section>
-  <p class="foot">${allTests.filter((item) => item.status === "passed").length} passed tests of ${allTests.length} declared across ${allWork.length} work items and ${allEvidence.length} evidence records. Metrics use traceability-v1 when work is recorded; otherwise every unavailable value is labeled not applicable, awaiting named inputs, stale, or error with its reason and next action.</p>
+  <p class="foot">${allTests.filter((item) => item.status === "passed").length} passed tests of ${allTests.length} declared across ${allWork.length} work items and ${allEvidence.length} evidence records. Metrics use ${TRACEABILITY_FORMULA_VERSION} when work is recorded; every declared check is in the denominator, and release/publication/deployment remain separate states. Otherwise every unavailable value is labeled not applicable, awaiting named inputs, stale, or error with its reason and next action.</p>
   <script>(()=>{const root=document.getElementById('human-dashboard');const max=Number(root.dataset.staleAfterDays)*86400000;const now=Date.now();let stale=now-Date.parse(root.dataset.portfolioUpdatedAt)>max;const cards=[...document.querySelectorAll('.project')];cards.forEach(card=>{const isStale=now-Date.parse(card.dataset.updatedAt)>max;card.classList.toggle('stale',isStale);const label=card.querySelector('.project-updated');if(label){label.textContent=label.textContent.replace(/ · stale$/,'')+(isStale?' · stale':'')}stale||=isStale});if(stale){const box=document.getElementById('data-quality');box.classList.add('stale');box.querySelector('strong').textContent='Dashboard data freshness needs attention';box.querySelector('div').textContent='The current clock is beyond the registered freshness window. This does not change ledger structure validity or prove that every project is blocked.'}const filter=document.getElementById('status-filter');const count=document.getElementById('visible-count');const matches=(status,value)=>value==='all'||(value==='blocked'&&['blocked','failed'].includes(status))||(value==='verified'&&['verified','complete','production_proven'].includes(status))||status===value;filter.addEventListener('change',()=>{let shown=0;cards.forEach(card=>{card.hidden=!matches(card.dataset.status,filter.value);if(!card.hidden)shown+=1});count.textContent=shown+' shown'});})();</script>
 </main></body></html>`;
 }
@@ -645,11 +665,36 @@ function progress(label, value, total) {
   return `<div><div class="progress-label"><span>${escapeHtml(label)}</span><span>${value}/${total}</span></div><div class="bar"><span style="width:${percent}%"></span></div></div>`;
 }
 
-function metricRow(label, metric) {
+function metricRow(kind, metric) {
+  const label = metricLabel(kind, metric?.model);
   const value = metric?.status === "valid" || metric?.status === "stale"
     ? `${metric.score} · ${metric.classification}${metric.status === "stale" ? " · stale" : ""}`
     : metricStateLabel(metric?.status);
   return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>${metricDetails(metric)}</div>`;
+}
+
+function metricLabel(kind, model) {
+  const prefix = model?.startsWith("lifecycle") ? "Lifecycle" : model?.startsWith("traceability") ? "Traceability" : "Reported";
+  return kind === "leq" ? `${prefix} LEQ` : `${prefix} JW proxy`;
+}
+
+function metricFamilyCards(families, fallback) {
+  if (!families?.length) {
+    return `<div class="card"><span class="eyebrow">Portfolio LEQ</span><strong>${metricValue(fallback.leq)}</strong></div><div class="card"><span class="eyebrow">Portfolio JW proxy</span><strong>${metricValue(fallback.joulework)}</strong></div>`;
+  }
+  return families.map((family) => `<div class="card"><span class="eyebrow">${escapeHtml(metricLabel("leq", family.model))}</span><strong>${metricValue(family.leq)}</strong></div><div class="card"><span class="eyebrow">${escapeHtml(metricLabel("joulework", family.model))}</span><strong>${metricValue(family.joulework)}</strong></div>`).join("");
+}
+
+function reportedMetricRows(projectMetrics) {
+  const reported = projectMetrics?.reported_metrics;
+  if (!reported) return "";
+  const rows = [];
+  for (const kind of ["leq", "joulework"]) {
+    const metric = reported[kind];
+    if (!metric || metric.status === "not_applicable" || metric.model === projectMetrics[kind]?.model) continue;
+    rows.push(metricRow(kind, metric));
+  }
+  return rows.join("");
 }
 
 function metricValue(metric) {
@@ -671,6 +716,9 @@ function metricDetails(metric) {
   if (metric.definition) details.push(`<p><strong>Definition:</strong> ${escapeHtml(metric.definition)}</p>`);
   if (metric.scope) details.push(`<p><strong>Scope:</strong> ${escapeHtml(metric.scope)}</p>`);
   if (metric.source) details.push(`<p><strong>Source:</strong> ${escapeHtml(metric.source)}</p>`);
+  if (metric.formula) details.push(`<p><strong>Formula:</strong> ${escapeHtml(metric.formula)}</p>`);
+  if (metric.denominator) details.push(`<p><strong>Denominator:</strong> ${escapeHtml(metric.denominator)}</p>`);
+  if (metric.pending_checks?.length) details.push(`<p><strong>Pending checks:</strong> ${escapeHtml(metric.pending_checks.join(", "))}</p>`);
   if (metric.measured_at) details.push(`<p><strong>Updated:</strong> ${escapeHtml(formatDate(metric.measured_at))}</p>`);
   if (metric.reason) details.push(`<p><strong>Why:</strong> ${escapeHtml(metric.reason)}</p>`);
   if (metric.missing_inputs?.length) details.push(`<p><strong>Missing:</strong> ${escapeHtml(metric.missing_inputs.join(", "))}</p>`);
@@ -687,8 +735,8 @@ function scoreWorkItem(project, workItem, staleDays, now) {
     return {
       id: workItem.id,
       status: workItem.status,
-      leq: notApplicableMetric("leq", scope, reason),
-      joulework: notApplicableMetric("joulework", scope, reason)
+      leq: notApplicableMetric("leq", scope, reason, TRACEABILITY_FORMULA_VERSION),
+      joulework: notApplicableMetric("joulework", scope, reason, TRACEABILITY_FORMULA_VERSION)
     };
   }
   if (["waiting_dependency", "unknown"].includes(workItem.status)) {
@@ -697,8 +745,8 @@ function scoreWorkItem(project, workItem, staleDays, now) {
     return {
       id: workItem.id,
       status: workItem.status,
-      leq: awaitingMetric("leq", scope, owner, missing, next),
-      joulework: awaitingMetric("joulework", scope, owner, missing, next)
+      leq: awaitingMetric("leq", scope, owner, missing, next, TRACEABILITY_FORMULA_VERSION),
+      joulework: awaitingMetric("joulework", scope, owner, missing, next, TRACEABILITY_FORMULA_VERSION)
     };
   }
   const evidence = new Map(project.evidence.map((item) => [item.id, item]));
@@ -706,17 +754,24 @@ function scoreWorkItem(project, workItem, staleDays, now) {
   const testsByType = new Map([...requiredTypes].map((type) => [type, workItem.tests.filter((test) => test.type === type)]));
   const ratio = (matched) => requiredTypes.size ? matched / requiredTypes.size : 0;
   const declaredRatio = ratio([...testsByType.values()].filter((tests) => tests.length).length);
-  const passedRatio = ratio([...testsByType.values()].filter((tests) => tests.some((test) => ["passed", "not_applicable"].includes(test.status))).length);
+  const missingRequiredTypes = [...testsByType.entries()].filter(([, tests]) => !tests.length).map(([type]) => type);
+  const passedChecks = workItem.tests.filter((test) => ["passed", "not_applicable"].includes(test.status));
+  const obligationCount = workItem.tests.length + missingRequiredTypes.length;
+  const passedRatio = obligationCount ? passedChecks.length / obligationCount : 0;
   const passedTests = workItem.tests.filter((test) => test.status === "passed");
   const failedTests = workItem.tests.filter((test) => test.status === "failed");
+  const pendingChecks = workItem.tests
+    .filter((test) => !["passed", "not_applicable"].includes(test.status))
+    .map((test) => `${test.id} (${test.type}: ${test.status})`)
+    .concat(missingRequiredTypes.map((type) => `required ${type} verification (not declared)`));
   if (!passedTests.length && !failedTests.length) {
     const missing = workItem.required_test_types.map((type) => `${type} verification evidence`);
     const next = workItem.next_actions?.[0] || "Run the declared verification and attach passed or failed evidence.";
     return {
       id: workItem.id,
       status: workItem.status,
-      leq: awaitingMetric("leq", scope, owner, missing, next),
-      joulework: awaitingMetric("joulework", scope, owner, missing, next)
+      leq: awaitingMetric("leq", scope, owner, missing, next, TRACEABILITY_FORMULA_VERSION),
+      joulework: awaitingMetric("joulework", scope, owner, missing, next, TRACEABILITY_FORMULA_VERSION)
     };
   }
   const evidenceRatio = passedTests.length
@@ -728,9 +783,14 @@ function scoreWorkItem(project, workItem, staleDays, now) {
   const completed = ["verified", "complete", "production_proven"].includes(workItem.status) ? 1 : 0;
   const leqScore = boundedScore(20 * linked + 15 * declaredRatio + 35 * passedRatio + 20 * evidenceRatio + 10 * blockerFree - failurePenalty);
   const jouleworkScore = boundedScore(20 * linked + 30 * passedRatio + 25 * evidenceRatio + 25 * completed - failurePenalty);
-  const leq = validMetric(leqScore, "leq", project.updated_at, "computed from registered requirement links, declared tests, passed evidence, failures, and blockers", scope);
-  const joulework = validMetric(jouleworkScore, "joulework", project.updated_at, "computed from registered completed outcomes, passed evidence, failures, and blockers", scope);
-  const stale = ageDays(project.updated_at, now) > staleDays;
+  const contributingEvidence = passedTests.flatMap((test) => test.evidence_ids.map((id) => evidence.get(id))).filter(Boolean);
+  const measuredAt = oldestTimestamp(contributingEvidence.map((item) => item.created_at)) || project.updated_at;
+  const denominator = `${passedChecks.length}/${obligationCount} verification obligations passed or not applicable (${workItem.tests.length} declared checks plus ${missingRequiredTypes.length} undeclared required types)`;
+  const source = `ledger ${project.id}/${workItem.id} at ${project.updated_at}`;
+  const metricDetails = { denominator, pendingChecks };
+  const leq = validMetric(leqScore, "leq", measuredAt, source, `${scope}; registered work-item evidence only; release/publication/deployment excluded`, metricDetails);
+  const joulework = validMetric(jouleworkScore, "joulework", measuredAt, source, `${scope}; registered work-item evidence only; release/publication/deployment excluded`, metricDetails);
+  const stale = ageDays(measuredAt, now) > staleDays;
   return {
     id: workItem.id,
     status: workItem.status,
@@ -742,22 +802,40 @@ function scoreWorkItem(project, workItem, staleDays, now) {
 function aggregateMetric(metrics, kind, now, scope, owner) {
   const applicable = metrics.filter((metric) => metric?.status !== "not_applicable");
   if (!applicable.length) return notApplicableMetric(kind, scope, "No child work is currently applicable to this metric.");
+  const models = [...new Set(applicable.map((metric) => metric.model).filter(Boolean))];
+  if (models.length > 1) {
+    return errorMetric(kind, scope, owner, `Incomparable metric models cannot be averaged: ${models.join(", ")}.`, "Review each metric family separately; do not convert or relabel scores across models.");
+  }
+  const model = models[0];
   const errors = applicable.filter((metric) => metric.status === "error");
   if (errors.length) {
-    return errorMetric(kind, scope, owner, errors.map((metric) => metric.reason).filter(Boolean).join("; ") || "A child metric is in error.", "Repair the child metric inputs and recompute the ledger.");
+    return errorMetric(kind, scope, owner, errors.map((metric) => metric.reason).filter(Boolean).join("; ") || "A child metric is in error.", "Repair the child metric inputs and recompute the ledger.", model);
   }
   const awaiting = applicable.filter((metric) => metric.status === "awaiting_inputs");
   if (awaiting.length) {
     const missing = [...new Set(awaiting.flatMap((metric) => metric.missing_inputs || []))];
-    return awaitingMetric(kind, scope, owner, missing.length ? missing : ["child metric inputs"], awaiting[0].next_action || "Supply the named child inputs and recompute the ledger.");
+    return awaitingMetric(kind, scope, owner, missing.length ? missing : ["child metric inputs"], awaiting[0].next_action || "Supply the named child inputs and recompute the ledger.", model);
   }
   const scored = applicable.filter((metric) => ["valid", "stale"].includes(metric.status) && Number.isFinite(metric.score));
   if (scored.length !== applicable.length) {
     return errorMetric(kind, scope, owner, "One or more child metrics have an invalid state or no score.", "Correct the child data-quality state and recompute the ledger.");
   }
+  const scoredModels = [...new Set(scored.map((metric) => metric.model || "unlabeled"))];
+  if (scoredModels.length !== 1) {
+    return errorMetric(kind, scope, owner, `Incomparable metric models cannot be averaged: ${scoredModels.join(", ")}.`, "Review each metric family separately; do not convert or relabel scores across models.");
+  }
   const score = boundedScore(scored.reduce((sum, metric) => sum + metric.score, 0) / scored.length);
-  const source = `average of ${scored.length} applicable child ${scored.length === 1 ? "record" : "records"}`;
-  const valid = validMetric(score, kind, now.toISOString(), source, scope);
+  const scoredModel = scoredModels[0];
+  const measuredAt = oldestTimestamp(scored.map((metric) => metric.measured_at)) || now.toISOString();
+  const source = `${scoredModel} unweighted average of ${scored.length} applicable child ${scored.length === 1 ? "record" : "records"}`;
+  const pendingChecks = [...new Set(scored.flatMap((metric) => metric.pending_checks || []))];
+  const valid = validMetric(score, kind, measuredAt, source, `${scope}; aggregate evidence for one metric model only; release/publication/deployment excluded`, {
+    model: scoredModel,
+    definition: `Unweighted aggregate of ${metricLabel(kind, scoredModel)} records; this model is never averaged with a different metric model.`,
+    formula: `Unweighted arithmetic mean of ${scored.length} applicable child ${metricLabel(kind, scoredModel)} scores; awaiting or error children invalidate the aggregate.`,
+    denominator: `${scored.length} applicable child ${scored.length === 1 ? "record" : "records"}`,
+    pendingChecks
+  });
   if (scored.some((metric) => metric.status === "stale")) {
     return staleMetric(valid, owner, "One or more dependent child metrics are stale.", "Refresh stale child inputs and recompute the aggregate.");
   }
@@ -774,29 +852,60 @@ function normalizeReportedMetric(metric, kind, project, staleDays, now) {
   return { ...metric };
 }
 
-function validMetric(score, kind, measuredAt, source, scope) {
+function validMetric(score, kind, measuredAt, source, scope, details = {}) {
   const healthy = kind === "leq" ? 85 : 70;
   const watch = kind === "leq" ? 60 : 40;
   const classification = score >= healthy
     ? (kind === "leq" ? "healthy" : "productive")
     : score >= watch ? "watch" : (kind === "leq" ? "critical" : "stalled");
-  return { status: "valid", score, classification, measured_at: measuredAt, source, definition: METRIC_DEFINITIONS[kind], scope };
+  return {
+    status: "valid",
+    score,
+    classification,
+    measured_at: measuredAt,
+    model: details.model || TRACEABILITY_FORMULA_VERSION,
+    source,
+    definition: details.definition || METRIC_DEFINITIONS[kind],
+    scope,
+    formula: details.formula || METRIC_FORMULAS[kind],
+    denominator: details.denominator || "Recorded metric source; see source for its denominator.",
+    pending_checks: [...new Set(details.pendingChecks || [])]
+  };
 }
 
-function notApplicableMetric(kind, scope, reason) {
-  return { status: "not_applicable", definition: METRIC_DEFINITIONS[kind], scope, reason };
+function aggregateMetricFamilies(projects, now, scope) {
+  const candidates = (kind) => projects.flatMap((project) => {
+    const primary = project[kind];
+    const reported = project.reported_metrics?.[kind];
+    return reported?.model && reported.model !== primary?.model ? [primary, reported] : [primary];
+  }).filter(Boolean);
+  const models = [...new Set(["leq", "joulework"].flatMap((kind) => candidates(kind).map((metric) => metric.model)).filter(Boolean))].sort();
+  return models.map((model) => ({
+    model,
+    leq: aggregateMetric(candidates("leq").filter((metric) => metric?.model === model), "leq", now, `${scope} / ${model}`, "Portfolio owners"),
+    joulework: aggregateMetric(candidates("joulework").filter((metric) => metric?.model === model), "joulework", now, `${scope} / ${model}`, "Portfolio owners")
+  }));
 }
 
-function awaitingMetric(kind, scope, owner, missingInputs, nextAction) {
-  return { status: "awaiting_inputs", definition: METRIC_DEFINITIONS[kind], scope, missing_inputs: [...new Set(missingInputs)], next_action: nextAction, owner };
+function oldestTimestamp(values) {
+  const timestamps = values.map((value) => Date.parse(value)).filter(Number.isFinite);
+  return timestamps.length ? new Date(Math.min(...timestamps)).toISOString() : null;
+}
+
+function notApplicableMetric(kind, scope, reason, model) {
+  return { status: "not_applicable", ...(model ? { model } : {}), definition: METRIC_DEFINITIONS[kind], scope, reason };
+}
+
+function awaitingMetric(kind, scope, owner, missingInputs, nextAction, model) {
+  return { status: "awaiting_inputs", ...(model ? { model } : {}), definition: METRIC_DEFINITIONS[kind], scope, missing_inputs: [...new Set(missingInputs)], next_action: nextAction, owner };
 }
 
 function staleMetric(metric, owner, reason, nextAction) {
   return { ...metric, status: "stale", reason, next_action: nextAction, owner };
 }
 
-function errorMetric(kind, scope, owner, reason, nextAction) {
-  return { status: "error", definition: METRIC_DEFINITIONS[kind], scope, reason, next_action: nextAction, owner };
+function errorMetric(kind, scope, owner, reason, nextAction, model) {
+  return { status: "error", ...(model ? { model } : {}), definition: METRIC_DEFINITIONS[kind], scope, reason, next_action: nextAction, owner };
 }
 
 function releaseQuality(project, staleDays, now) {

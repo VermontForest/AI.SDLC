@@ -359,20 +359,39 @@ approval.
 
 ### Portfolio rollups
 
-The portfolio board uses a separate, transparent `traceability-v1` rollup so
+The portfolio board uses a separate, transparent `traceability-v2` rollup so
 task, project, and portfolio health can be refreshed without hand-entered
 scores:
 
-- task LEQ weighs requirement linkage (20), declared verification coverage
-  (15), passed required verification (35), passed evidence linkage (20), and
-  blocker-free state (10), with explicit failure/blocker penalties;
-- task JouleWork weighs requirement linkage (20), passed verification (30),
-  passed evidence (25), and completed useful work (25), with the same penalties;
+- task traceability LEQ weighs requirement linkage (20), required test-type
+  declaration coverage (15), the pass ratio across every declared check plus
+  every undeclared required verification type (35), passed-check evidence
+  linkage (20), and blocker-free state (10), with explicit failure/blocker
+  penalties;
+- task traceability JouleWork weighs requirement linkage (20), that same
+  verification-obligation pass ratio (30), passed-check evidence (25), and
+  completed useful work (25), with the same penalties;
 - project scores average applicable task records, and the portfolio averages
-  applicable projects only when every dependent input is valid;
+  applicable projects only when every dependent input is valid and uses the
+  same named metric model;
 - stale, error, or awaiting child state invalidates its dependent aggregate;
 - projects without recorded work use an explicit reported source or state why
   the metric is not applicable, which inputs are awaited, or what failed.
+
+Every valid or stale score names its metric model, exact formula, denominator,
+pending checks, source, scope, and observation time. Evidence freshness comes
+from the oldest contributing observation, not from the time the dashboard was
+regenerated or unrelated project metadata was edited. A planned duplicate test
+cannot disappear behind another passing test of the same type, and a missing
+required verification type remains an unmet denominator obligation.
+
+These portfolio values are evidence-coverage proxies, not scientific energy,
+engineering efficiency, business outcome, release completion, or the harness's
+separate lifecycle LEQ/JW_proxy. The lifecycle model begins from 100 and applies
+documented debt penalties; lifecycle JouleWork credits up to four useful
+artifacts at 20 points each and subtracts waste. The portal keeps lifecycle and
+traceability families separate rather than averaging or relabeling them. Release,
+publication, deployment, and production proof remain explicit adjacent states.
 
 `npm run portfolio:sync` regenerates both `ops/portfolio-metrics.json` and
 `ops/portfolio-dashboard.html`. Local hooks, pull-request CI, `main` CI, and the

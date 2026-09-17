@@ -1,6 +1,6 @@
 {
   "name": "ai-sdlc",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",

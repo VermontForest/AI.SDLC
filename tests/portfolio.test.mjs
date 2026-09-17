@@ -41,6 +41,31 @@ test("required verification types and evidence are enforced", async () => {
   assert.ok(report.errors.some((item) => item.code === "missing_evidence"));
 });
 
+test("completed work cannot hide a pending declared check behind another passed check of the same type", async () => {
+  const { ledger, root } = await fixture();
+  ledger.projects[0].work_items[0].tests.push({ id: "TST-003", type: "production", status: "planned", evidence_ids: [] });
+  const report = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
+  assert.ok(report.errors.some((item) => item.code === "test_not_passed" && item.message.includes("TST-003")));
+
+  ledger.projects[0].work_items[0].status = "active";
+  const metrics = computePortfolioMetrics(ledger, NOW);
+  assert.equal(metrics.projects[0].work_items[0].leq.score, 88);
+  assert.equal(metrics.projects[0].work_items[0].joulework.score, 65);
+  assert.match(metrics.projects[0].work_items[0].leq.denominator, /2\/3 verification obligations/);
+  assert.deepEqual(metrics.projects[0].work_items[0].leq.pending_checks, ["TST-003 (production: planned)"]);
+});
+
+test("undeclared required verification remains in active-work metric denominators", async () => {
+  const { ledger } = await fixture();
+  const work = ledger.projects[0].work_items[0];
+  work.status = "active";
+  work.tests = work.tests.filter((item) => item.type !== "production");
+  const metric = computePortfolioMetrics(ledger, NOW).projects[0].work_items[0].leq;
+  assert.equal(metric.score, 75);
+  assert.match(metric.denominator, /1\/2 verification obligations/);
+  assert.deepEqual(metric.pending_checks, ["required production verification (not declared)"]);
+});
+
 test("a failed task blocks itself but not an unrelated scoped task", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].status = "active";
@@ -125,6 +150,10 @@ test("portal is generated from the validated ledger", async () => {
   assert.match(html, /Ledger structure is valid/);
   assert.match(html, /This does not mean every project is tested, complete, or unblocked/);
   assert.match(html, /Dashboard data quality/);
+  assert.match(html, /Traceability LEQ/);
+  assert.match(html, /Metric boundary: traceability evidence coverage, not lifecycle health or physical energy/);
+  assert.match(html, /Formula:/);
+  assert.match(html, /Denominator:/);
   assert.match(html, /UTC/);
   assert.match(html, /data-portfolio-updated-at/);
   assert.match(html, /Dashboard data freshness needs attention/);
@@ -210,12 +239,15 @@ test("missing, stale, and dependent metric inputs never become invented scores",
   assert.equal(metrics.projects[0].leq.status, "awaiting_inputs");
   assert.equal("score" in metrics.projects[0].leq, false);
   assert.ok(metrics.projects[0].leq.missing_inputs.includes("unit verification evidence"));
+  assert.equal(metrics.portfolio.metric_families.find((item) => item.model === "traceability-v2").leq.status, "awaiting_inputs");
 
   const stale = await fixture();
-  stale.ledger.projects[0].updated_at = "2026-01-01T00:00:00.000Z";
+  stale.ledger.projects[0].updated_at = NOW.toISOString();
+  for (const evidence of stale.ledger.projects[0].evidence) evidence.created_at = "2026-01-01T00:00:00.000Z";
   metrics = computePortfolioMetrics(stale.ledger, NOW);
   assert.equal(metrics.projects[0].leq.status, "stale");
   assert.equal(metrics.portfolio.leq.status, "stale");
+  assert.equal(metrics.projects[0].leq.measured_at, "2026-01-01T00:00:00.000Z");
 
   const completed = await fixture();
   const project = completed.ledger.projects[0];
@@ -226,6 +258,45 @@ test("missing, stale, and dependent metric inputs never become invented scores",
   project.metrics.joulework = { status: "awaiting_inputs", definition: "Current JouleWork.", scope: "Demo Project", missing_inputs: ["completed outcome evidence"], next_action: "Record outcome evidence.", owner: "Demo owner" };
   const report = await validateLedger(completed.ledger, { root: completed.root, stage: "change", now: NOW });
   assert.ok(report.errors.some((item) => item.code === "metric_awaiting_inputs"));
+});
+
+test("release metrics are scoped to registered release work instead of unrelated active work", async () => {
+  const { ledger, root } = await fixture();
+  ledger.projects[0].status = "active";
+  ledger.projects[0].work_items.push({
+    id: "WBS-002",
+    title: "Record hosted publication after release",
+    owner: "Demo owner",
+    status: "active",
+    implements: ["FRS-001"],
+    affected_surfaces: ["release ledger"],
+    protected_contracts: ["hosted publication proof"],
+    required_test_types: ["production"],
+    tests: [{ id: "TST-003", type: "production", status: "planned", evidence_ids: [] }],
+    changed_files: [],
+    blockers: [],
+    next_actions: ["Publish and record the release."]
+  });
+  const report = await validateLedger(ledger, { root, stage: "release", projectId: "demo", releaseId: "REL-001", now: NOW });
+  assert.equal(report.ok, true, report.errors.map((item) => item.message).join("; "));
+  assert.equal(report.visible_debt.some((item) => item.code === "metric_awaiting_inputs" && item.blocking), false);
+});
+
+test("lifecycle and traceability metric models stay separate", async () => {
+  const { ledger } = await fixture();
+  const metrics = computePortfolioMetrics(ledger, NOW);
+  assert.equal(metrics.portfolio.leq.model, "traceability-v2");
+  assert.equal(metrics.portfolio.metric_families.length, 2);
+  assert.deepEqual(metrics.portfolio.metric_families.map((item) => item.model), ["lifecycle-v1", "traceability-v2"]);
+  assert.equal(metrics.portfolio.metric_families.find((item) => item.model === "lifecycle-v1").leq.score, 96);
+  assert.equal(metrics.portfolio.metric_families.find((item) => item.model === "traceability-v2").leq.score, 100);
+
+  const root = await mkdtemp(join(tmpdir(), "ai-sdlc-model-portal-"));
+  await writeFile(join(root, "portfolio.json"), `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+  await buildPortfolioPortal(["--ledger", "portfolio.json", "--output", "dashboard.html"], { root, now: NOW });
+  const html = await readFile(join(root, "dashboard.html"), "utf8");
+  assert.match(html, /Lifecycle LEQ/);
+  assert.match(html, /Traceability LEQ/);
 });
 
 test("release display distinguishes awaiting, recorded, and unavailable states", async () => {
@@ -255,7 +326,7 @@ test("portfolio sync writes deterministic board and metrics from one ledger", as
   ], { root, now: NOW });
   assert.equal(result.exitCode, 0);
   const metrics = JSON.parse(await readFile(join(root, "metrics.json"), "utf8"));
-  assert.equal(metrics.formula_version, "traceability-v1");
+  assert.equal(metrics.formula_version, "traceability-v2");
   assert.equal(metrics.projects[0].work_items[0].leq.score, 100);
 });
 
@@ -373,8 +444,8 @@ async function fixture() {
         production_test_ids: ["TST-002"]
       }],
       metrics: {
-        leq: { status: "valid", score: 96, classification: "healthy", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture", definition: "Fixture LEQ definition.", scope: "Demo Project" },
-        joulework: { status: "valid", score: 90, classification: "productive", measured_at: "2026-09-17T10:00:00.000Z", source: "fixture", definition: "Fixture JouleWork definition.", scope: "Demo Project" }
+        leq: { status: "valid", score: 96, classification: "healthy", measured_at: "2026-09-17T10:00:00.000Z", model: "lifecycle-v1", source: "fixture", formula: "Fixture LEQ formula.", denominator: "2 declared checks", pending_checks: [], definition: "Fixture LEQ definition.", scope: "Demo Project" },
+        joulework: { status: "valid", score: 90, classification: "productive", measured_at: "2026-09-17T10:00:00.000Z", model: "lifecycle-v1", source: "fixture", formula: "Fixture JouleWork formula.", denominator: "2 declared checks", pending_checks: [], definition: "Fixture JouleWork definition.", scope: "Demo Project" }
       },
       blockers: [],
       blocker_actions: [],

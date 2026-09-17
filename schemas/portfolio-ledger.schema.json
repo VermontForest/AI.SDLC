@@ -179,7 +179,11 @@
         "score": { "type": "number", "minimum": 0, "maximum": 100 },
         "classification": { "type": "string" },
         "measured_at": { "$ref": "#/$defs/dateTime" },
+        "model": { "$ref": "#/$defs/nonEmpty" },
         "source": { "$ref": "#/$defs/nonEmpty" },
+        "formula": { "$ref": "#/$defs/nonEmpty" },
+        "denominator": { "$ref": "#/$defs/nonEmpty" },
+        "pending_checks": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" }, "uniqueItems": true },
         "definition": { "$ref": "#/$defs/nonEmpty" },
         "scope": { "$ref": "#/$defs/nonEmpty" },
         "reason": { "$ref": "#/$defs/nonEmpty" },
@@ -188,10 +192,10 @@
         "owner": { "$ref": "#/$defs/nonEmpty" }
       },
       "allOf": [
-        { "if": { "properties": { "status": { "const": "valid" } } }, "then": { "required": ["score", "classification", "measured_at", "source"] } },
+        { "if": { "properties": { "status": { "const": "valid" } } }, "then": { "required": ["score", "classification", "measured_at", "model", "source", "formula", "denominator", "pending_checks"] } },
         { "if": { "properties": { "status": { "const": "not_applicable" } } }, "then": { "required": ["reason"] } },
         { "if": { "properties": { "status": { "const": "awaiting_inputs" } } }, "then": { "required": ["missing_inputs", "next_action", "owner"] } },
-        { "if": { "properties": { "status": { "const": "stale" } } }, "then": { "required": ["score", "classification", "measured_at", "source", "reason", "next_action", "owner"] } },
+        { "if": { "properties": { "status": { "const": "stale" } } }, "then": { "required": ["score", "classification", "measured_at", "model", "source", "formula", "denominator", "pending_checks", "reason", "next_action", "owner"] } },
         { "if": { "properties": { "status": { "const": "error" } } }, "then": { "required": ["reason", "next_action", "owner"] } }
       ]
     },

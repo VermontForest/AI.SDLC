@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-17T13:10:00.000Z",
+  "release": "v0.2.3",
+  "artifact": {
+    "path": "dist/ai-sdlc-0.2.3.tgz",
+    "sha256": "0ed304d902edbd6f1323ed382585cb926e15d06f6f1bf22c25ee5dca6ccdf077"
+  },
+  "verification": [
+    {
+      "command": "node --test tests/portfolio.test.mjs tests/automation.test.mjs",
+      "status": "passed",
+      "tests": 25,
+      "failures": 0
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": "repository contract, lifecycle self-test, 24 hook tests, and 25 portfolio/automation tests",
+      "failures": 0
+    }
+  ],
+  "verified_contracts": [
+    "Every declared check remains in the verification denominator.",
+    "Every undeclared required verification type remains an unmet denominator obligation.",
+    "Completed work rejects planned, blocked, or failed declared checks even when another check of the same type passed.",
+    "Lifecycle and traceability metric models are labeled and aggregated separately.",
+    "Evidence freshness uses the oldest contributing evidence timestamp, not dashboard generation or unrelated metadata time.",
+    "Release, publication, deployment, and production proof remain outside implementation metric scores."
+  ],
+  "pending_external_proof": [
+    "Protected GitHub pull-request checks",
+    "Hosted v0.2.3 release tag and asset",
+    "Downloaded hosted asset digest match",
+    "Merged release-event ledger update"
+  ]
+}
