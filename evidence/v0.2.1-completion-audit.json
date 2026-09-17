@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "release": "0.2.1",
+  "recorded_at": "2026-09-17T12:15:00.000Z",
+  "local_verification": {
+    "repository_contract": "passed",
+    "built_in_self_test": "passed",
+    "lifecycle_hook_tests": { "passed": 24, "failed": 0 },
+    "portfolio_and_automation_tests": { "passed": 17, "failed": 0 },
+    "protected_regression": "passed",
+    "yaml_lint": "passed"
+  },
+  "browser_proof": {
+    "url": "http://127.0.0.1:5191/#human-dashboard",
+    "desktop": "external-local-proof/completion-audit-final-desktop.png",
+    "mobile_390x844": "external-local-proof/completion-audit-final-mobile.png",
+    "console_errors": 0,
+    "console_warnings": 0
+  },
+  "github_repository_enforcement": {
+    "main_requires_pull_request": true,
+    "required_checks": [
+      "validate",
+      "validation (ubuntu-latest, 20)",
+      "validation (ubuntu-latest, 24)",
+      "validation (windows-latest, 20)",
+      "validation (windows-latest, 24)"
+    ],
+    "strict_up_to_date_branch": true,
+    "enforce_admins": true,
+    "conversation_resolution_required": true,
+    "force_pushes_allowed": false,
+    "branch_deletion_allowed": false,
+    "actions_can_create_pull_requests": true,
+    "source": "GitHub branch-protection and Actions-permissions APIs"
+  },
+  "release_artifact": {
+    "path": "dist/ai-sdlc-0.2.1.tgz",
+    "sha256": "9e109af08ca365f23a04d932b3483f5357c9cc291124c97744f9af6044df0f47"
+  },
+  "hosted_verification": {
+    "status": "pending",
+    "note": "This record will be updated after the audit branch runs on GitHub."
+  },
+  "limits": [
+    "Lifecycle event automation refuses to fabricate production tests or acceptance evidence.",
+    "Projects without recorded work or an explicit measured metric source remain unknown.",
+    "Vibe Mode remains planned and unimplemented."
+  ]
+}

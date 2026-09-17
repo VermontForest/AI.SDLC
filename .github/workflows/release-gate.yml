@@ -1,6 +1,16 @@
 name: AI.SDLC release gate
 
 on:
+  workflow_call:
+    inputs:
+      project:
+        description: Project id in portfolio.ledger.json
+        required: true
+        type: string
+      release:
+        description: Release id in portfolio.ledger.json
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       project:
@@ -11,9 +21,15 @@ on:
         description: Release id in portfolio.ledger.json
         required: true
         type: string
+  release:
+    types: [published]
 
 permissions:
   contents: read
+
+concurrency:
+  group: ai-sdlc-release-${{ github.event.release.tag_name || inputs.release || github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -31,5 +47,52 @@ jobs:
         run: npm ci
       - name: Run behavioral test suite
         run: npm test
-      - name: Enforce release evidence, approval, artifact, and rollback gates
+      - name: Validate requested release candidate
+        if: github.event_name != 'release'
         run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release --project "${{ inputs.project }}" --release "${{ inputs.release }}"
+      - name: Audit externally published release against its registered gate
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node src/cli.mjs plan:record-event --ledger portfolio.ledger.json --event release --ref "$RELEASE_TAG" --run-url "$RUN_URL"
+
+  record-published-release:
+    if: github.event_name == 'release'
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Record published release after its registered gate passes
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node src/cli.mjs plan:record-event --ledger portfolio.ledger.json --event release --ref "$RELEASE_TAG" --run-url "$RUN_URL"
+      - name: Propose the lifecycle ledger update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          branch="automation/release-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add portfolio.ledger.json ops/portfolio-dashboard.html ops/portfolio-metrics.json
+          git commit -m "Record release ${RELEASE_TAG}"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Record release ${RELEASE_TAG}" --body "Automated AI.SDLC lifecycle update after the registered release gate passed. Merge remains subject to the protected main-branch checks."

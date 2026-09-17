@@ -5,9 +5,9 @@ echo "AI.SDLC pre-push: running tests, traceability, and drift gates"
 npm test
 npm run plan:validate
 npm run plan:drift
-npm run portal:build
+npm run portfolio:sync
 
-if ! git diff --quiet -- ops/portfolio-dashboard.html; then
-  echo "AI.SDLC pre-push blocked: generated portal differs from the committed artifact."
+if ! git diff --quiet -- ops/portfolio-dashboard.html ops/portfolio-metrics.json; then
+  echo "AI.SDLC pre-push blocked: generated portal or metrics differ from committed artifacts."
   exit 1
 fi

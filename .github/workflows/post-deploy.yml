@@ -1,6 +1,16 @@
 name: AI.SDLC post-deploy gate
 
 on:
+  workflow_call:
+    inputs:
+      project:
+        description: Project id in portfolio.ledger.json
+        required: true
+        type: string
+      release:
+        description: Released id in portfolio.ledger.json
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       project:
@@ -11,17 +21,25 @@ on:
         description: Released id in portfolio.ledger.json
         required: true
         type: string
+  deployment_status:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ai-sdlc-deploy-${{ github.event.deployment.ref || inputs.release || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   production-proof:
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -31,5 +49,56 @@ jobs:
         run: npm ci
       - name: Run behavioral test suite
         run: npm test
-      - name: Enforce deployment and production outcome proof
+      - name: Validate requested production proof
+        if: github.event_name != 'deployment_status'
         run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy --project "${{ inputs.project }}" --release "${{ inputs.release }}"
+      - name: Record successful deployment only after production proof passes
+        if: github.event_name == 'deployment_status'
+        env:
+          DEPLOYMENT_REF: ${{ github.event.deployment.ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node src/cli.mjs plan:record-event --ledger portfolio.ledger.json --event deployment --ref "$DEPLOYMENT_REF" --run-url "$RUN_URL"
+
+  record-successful-deployment:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    needs: production-proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Record successful deployment after production proof passes
+        env:
+          DEPLOYMENT_REF: ${{ github.event.deployment.ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node src/cli.mjs plan:record-event --ledger portfolio.ledger.json --event deployment --ref "$DEPLOYMENT_REF" --run-url "$RUN_URL"
+      - name: Propose the lifecycle ledger update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_REF: ${{ github.event.deployment.ref }}
+        shell: bash
+        run: |
+          if git diff --quiet -- portfolio.ledger.json ops/portfolio-dashboard.html ops/portfolio-metrics.json; then
+            echo "No lifecycle update was generated."
+            exit 1
+          fi
+          branch="automation/deployment-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add portfolio.ledger.json ops/portfolio-dashboard.html ops/portfolio-metrics.json
+          git commit -m "Record deployment ${DEPLOYMENT_REF}"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Record deployment ${DEPLOYMENT_REF}" --body "Automated AI.SDLC lifecycle update after registered production proof passed. Merge remains subject to the protected main-branch checks."

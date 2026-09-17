@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -30,7 +32,20 @@ jobs:
         run: npm test
       - name: Validate change traceability
         run: npm run plan:validate
-      - name: Rebuild human portal
-        run: npm run portal:build
-      - name: Reject stale generated portal
-        run: git diff --exit-code -- ops/portfolio-dashboard.html
+      - name: Require ledger updates for implementation and enforcement changes
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          if printf '%s\n' "$changed" | grep -Eq '^(src/|schemas/|\.github/workflows/|\.githooks/|package(-lock)?\.json$)' \
+            && ! printf '%s\n' "$changed" | grep -qx 'portfolio.ledger.json'; then
+            echo "Implementation or enforcement changed without portfolio.ledger.json."
+            exit 1
+          fi
+      - name: Recompute human board and portfolio metrics
+        run: npm run portfolio:sync
+      - name: Reject stale generated board or metrics
+        run: git diff --exit-code -- ops/portfolio-dashboard.html ops/portfolio-metrics.json

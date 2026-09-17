@@ -3,10 +3,17 @@ set -eu
 
 echo "AI.SDLC pre-commit: validating traceability ledger"
 npm run plan:validate
-npm run portal:build
+npm run portfolio:sync
 
-if ! git diff --quiet -- ops/portfolio-dashboard.html; then
-  echo "AI.SDLC pre-commit blocked: ops/portfolio-dashboard.html is stale."
-  echo "Stage the regenerated portal and commit again."
+staged_files="$(git diff --cached --name-only)"
+if printf '%s\n' "$staged_files" | grep -Eq '^(src/|schemas/|\.github/workflows/|\.githooks/|package(-lock)?\.json$)' \
+  && ! printf '%s\n' "$staged_files" | grep -qx 'portfolio.ledger.json'; then
+  echo "AI.SDLC pre-commit blocked: implementation or enforcement changed without portfolio.ledger.json."
+  exit 1
+fi
+
+if ! git diff --quiet -- ops/portfolio-dashboard.html ops/portfolio-metrics.json; then
+  echo "AI.SDLC pre-commit blocked: derived portfolio board or metrics are stale."
+  echo "Stage the regenerated files and commit again."
   exit 1
 fi
