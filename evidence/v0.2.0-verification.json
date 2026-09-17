@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "release": "v0.2.0",
+  "created_at": "2026-09-17T10:34:07.000Z",
+  "base_commit": "7efd19d8062ee1eed96732455f3cff68faa45942",
+  "checks": [
+    {
+      "id": "behavioral-suite",
+      "command": "npm test",
+      "status": "passed",
+      "result": "The repository contract and built-in self-test passed, followed by 38 Node tests with 0 failures: 24 lifecycle-hook tests and 14 portfolio/automation tests. The portfolio suite includes valid transition passage plus intentional failures for malformed schema, broken links, missing test classes and evidence, scoped failed work, missing approval and rollback, delivery-only content claims, absent comparisons, wrong artifact hash, missing deployment proof, stale state, workflow definitions, and nondeterministic saved portal output."
+    },
+    {
+      "id": "change-gate",
+      "command": "npm run plan:validate",
+      "status": "passed",
+      "result": "The public AI.SDLC ledger passed the change gate."
+    },
+    {
+      "id": "drift-gate",
+      "command": "npm run plan:drift",
+      "status": "passed",
+      "result": "The public AI.SDLC ledger passed the drift gate."
+    },
+    {
+      "id": "public-portal-browser",
+      "command": "Playwright CLI against http://127.0.0.1:5191/#human-dashboard",
+      "status": "passed",
+      "result": "The public portal rendered from the authoritative ledger at desktop and 390x844 mobile widths with zero console errors."
+    },
+    {
+      "id": "private-portfolio-browser",
+      "command": "Playwright CLI against http://127.0.0.1:5190/#human-dashboard",
+      "status": "passed",
+      "result": "The private local portfolio rendered nine current workstreams at desktop and 390x844 mobile widths with zero console errors; private data remains outside the public repository."
+    },
+    {
+      "id": "release-artifact",
+      "command": "npm pack --pack-destination dist",
+      "status": "passed",
+      "result": "dist/ai-sdlc-0.2.0.tgz was created with SHA-256 213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c."
+    }
+  ],
+  "hosted_ci": {
+    "status": "passed",
+    "head_sha": "56831973820d5eb63846a1234b3bd38e4e87dbda",
+    "change_gate_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
+    "cross_platform_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628920",
+    "result": "The hosted change gate passed. The existing validation matrix also passed on Ubuntu and Windows with Node.js 20 and 24."
+  }
+}

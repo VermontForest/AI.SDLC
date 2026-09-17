@@ -1,6 +1,6 @@
 {
   "name": "ai-sdlc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test:hooks": "node --test src/codex-hooks.test.mjs",
-    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks",
+    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks && node --test tests/automation.test.mjs tests/portfolio.test.mjs",
     "self-test": "node src/cli.mjs self-test",
     "jsm:install": "node src/cli.mjs skills:install",
     "jsm:verify": "node src/cli.mjs skills:verify",
@@ -19,7 +19,14 @@
     "finish:iteration": "node src/cli.mjs finish",
     "manage:status": "node src/cli.mjs status",
     "manage:refresh": "node src/cli.mjs refresh",
-    "manage:metrics:test": "node src/cli.mjs self-test",
+    "manage:metrics:test": "node src/cli.mjs self-test && node --test tests/automation.test.mjs tests/portfolio.test.mjs",
+    "plan:validate": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage change",
+    "plan:release": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release",
+    "plan:post-deploy": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy",
+    "plan:drift": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage drift",
+    "portal:build": "node src/cli.mjs portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html",
+    "portal:serve": "node src/cli.mjs portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190",
+    "hooks:install": "git config core.hooksPath .githooks",
     "verify:repository": "node scripts/verify-repository.mjs",
     "verify:completion": "node src/cli.mjs verify-completion"
   },
@@ -38,5 +45,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/VermontForest/AI.SDLC.git"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0"
   }
 }

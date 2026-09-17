@@ -24,6 +24,89 @@ AI.SDLC is project-neutral. Product rules, commands, skill choices, provider
 requirements, and external proof belong in the consuming project's
 `harness.config.json`.
 
+## Executable Portfolio Traceability
+
+AI.SDLC now includes a strict portfolio ledger, transition gates, and a human
+portal. The ledger is the authority: requirements, work, tests, evidence,
+approvals, artifacts, releases, blockers, next actions, LEQ, and JouleWork are
+validated and displayed from the same file.
+
+```text
+plan -> numbered user requirements -> functional requirements -> work
+     -> required test types -> evidence -> approval -> release -> live proof
+```
+
+The public, sanitized example is [`portfolio.ledger.json`](portfolio.ledger.json).
+The schema is
+[`schemas/portfolio-ledger.schema.json`](schemas/portfolio-ledger.schema.json).
+Consumer portfolios containing private products, customer data, or internal
+status belong outside this public repository and can still use the same CLI:
+
+```bash
+ai-sdlc plan:validate --ledger /private/portfolio.json --stage change
+ai-sdlc portal:serve --ledger /private/portfolio.json --host 127.0.0.1 --port 5190
+```
+
+The portal is then available at `http://127.0.0.1:5190/#human-dashboard`.
+It does not manufacture scores or convert missing proof into a green status.
+
+### Transition Gates
+
+| Gate | What it blocks |
+|---|---|
+| `change` | Invalid schema, broken traceability, contradictory completion, or a failed scoped task |
+| `release` | Incomplete work, missing approvals, wrong artifact hashes, unready rollback, or content claims without comparison evidence |
+| `post-deploy` | Missing deployment records or absent evidence-backed production checks |
+| `drift` | Stale portfolio, project, or measured-metric state |
+
+Validation can be scoped to one project, work item, or release. A failed task
+blocks its own transition while remaining visible as debt; it does not silently
+stop unrelated healthy work.
+
+```bash
+npm run plan:validate
+node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage change --project ai-sdlc --work-item WBS-001
+node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release --project ai-sdlc --release REL-001
+npm run plan:drift
+```
+
+### Outcome Evidence Is Not Delivery Evidence
+
+A successful build, upload, URL, filename, or checksum proves delivery and
+identity. It does not prove that visible, motion, or behavioral content changed.
+When a release claims a content change, the release gate additionally requires:
+
+- an exact SHA-256 artifact identity;
+- an artifact marked as a `content` revision; and
+- passed visual, motion, or behavioral comparison evidence bound to that exact
+  artifact.
+
+The negative test suite proves that a delivery-only artifact cannot pass as a
+content revision.
+
+### Automation
+
+Install the versioned local hooks once per clone:
+
+```bash
+npm run hooks:install
+```
+
+The pre-commit hook validates the ledger and rejects a stale generated portal.
+The pre-push hook runs behavioral tests plus change and drift gates. GitHub
+Actions repeat the change gate on pull requests and `main`, provide explicit
+release and post-deploy gates, and run drift detection daily. Workflow files
+are controls; a capability claim is made only after an actual hosted run is
+observed.
+
+AI.SDLC is also planning an optional **Vibe Mode** for intentionally fast,
+low-ceremony exploration. Vibe Mode will let people prototype and move ideas
+around without running the full gated lifecycle, while keeping that work
+clearly marked as experimental. Ungated work will not be representable as
+verified, release-ready, or production-proven until it re-enters the standard
+traceable workflow. The planned boundary and acceptance criteria are tracked in
+[`docs/project-plan.md`](docs/project-plan.md).
+
 ## How The Harness Works
 
 ```mermaid
@@ -508,6 +591,17 @@ project files, and real shell-command packs. It proves:
 - complete JSM aggregation in status;
 - LEQ participation; and
 - productive JouleWork after a complete useful-work chain.
+
+The portfolio tests additionally prove:
+
+- schema and trace-link failures block;
+- required test classes and evidence are enforced;
+- a failed scoped task blocks itself without blocking an unrelated task;
+- approvals, rollback, deployment, and production proof are stage-specific;
+- incorrect artifact hashes block release;
+- delivery-only artifacts cannot masquerade as content changes;
+- stale projects and metrics fail the drift gate; and
+- the responsive portal is generated from the validated ledger.
 
 ## Trust Boundaries
 

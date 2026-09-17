@@ -1,0 +1,36 @@
+name: AI.SDLC change gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-sdlc-change-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run behavioral test suite
+        run: npm test
+      - name: Validate change traceability
+        run: npm run plan:validate
+      - name: Rebuild human portal
+        run: npm run portal:build
+      - name: Reject stale generated portal
+        run: git diff --exit-code -- ops/portfolio-dashboard.html

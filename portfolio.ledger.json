@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "portfolio": {
+    "id": "ai-sdlc-public",
+    "name": "AI.SDLC Public Framework",
+    "updated_at": "2026-09-17T10:52:44.000Z",
+    "stale_after_days": 14,
+    "mode": "standard",
+    "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
+  },
+  "projects": [
+    {
+      "id": "ai-sdlc",
+      "name": "AI.SDLC",
+      "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
+      "status": "verified",
+      "updated_at": "2026-09-17T10:52:44.000Z",
+      "requirements": [
+        {
+          "id": "URS-001",
+          "type": "user",
+          "text": "A human project lead can see plans, requirements, work, verification, evidence, blockers, metrics, and releases in one portal.",
+          "status": "verified",
+          "acceptance": ["The portal is generated from the same ledger that CI validates."]
+        },
+        {
+          "id": "URS-002",
+          "type": "user",
+          "text": "Required SDLC controls run automatically instead of relying on a person to remember them.",
+          "status": "verified",
+          "acceptance": ["Local hooks and hosted CI fail with nonzero exit codes when applicable proof is missing."]
+        },
+        {
+          "id": "URS-003",
+          "type": "user",
+          "text": "A failed task blocks itself without unrelated legacy debt stopping all other work.",
+          "status": "verified",
+          "acceptance": ["Task-scoped validation excludes unrelated transition debt while preserving it in the portal."]
+        },
+        {
+          "id": "URS-004",
+          "type": "user",
+          "text": "The system cannot claim a visible or behavioral outcome from packaging, a new URL, or a changed filename alone.",
+          "status": "verified",
+          "acceptance": ["Content revisions require artifact identity and passed before/after outcome evidence."]
+        },
+        {
+          "id": "FRS-001",
+          "type": "functional",
+          "text": "Validate one strict machine-readable portfolio ledger with numbered requirements and linked work, tests, evidence, approvals, artifacts, and releases.",
+          "status": "verified",
+          "derived_from": ["URS-001", "URS-002"],
+          "acceptance": ["Malformed, incomplete, contradictory, or incorrectly linked ledgers fail validation."]
+        },
+        {
+          "id": "FRS-002",
+          "type": "functional",
+          "text": "Apply stage-specific change, release, post-deploy, and drift gates with selectable project, task, and release scope.",
+          "status": "verified",
+          "derived_from": ["URS-002", "URS-003"],
+          "acceptance": ["Each lifecycle transition asks only for evidence appropriate to that transition."]
+        },
+        {
+          "id": "FRS-003",
+          "type": "functional",
+          "text": "Generate a responsive human portal from the authoritative ledger.",
+          "status": "verified",
+          "derived_from": ["URS-001"],
+          "acceptance": ["The portal shows progress, verification, evidence, blockers, next actions, metrics, and release state."]
+        },
+        {
+          "id": "FRS-004",
+          "type": "functional",
+          "text": "Run the gates from repository hooks and GitHub Actions for change, release, post-deploy, and scheduled drift transitions.",
+          "status": "verified",
+          "derived_from": ["URS-002", "URS-003"],
+          "acceptance": ["Actual hosted workflow runs are distinguished from merely committing workflow files."]
+        },
+        {
+          "id": "FRS-005",
+          "type": "functional",
+          "text": "Bind content-change claims to immutable artifact hashes and passed visual, motion, or behavioral comparison evidence.",
+          "status": "verified",
+          "derived_from": ["URS-004"],
+          "acceptance": ["A delivery-only artifact fails any release that claims changed content."]
+        }
+      ],
+      "work_items": [
+        {
+          "id": "WBS-001",
+          "title": "Executable ledger and transition validator",
+          "status": "verified",
+          "implements": ["FRS-001", "FRS-002", "FRS-005"],
+          "affected_surfaces": ["schema", "CLI", "validation engine"],
+          "protected_contracts": ["stage-specific proof", "task-scoped failure", "artifact identity"],
+          "required_test_types": ["unit", "regression"],
+          "tests": [
+            { "id": "TST-001", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-001"] },
+            { "id": "TST-002", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001"] }
+          ],
+          "changed_files": ["src/portfolio.mjs", "schemas/portfolio-ledger.schema.json"],
+          "blockers": [],
+          "next_actions": []
+        },
+        {
+          "id": "WBS-002",
+          "title": "Human-readable portfolio portal",
+          "status": "verified",
+          "implements": ["FRS-003"],
+          "affected_surfaces": ["generated portal"],
+          "protected_contracts": ["same-ledger rendering", "unknown stays unknown"],
+          "required_test_types": ["unit", "visual"],
+          "tests": [
+            { "id": "TST-003", "type": "unit", "status": "passed", "command": "node --test tests/portfolio.test.mjs", "evidence_ids": ["EV-001"] },
+            { "id": "TST-004", "type": "visual", "status": "passed", "evidence_ids": ["EV-003"] }
+          ],
+          "changed_files": ["src/portfolio.mjs"],
+          "blockers": [],
+          "next_actions": []
+        },
+        {
+          "id": "WBS-003",
+          "title": "Automated hooks and hosted CI gates",
+          "status": "verified",
+          "implements": ["FRS-004"],
+          "affected_surfaces": ["Git hooks", "GitHub Actions"],
+          "protected_contracts": ["failing exit codes", "least-privilege workflows", "hosted-run evidence"],
+          "required_test_types": ["integration", "regression"],
+          "tests": [
+            { "id": "TST-005", "type": "integration", "status": "passed", "command": "npm run plan:validate", "evidence_ids": ["EV-001", "EV-006"] },
+            { "id": "TST-006", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001", "EV-006"] }
+          ],
+          "changed_files": [".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/ci.yml", ".github/workflows/release-gate.yml", ".github/workflows/post-deploy.yml", ".github/workflows/drift.yml"],
+          "blockers": [],
+          "next_actions": []
+        },
+        {
+          "id": "WBS-004",
+          "title": "Public documentation and release proof",
+          "status": "verified",
+          "implements": ["FRS-001", "FRS-002", "FRS-003", "FRS-004", "FRS-005"],
+          "affected_surfaces": ["README", "project plan", "release notes"],
+          "protected_contracts": ["public/private separation", "accurate capability claims"],
+          "required_test_types": ["regression", "human_acceptance"],
+          "tests": [
+            { "id": "TST-007", "type": "regression", "status": "passed", "command": "npm test", "evidence_ids": ["EV-001"] },
+            { "id": "TST-008", "type": "human_acceptance", "status": "passed", "evidence_ids": ["EV-004"] }
+          ],
+          "changed_files": ["README.md", "docs/project-plan.md"],
+          "blockers": [],
+          "next_actions": ["Publish the verified branch and keep Vibe Mode explicitly future-only."]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "EV-001",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T10:34:07.000Z",
+          "summary": "The repository contract, built-in self-test, 24 lifecycle-hook tests, and 14 portfolio/automation tests passed with zero failures, including positive and intentional negative transition cases.",
+          "uri": "evidence/v0.2.0-verification.json",
+          "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-002",
+          "type": "behavioral_comparison",
+          "status": "passed",
+          "created_at": "2026-09-17T10:34:07.000Z",
+          "summary": "The implemented validator passes complete linked work and rejects malformed, contradictory, stale, unapproved, unproven, or incorrectly packaged states.",
+          "uri": "tests/portfolio.test.mjs",
+          "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-003",
+          "type": "visual_comparison",
+          "status": "passed",
+          "created_at": "2026-09-17T10:34:07.000Z",
+          "summary": "The public and private portals rendered at desktop and 390x844 mobile widths with zero browser console errors; private portfolio data remains outside the public repository.",
+          "uri": "evidence/v0.2.0-verification.json",
+          "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-004",
+          "type": "approval_record",
+          "status": "passed",
+          "created_at": "2026-09-17T10:34:07.000Z",
+          "summary": "The operator explicitly authorized implementation, verification, and public GitHub promotion of the AI.SDLC upgrade.",
+          "uri": "docs/project-plan.md",
+          "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-005",
+          "type": "artifact_identity",
+          "status": "passed",
+          "created_at": "2026-09-17T10:34:07.000Z",
+          "summary": "The v0.2.0 npm tarball identity was calculated from its actual bytes.",
+          "uri": "dist/ai-sdlc-0.2.0.tgz",
+          "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
+          "artifact_ids": ["ART-001"]
+        },
+        {
+          "id": "EV-006",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-17T10:52:44.000Z",
+          "summary": "Hosted GitHub Actions passed the executable change gate and the Ubuntu/Windows Node.js 20/24 validation matrix for commit 56831973820d5eb63846a1234b3bd38e4e87dbda.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
+          "artifact_ids": ["ART-001"]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": "ART-001",
+          "label": "AI.SDLC v0.2.0 CLI package",
+          "uri": "dist/ai-sdlc-0.2.0.tgz",
+          "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
+          "revision_type": "content",
+          "comparison_evidence_ids": ["EV-002", "EV-003"]
+        }
+      ],
+      "approvals": [
+        {
+          "id": "APP-001",
+          "scope": "Implement, verify, and promote the public executable-traceability release to GitHub.",
+          "required": true,
+          "status": "approved",
+          "decided_at": "2026-09-17T10:34:07.000Z",
+          "evidence_id": "EV-004"
+        }
+      ],
+      "releases": [
+        {
+          "id": "REL-001",
+          "title": "Executable traceability and human portal",
+          "status": "ready",
+          "work_item_ids": ["WBS-001", "WBS-002", "WBS-003", "WBS-004"],
+          "artifact_id": "ART-001",
+          "content_change_claimed": true,
+          "approval_ids": ["APP-001"],
+          "rollback": {
+            "status": "ready",
+            "reference": "Revert the release commit or restore base commit 7efd19d8062ee1eed96732455f3cff68faa45942."
+          },
+          "deployment": { "status": "not_started" },
+          "production_test_ids": []
+        }
+      ],
+      "metrics": {
+        "leq": { "status": "unknown" },
+        "joulework": { "status": "unknown" }
+      },
+      "blockers": [],
+      "next_actions": ["Merge the green public pull request; use the release and post-deploy workflows when a specific downstream release or production deployment is registered."]
+    }
+  ]
+}

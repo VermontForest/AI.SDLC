@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -eu
+
+echo "AI.SDLC pre-push: running tests, traceability, and drift gates"
+npm test
+npm run plan:validate
+npm run plan:drift
+npm run portal:build
+
+if ! git diff --quiet -- ops/portfolio-dashboard.html; then
+  echo "AI.SDLC pre-push blocked: generated portal differs from the committed artifact."
+  exit 1
+fi

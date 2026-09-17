@@ -13,6 +13,12 @@ import {
   installJsmDependencies,
   verifyJsmDependencies
 } from "./jsm-dependencies.mjs";
+import {
+  buildPortfolioPortal,
+  hashArtifact,
+  servePortfolioPortal,
+  validatePortfolio
+} from "./portfolio.mjs";
 
 const raw = process.argv.slice(2);
 const command = normalizeCommand(raw[0]);
@@ -47,6 +53,18 @@ try {
       break;
     case "skills:verify":
       result = await verifyJsmDependencies(args);
+      break;
+    case "plan:validate":
+      result = await validatePortfolio(args);
+      break;
+    case "portal:build":
+      result = await buildPortfolioPortal(args);
+      break;
+    case "portal:serve":
+      result = await servePortfolioPortal(args);
+      break;
+    case "artifact:hash":
+      result = await hashArtifact(args);
       break;
     case "verify-completion": {
       const dependencies = await verifyJsmDependencies(["--json"]);
@@ -86,6 +104,10 @@ function normalizeCommand(value) {
   if (["manage:metrics:test", "test"].includes(normalized)) return "self-test";
   if (["jsm:install", "skills-install"].includes(normalized)) return "skills:install";
   if (["jsm:verify", "skills-verify"].includes(normalized)) return "skills:verify";
+  if (["validate", "trace:validate", "portfolio:validate"].includes(normalized)) return "plan:validate";
+  if (["portfolio:build", "dashboard:build"].includes(normalized)) return "portal:build";
+  if (["portfolio:serve", "dashboard:serve"].includes(normalized)) return "portal:serve";
+  if (["hash", "hash:artifact"].includes(normalized)) return "artifact:hash";
   return normalized;
 }
 
@@ -103,6 +125,10 @@ Usage:
   ai-sdlc skills:install [--json]
   ai-sdlc skills:verify [--json]
   ai-sdlc verify-completion --intentional-files src/a.ts,docs/b.md
+  ai-sdlc plan:validate --ledger portfolio.ledger.json --stage change|release|post-deploy|drift [--project id] [--work-item id] [--release id]
+  ai-sdlc portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html
+  ai-sdlc portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190
+  ai-sdlc artifact:hash --file dist/release.zip
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.
 Applied skills accept comma-separated or repeated --applied-skill flags.
