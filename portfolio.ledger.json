@@ -195,7 +195,7 @@
           "created_at": "2026-09-17T10:34:07.000Z",
           "summary": "The v0.2.0 npm tarball identity was calculated from its actual bytes.",
           "uri": "dist/ai-sdlc-0.2.0.tgz",
-          "sha256": "613593e8a441538bca0cfd09c71300d83581a863746b4ce57fd461cba69b66f3",
+          "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
           "artifact_ids": ["ART-001"]
         }
       ],
@@ -204,7 +204,7 @@
           "id": "ART-001",
           "label": "AI.SDLC v0.2.0 CLI package",
           "uri": "dist/ai-sdlc-0.2.0.tgz",
-          "sha256": "613593e8a441538bca0cfd09c71300d83581a863746b4ce57fd461cba69b66f3",
+          "sha256": "213a853597c3c697afafe609a9ffbe07c548b41daf46b4e7164b1c9dd816532c",
           "revision_type": "content",
           "comparison_evidence_ids": ["EV-002", "EV-003"]
         }

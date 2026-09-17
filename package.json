@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test:hooks": "node --test src/codex-hooks.test.mjs",
-    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks && node --test tests/*.test.mjs",
+    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks && node --test tests/automation.test.mjs tests/portfolio.test.mjs",
     "self-test": "node src/cli.mjs self-test",
     "jsm:install": "node src/cli.mjs skills:install",
     "jsm:verify": "node src/cli.mjs skills:verify",
@@ -19,7 +19,7 @@
     "finish:iteration": "node src/cli.mjs finish",
     "manage:status": "node src/cli.mjs status",
     "manage:refresh": "node src/cli.mjs refresh",
-    "manage:metrics:test": "node src/cli.mjs self-test && node --test tests/*.test.mjs",
+    "manage:metrics:test": "node src/cli.mjs self-test && node --test tests/automation.test.mjs tests/portfolio.test.mjs",
     "plan:validate": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage change",
     "plan:release": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release",
     "plan:post-deploy": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy",
