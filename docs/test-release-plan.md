@@ -9,6 +9,9 @@ Last updated: 2026-09-13
 | SDLC-3: Failed, skipped, stale, partial, or missing proof cannot close work | positive and negative lifecycle tests; nonzero Finish/completion exit status |
 | SDLC-4: LEQ/JouleWork and external proof remain meaningful | completion gate reads current loop health and rejects pending proof |
 | SDLC-5: Carl is not the assistant's assistant | root instructions, generated agent template, management SOP; human review of actual behavior |
+| SDLC-6: Portfolio LEQ/JouleWork are continuously derived across task, project, and portfolio | portfolio sync tests, generated metrics diff gate, local hooks, PR/main CI, and daily drift |
+| SDLC-7: Release and deployment transitions are gated and recorded | reusable workflow-call gates, pre-publication publish dependency, lifecycle-event tests, and automation-branch pull requests |
+| SDLC-8: Invalid changes cannot merge directly to main | GitHub branch protection/ruleset API evidence plus required hosted checks |
 
 Run `npm test` on Node 20 or newer. It validates maintained-file spelling,
 configuration routing, package/launcher references, and real temporary-project
@@ -25,10 +28,11 @@ Reassess changed scope/config; rerun Regress and Finish after content changes.
 
 CI validates enforcement behavior and configuration, not private local workflow
 history or an agent's reasoning. GitHub branch protection is separate: adding a
-workflow does not itself make its status a required merge check. No such setting
-is claimed here. Rolling JSON is inspectable but not tamper-evident. Human review
-must still assess honesty, method quality, and whether responsibility was
-properly exercised. External proof cannot be cleared merely by passing tests.
+workflow does not itself make its status a required merge check, so repository
+rules must be verified through the GitHub API as release evidence. Rolling JSON
+is inspectable but not tamper-evident. Human review must still assess honesty,
+method quality, and whether responsibility was properly exercised. External
+proof cannot be cleared merely by passing tests.
 
 This repository has no product deployment step. Publishing a package or changing
 access permissions is outside the spelling migration. Existing consumers must

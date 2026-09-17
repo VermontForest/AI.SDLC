@@ -8,11 +8,10 @@ tests, evidence, and releases can be traced back to an explicit plan.
 
 ## Current Priority: Executable Traceability And CI Enforcement
 
-**Implementation status:** implemented locally and under release verification.
-The schema, transition validator, browser-readable portal, local hooks, and
-GitHub workflow definitions exist. Local behavioral and browser proof must pass,
-then an actual hosted GitHub Actions run must pass before this release is called
-publicly verified.
+**Implementation status:** v0.2.0 was publicly verified and merged. The v0.2.1
+completion audit adds automatic task/project/portfolio metric rollups,
+current-clock portal staleness, pre-publication release dependency, event-bound
+lifecycle recording through pull requests, and repository merge enforcement.
 
 AI.SDLC will make the project plan the root record for delivery. The plan will
 define numbered user requirements, functional requirements, work breakdown,
@@ -53,6 +52,17 @@ comparison evidence attached to that artifact.
 The human portal and generated reports must read from the same authoritative
 ledger that CI validates. They must not maintain separate status copies that can
 silently drift.
+
+The ledger remains the source of facts; `ops/portfolio-metrics.json` and the
+human portal are deterministic derived artifacts. Hooks and CI recompute both
+and fail when committed output is stale. This avoids a second hand-maintained
+status source while still exposing task, project, and portfolio rollups.
+
+GitHub lifecycle events never manufacture acceptance. Release publication may
+record a passed release gate. A successful deployment event may record a
+deployment only when the ledger already contains passed production tests and
+evidence. Each event produces a pull request so branch rules and ordinary CI
+remain in control of the authoritative ledger.
 
 ## Planned: Optional Vibe Mode
 

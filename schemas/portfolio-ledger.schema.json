@@ -83,7 +83,7 @@
       "required": ["id", "type", "status", "created_at", "summary"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
-        "type": { "enum": ["test_report", "artifact_identity", "visual_comparison", "motion_comparison", "behavioral_comparison", "approval_record", "deployment_record", "production_check"] },
+        "type": { "enum": ["test_report", "artifact_identity", "visual_comparison", "motion_comparison", "behavioral_comparison", "approval_record", "release_record", "deployment_record", "production_check"] },
         "status": { "enum": ["pending", "failed", "passed"] },
         "created_at": { "$ref": "#/$defs/dateTime" },
         "summary": { "$ref": "#/$defs/nonEmpty" },
@@ -127,6 +127,7 @@
         "id": { "$ref": "#/$defs/id" },
         "title": { "$ref": "#/$defs/nonEmpty" },
         "status": { "enum": ["draft", "ready", "released", "production_proven", "blocked"] },
+        "tag": { "$ref": "#/$defs/nonEmpty" },
         "work_item_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "uniqueItems": true },
         "artifact_id": { "$ref": "#/$defs/id" },
         "content_change_claimed": { "type": "boolean" },
@@ -146,6 +147,7 @@
           "required": ["status"],
           "properties": {
             "status": { "enum": ["not_started", "deployed", "failed", "rolled_back"] },
+            "ref": { "type": "string" },
             "environment": { "type": "string" },
             "deployed_at": { "$ref": "#/$defs/dateTime" },
             "evidence_id": { "$ref": "#/$defs/id" }

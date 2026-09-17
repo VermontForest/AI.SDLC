@@ -1,6 +1,6 @@
 {
   "name": "ai-sdlc",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",
@@ -25,6 +25,7 @@
     "plan:post-deploy": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy",
     "plan:drift": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage drift",
     "portal:build": "node src/cli.mjs portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html",
+    "portfolio:sync": "node src/cli.mjs portfolio:sync --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html --metrics-output ops/portfolio-metrics.json",
     "portal:serve": "node src/cli.mjs portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190",
     "hooks:install": "git config core.hooksPath .githooks",
     "verify:repository": "node scripts/verify-repository.mjs",

@@ -27,9 +27,11 @@ requirements, and external proof belong in the consuming project's
 ## Executable Portfolio Traceability
 
 AI.SDLC now includes a strict portfolio ledger, transition gates, and a human
-portal. The ledger is the authority: requirements, work, tests, evidence,
-approvals, artifacts, releases, blockers, next actions, LEQ, and JouleWork are
-validated and displayed from the same file.
+portal. The ledger is the authority for requirements, work, tests, evidence,
+approvals, artifacts, releases, blockers, and next actions. LEQ and JouleWork
+are deterministically recomputed from those records into
+`ops/portfolio-metrics.json`; the portal reads that derived state rather than
+asking a person to copy scores.
 
 ```text
 plan -> numbered user requirements -> functional requirements -> work
@@ -44,11 +46,15 @@ status belong outside this public repository and can still use the same CLI:
 
 ```bash
 ai-sdlc plan:validate --ledger /private/portfolio.json --stage change
+ai-sdlc portfolio:sync --ledger /private/portfolio.json --output /private/portfolio.html --metrics-output /private/portfolio-metrics.json
 ai-sdlc portal:serve --ledger /private/portfolio.json --host 127.0.0.1 --port 5190
 ```
 
 The portal is then available at `http://127.0.0.1:5190/#human-dashboard`.
-It does not manufacture scores or convert missing proof into a green status.
+When a project has recorded work, task scores roll up to project scores and
+project scores roll up to the portfolio. A project with neither recorded work
+nor an explicit measured source remains `unknown`; the tool does not invent
+input data or convert missing proof into a green status.
 
 ### Transition Gates
 
@@ -92,12 +98,30 @@ Install the versioned local hooks once per clone:
 npm run hooks:install
 ```
 
-The pre-commit hook validates the ledger and rejects a stale generated portal.
-The pre-push hook runs behavioral tests plus change and drift gates. GitHub
-Actions repeat the change gate on pull requests and `main`, provide explicit
-release and post-deploy gates, and run drift detection daily. Workflow files
-are controls; a capability claim is made only after an actual hosted run is
-observed.
+The pre-commit hook validates the ledger, requires an accompanying ledger
+change when implementation or enforcement files change, recomputes portfolio
+metrics, and rejects a stale generated board. The pre-push hook repeats that
+sync after behavioral, change, and drift gates. GitHub Actions enforce the same
+contract on pull requests and `main`; daily drift runs use the current clock.
+
+Release and deployment automation has two layers:
+
+- `.github/workflows/release-gate.yml` and `post-deploy.yml` are reusable gates
+  for consumer pipelines and also audit real GitHub `release.published` and
+  successful `deployment_status` events.
+- `.github/workflows/publish-release.yml` is the authorized repository release
+  path: its publish job depends on the reusable release gate, so invalid
+  evidence prevents `gh release create` from running.
+
+After a registered release or deployment event passes, automation updates the
+ledger and derived board on an automation branch and opens a pull request. It
+does not bypass protected `main`. A deployment can become
+`production_proven` only when its production tests and evidence were already
+recorded and pass the post-deploy gate.
+
+Repository settings are a separate enforcement layer. Required status checks
+and pull-request rules must be configured on `main`; merely committing a
+workflow file does not create branch protection.
 
 AI.SDLC is also planning an optional **Vibe Mode** for intentionally fast,
 low-ceremony exploration. Vibe Mode will let people prototype and move ideas
@@ -324,6 +348,26 @@ With the default thresholds, status is healthy only when:
 A command passing does not erase external proof debt, and a healthy metric does
 not imply human acceptance, production readiness, profitability, or deployment
 approval.
+
+### Portfolio rollups
+
+The portfolio board uses a separate, transparent `traceability-v1` rollup so
+task, project, and portfolio health can be refreshed without hand-entered
+scores:
+
+- task LEQ weighs requirement linkage (20), declared verification coverage
+  (15), passed required verification (35), passed evidence linkage (20), and
+  blocker-free state (10), with explicit failure/blocker penalties;
+- task JouleWork weighs requirement linkage (20), passed verification (30),
+  passed evidence (25), and completed useful work (25), with the same penalties;
+- project scores average recorded tasks, and the portfolio averages projects
+  with measured input;
+- projects without recorded work fall back only to a named measured source;
+  otherwise they remain `unknown`.
+
+`npm run portfolio:sync` regenerates both `ops/portfolio-metrics.json` and
+`ops/portfolio-dashboard.html`. Local hooks, pull-request CI, `main` CI, and the
+daily drift workflow reject generated files that do not match the ledger.
 
 ## Install
 

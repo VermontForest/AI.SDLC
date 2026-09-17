@@ -16,7 +16,9 @@ import {
 import {
   buildPortfolioPortal,
   hashArtifact,
+  recordLifecycleEvent,
   servePortfolioPortal,
+  syncPortfolio,
   validatePortfolio
 } from "./portfolio.mjs";
 
@@ -63,6 +65,12 @@ try {
     case "portal:serve":
       result = await servePortfolioPortal(args);
       break;
+    case "portfolio:sync":
+      result = await syncPortfolio(args);
+      break;
+    case "plan:record-event":
+      result = await recordLifecycleEvent(args);
+      break;
     case "artifact:hash":
       result = await hashArtifact(args);
       break;
@@ -107,6 +115,8 @@ function normalizeCommand(value) {
   if (["validate", "trace:validate", "portfolio:validate"].includes(normalized)) return "plan:validate";
   if (["portfolio:build", "dashboard:build"].includes(normalized)) return "portal:build";
   if (["portfolio:serve", "dashboard:serve"].includes(normalized)) return "portal:serve";
+  if (["portfolio:sync", "dashboard:sync"].includes(normalized)) return "portfolio:sync";
+  if (["record-event", "lifecycle:record"].includes(normalized)) return "plan:record-event";
   if (["hash", "hash:artifact"].includes(normalized)) return "artifact:hash";
   return normalized;
 }
@@ -128,6 +138,8 @@ Usage:
   ai-sdlc plan:validate --ledger portfolio.ledger.json --stage change|release|post-deploy|drift [--project id] [--work-item id] [--release id]
   ai-sdlc portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html
   ai-sdlc portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190
+  ai-sdlc portfolio:sync --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html --metrics-output ops/portfolio-metrics.json
+  ai-sdlc plan:record-event --ledger portfolio.ledger.json --event release|deployment --ref lifecycle-ref --run-url https://github.example/run
   ai-sdlc artifact:hash --file dist/release.zip
 
 File list flags accept comma-separated, repeated, and space-separated paths until the next flag.

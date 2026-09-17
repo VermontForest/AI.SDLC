@@ -4,7 +4,7 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { buildPortfolioPortal, validateLedger } from "../src/portfolio.mjs";
+import { buildPortfolioPortal, computePortfolioMetrics, recordLifecycleEvent, syncPortfolio, validateLedger } from "../src/portfolio.mjs";
 
 const NOW = new Date("2026-09-17T12:00:00.000Z");
 
@@ -120,8 +120,10 @@ test("portal is generated from the validated ledger", async () => {
   assert.match(html, /id="human-dashboard"/);
   assert.match(html, /Demo Project/);
   assert.match(html, /WBS-001/);
-  assert.match(html, /Ledger passes the change gate/);
+  assert.match(html, /Ledger passes current checks/);
   assert.match(html, /UTC/);
+  assert.match(html, /data-portfolio-updated-at/);
+  assert.match(html, /Ledger drift is stale/);
 });
 
 test("saved portal output is deterministic for an unchanged ledger", async () => {
@@ -131,6 +133,86 @@ test("saved portal output is deterministic for an unchanged ledger", async () =>
   await new Promise((resolvePromise) => setTimeout(resolvePromise, 10));
   await buildPortfolioPortal(["--ledger", "portfolio.json", "--output", "second.html"], { root });
   assert.equal(await readFile(join(root, "first.html"), "utf8"), await readFile(join(root, "second.html"), "utf8"));
+});
+
+test("task, project, and portfolio metrics are computed from recorded traceability", async () => {
+  const { ledger } = await fixture();
+  const metrics = computePortfolioMetrics(ledger, NOW);
+  assert.equal(metrics.portfolio.leq.status, "measured");
+  assert.equal(metrics.portfolio.leq.score, 100);
+  assert.equal(metrics.projects[0].leq.score, 100);
+  assert.equal(metrics.projects[0].joulework.score, 100);
+  assert.equal(metrics.projects[0].work_items[0].leq.score, 100);
+  assert.equal(metrics.projects[0].work_items[0].joulework.score, 100);
+
+  ledger.projects[0].work_items[0].tests[0].status = "failed";
+  ledger.projects[0].work_items[0].blockers.push("Regression failed");
+  const degraded = computePortfolioMetrics(ledger, NOW);
+  assert.ok(degraded.projects[0].work_items[0].leq.score < 100);
+  assert.ok(degraded.projects[0].work_items[0].joulework.score < 100);
+});
+
+test("portfolio sync writes deterministic board and metrics from one ledger", async () => {
+  const { ledger, root } = await fixture();
+  await writeFile(join(root, "portfolio.json"), `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+  const result = await syncPortfolio([
+    "--ledger", "portfolio.json",
+    "--output", "dashboard.html",
+    "--metrics-output", "metrics.json"
+  ], { root, now: NOW });
+  assert.equal(result.exitCode, 0);
+  const metrics = JSON.parse(await readFile(join(root, "metrics.json"), "utf8"));
+  assert.equal(metrics.formula_version, "traceability-v1");
+  assert.equal(metrics.projects[0].work_items[0].leq.score, 100);
+});
+
+test("release and deployment events update the ledger only after their gates pass", async () => {
+  const released = await fixture();
+  await writeFile(join(released.root, "portfolio.json"), `${JSON.stringify(released.ledger, null, 2)}\n`, "utf8");
+  let result = await recordLifecycleEvent([
+    "--ledger", "portfolio.json",
+    "--event", "release",
+    "--ref", "v1.0.0",
+    "--run-url", "https://example.invalid/runs/release",
+    "--output", "dashboard.html",
+    "--metrics-output", "metrics.json"
+  ], { root: released.root, now: NOW });
+  assert.equal(result.exitCode, 0);
+  let saved = JSON.parse(await readFile(join(released.root, "portfolio.json"), "utf8"));
+  assert.equal(saved.projects[0].releases[0].status, "released");
+  assert.ok(saved.projects[0].evidence.some((item) => item.type === "release_record"));
+
+  const deployed = await fixture();
+  await writeFile(join(deployed.root, "portfolio.json"), `${JSON.stringify(deployed.ledger, null, 2)}\n`, "utf8");
+  result = await recordLifecycleEvent([
+    "--ledger", "portfolio.json",
+    "--event", "deployment",
+    "--ref", "demo-production",
+    "--run-url", "https://example.invalid/runs/deployment",
+    "--output", "dashboard.html",
+    "--metrics-output", "metrics.json"
+  ], { root: deployed.root, now: NOW });
+  assert.equal(result.exitCode, 0);
+  saved = JSON.parse(await readFile(join(deployed.root, "portfolio.json"), "utf8"));
+  assert.equal(saved.projects[0].releases[0].status, "production_proven");
+  assert.equal(saved.projects[0].releases[0].deployment.evidence_id, "EV-DEPLOYMENT-demo-production");
+
+  const rejected = await fixture();
+  rejected.ledger.projects[0].work_items[0].tests[1].status = "planned";
+  rejected.ledger.projects[0].work_items[0].tests[1].evidence_ids = [];
+  rejected.ledger.projects[0].releases[0].production_test_ids = [];
+  const original = `${JSON.stringify(rejected.ledger, null, 2)}\n`;
+  await writeFile(join(rejected.root, "portfolio.json"), original, "utf8");
+  result = await recordLifecycleEvent([
+    "--ledger", "portfolio.json",
+    "--event", "deployment",
+    "--ref", "demo-production",
+    "--run-url", "https://example.invalid/runs/rejected",
+    "--output", "dashboard.html",
+    "--metrics-output", "metrics.json"
+  ], { root: rejected.root, now: NOW });
+  assert.equal(result.exitCode, 1);
+  assert.equal(await readFile(join(rejected.root, "portfolio.json"), "utf8"), original);
 });
 
 async function fixture() {
@@ -184,13 +266,14 @@ async function fixture() {
       releases: [{
         id: "REL-001",
         title: "Demo release",
+        tag: "v1.0.0",
         status: "production_proven",
         work_item_ids: ["WBS-001"],
         artifact_id: "ART-002",
         content_change_claimed: true,
         approval_ids: ["APR-001"],
         rollback: { status: "ready", reference: "Restore ART-001" },
-        deployment: { status: "deployed", environment: "production", deployed_at: "2026-09-17T10:05:00.000Z", evidence_id: "EV-005" },
+        deployment: { status: "deployed", ref: "demo-production", environment: "production", deployed_at: "2026-09-17T10:05:00.000Z", evidence_id: "EV-005" },
         production_test_ids: ["TST-002"]
       }],
       metrics: {

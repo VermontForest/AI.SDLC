@@ -1,0 +1,86 @@
+name: Publish registered AI.SDLC release
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: Project id in portfolio.ledger.json
+        required: true
+        type: string
+      release:
+        description: Release id in portfolio.ledger.json
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release-gate:
+    uses: ./.github/workflows/release-gate.yml
+    with:
+      project: ${{ inputs.project }}
+      release: ${{ inputs.release }}
+
+  publish:
+    needs: release-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out the gated source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Resolve the registered tag and artifact
+        id: release
+        env:
+          PROJECT_ID: ${{ inputs.project }}
+          RELEASE_ID: ${{ inputs.release }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          const ledger = JSON.parse(readFileSync('portfolio.ledger.json', 'utf8'));
+          const project = ledger.projects.find((item) => item.id === process.env.PROJECT_ID);
+          const release = project?.releases.find((item) => item.id === process.env.RELEASE_ID);
+          const artifact = project?.artifacts.find((item) => item.id === release?.artifact_id);
+          if (!release?.tag || !artifact?.uri || /^https?:\/\//i.test(artifact.uri)) {
+            throw new Error('The registered release needs a local artifact and immutable tag.');
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT, `tag=${release.tag}\nartifact=${artifact.uri}\n`);
+          NODE
+      - name: Publish only after the release gate succeeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          ARTIFACT: ${{ steps.release.outputs.artifact }}
+        run: gh release create "$RELEASE_TAG" "$ARTIFACT" --target "$GITHUB_SHA" --title "$RELEASE_TAG" --generate-notes --verify-tag
+      - name: Record the published release in the authoritative ledger
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node src/cli.mjs plan:record-event --ledger portfolio.ledger.json --event release --ref "$RELEASE_TAG" --run-url "$RUN_URL"
+      - name: Propose the lifecycle ledger update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          branch="automation/release-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add portfolio.ledger.json ops/portfolio-dashboard.html ops/portfolio-metrics.json
+          git commit -m "Record release ${RELEASE_TAG}"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Record release ${RELEASE_TAG}" --body "Automated AI.SDLC lifecycle update after the registered release gate passed and the release was published. Merge remains subject to the protected main-branch checks."
