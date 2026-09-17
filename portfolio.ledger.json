@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T13:41:03.227Z",
+    "updated_at": "2026-09-17T13:42:30.000Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -14,9 +14,9 @@
       "name": "AI.SDLC",
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "owner": "AI.SDLC maintainers",
-      "status": "active",
-      "state_reason": "v0.2.3 metric-integrity implementation is verified locally; hosted GitHub publication and recorded release proof remain active.",
-      "updated_at": "2026-09-17T13:41:03.227Z",
+      "status": "verified",
+      "state_reason": "v0.2.3 is published through the protected GitHub release path; the hosted tarball matches the registered SHA-256, the release event is reviewable in PR #8, and no product deployment is claimed.",
+      "updated_at": "2026-09-17T13:42:30.000Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -112,7 +112,7 @@
           "id": "URS-011",
           "type": "user",
           "text": "A public release is called published only after its hosted tag, downloadable asset, digest, and reviewable ledger event exist on GitHub.",
-          "status": "active",
+          "status": "verified",
           "acceptance": [
             "The protected publication workflow creates one hosted release and one ledger-update pull request; repository publication does not claim a product deployment."
           ]
@@ -268,7 +268,7 @@
           "id": "FRS-013",
           "type": "functional",
           "text": "Publish the registered v0.2.3 artifact through the protected GitHub release path and record the hosted result through review.",
-          "status": "active",
+          "status": "verified",
           "derived_from": [
             "URS-011"
           ],
@@ -879,7 +879,7 @@
           "id": "WBS-011",
           "title": "Publish and record the hosted v0.2.3 GitHub release",
           "owner": "AI.SDLC maintainers",
-          "status": "active",
+          "status": "verified",
           "implements": [
             "FRS-013"
           ],
@@ -901,8 +901,11 @@
             {
               "id": "TST-027",
               "type": "production",
-              "status": "planned",
-              "evidence_ids": []
+              "status": "passed",
+              "evidence_ids": [
+                "EV-RELEASE-v0.2.3",
+                "EV-027"
+              ]
             }
           ],
           "changed_files": [
@@ -913,9 +916,7 @@
             "ops/portfolio-metrics.json"
           ],
           "blockers": [],
-          "next_actions": [
-            "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update."
-          ]
+          "next_actions": []
         }
       ],
       "evidence": [
@@ -1206,6 +1207,17 @@
           "artifact_ids": [
             "ART-004"
           ]
+        },
+        {
+          "id": "EV-027",
+          "type": "production_check",
+          "status": "passed",
+          "created_at": "2026-09-17T13:42:30.000Z",
+          "summary": "The public v0.2.3 tarball was downloaded from GitHub and matched the registered local artifact byte-for-byte: SHA-256 0ed304d902edbd6f1323ed382585cb926e15d06f6f1bf22c25ee5dca6ccdf077, 71,659 bytes.",
+          "uri": "https://github.com/VermontForest/AI.SDLC/releases/download/v0.2.3/ai-sdlc-0.2.3.tgz",
+          "artifact_ids": [
+            "ART-004"
+          ]
         }
       ],
       "artifacts": [
@@ -1383,7 +1395,9 @@
           "deployment": {
             "status": "not_started"
           },
-          "production_test_ids": []
+          "production_test_ids": [
+            "TST-027"
+          ]
         }
       ],
       "metrics": {
@@ -1401,9 +1415,7 @@
         }
       },
       "blockers": [],
-      "next_actions": [
-        "Pass protected checks, publish v0.2.3, verify the hosted asset digest, and merge the release-event ledger update."
-      ]
+      "next_actions": []
     }
   ]
 }

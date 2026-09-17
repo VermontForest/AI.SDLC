@@ -1,62 +1,70 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T13:41:03.227Z",
+  "generated_at": "2026-09-17T13:42:30.000Z",
   "formula_version": "traceability-v2",
   "portfolio": {
     "id": "ai-sdlc-public",
     "leq": {
-      "status": "awaiting_inputs",
+      "status": "valid",
+      "score": 100,
+      "classification": "healthy",
+      "measured_at": "2026-09-17T10:34:07.000Z",
       "model": "traceability-v2",
-      "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
-      "scope": "AI.SDLC Public Framework",
-      "missing_inputs": [
-        "production verification evidence"
-      ],
-      "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-      "owner": "Portfolio owners"
+      "source": "traceability-v2 unweighted average of 1 applicable child record",
+      "definition": "Unweighted aggregate of Traceability LEQ records; this model is never averaged with a different metric model.",
+      "scope": "AI.SDLC Public Framework; aggregate evidence for one metric model only; release/publication/deployment excluded",
+      "formula": "Unweighted arithmetic mean of 1 applicable child Traceability LEQ scores; awaiting or error children invalidate the aggregate.",
+      "denominator": "1 applicable child record",
+      "pending_checks": []
     },
     "joulework": {
-      "status": "awaiting_inputs",
+      "status": "valid",
+      "score": 100,
+      "classification": "productive",
+      "measured_at": "2026-09-17T10:34:07.000Z",
       "model": "traceability-v2",
-      "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
-      "scope": "AI.SDLC Public Framework",
-      "missing_inputs": [
-        "production verification evidence"
-      ],
-      "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-      "owner": "Portfolio owners"
+      "source": "traceability-v2 unweighted average of 1 applicable child record",
+      "definition": "Unweighted aggregate of Traceability JW proxy records; this model is never averaged with a different metric model.",
+      "scope": "AI.SDLC Public Framework; aggregate evidence for one metric model only; release/publication/deployment excluded",
+      "formula": "Unweighted arithmetic mean of 1 applicable child Traceability JW proxy scores; awaiting or error children invalidate the aggregate.",
+      "denominator": "1 applicable child record",
+      "pending_checks": []
     },
     "metric_families": [
       {
         "model": "traceability-v2",
         "leq": {
-          "status": "awaiting_inputs",
+          "status": "valid",
+          "score": 100,
+          "classification": "healthy",
+          "measured_at": "2026-09-17T10:34:07.000Z",
           "model": "traceability-v2",
-          "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
-          "scope": "AI.SDLC Public Framework / traceability-v2",
-          "missing_inputs": [
-            "production verification evidence"
-          ],
-          "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-          "owner": "Portfolio owners"
+          "source": "traceability-v2 unweighted average of 1 applicable child record",
+          "definition": "Unweighted aggregate of Traceability LEQ records; this model is never averaged with a different metric model.",
+          "scope": "AI.SDLC Public Framework / traceability-v2; aggregate evidence for one metric model only; release/publication/deployment excluded",
+          "formula": "Unweighted arithmetic mean of 1 applicable child Traceability LEQ scores; awaiting or error children invalidate the aggregate.",
+          "denominator": "1 applicable child record",
+          "pending_checks": []
         },
         "joulework": {
-          "status": "awaiting_inputs",
+          "status": "valid",
+          "score": 100,
+          "classification": "productive",
+          "measured_at": "2026-09-17T10:34:07.000Z",
           "model": "traceability-v2",
-          "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
-          "scope": "AI.SDLC Public Framework / traceability-v2",
-          "missing_inputs": [
-            "production verification evidence"
-          ],
-          "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-          "owner": "Portfolio owners"
+          "source": "traceability-v2 unweighted average of 1 applicable child record",
+          "definition": "Unweighted aggregate of Traceability JW proxy records; this model is never averaged with a different metric model.",
+          "scope": "AI.SDLC Public Framework / traceability-v2; aggregate evidence for one metric model only; release/publication/deployment excluded",
+          "formula": "Unweighted arithmetic mean of 1 applicable child Traceability JW proxy scores; awaiting or error children invalidate the aggregate.",
+          "denominator": "1 applicable child record",
+          "pending_checks": []
         }
       }
     ],
     "data_quality": {
-      "valid": 1,
+      "valid": 3,
       "not_applicable": 0,
-      "awaiting_inputs": 2,
+      "awaiting_inputs": 0,
       "stale": 0,
       "error": 0
     }
@@ -66,26 +74,30 @@
       "id": "ai-sdlc",
       "name": "AI.SDLC",
       "leq": {
-        "status": "awaiting_inputs",
+        "status": "valid",
+        "score": 100,
+        "classification": "healthy",
+        "measured_at": "2026-09-17T10:34:07.000Z",
         "model": "traceability-v2",
-        "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
-        "scope": "AI.SDLC",
-        "missing_inputs": [
-          "production verification evidence"
-        ],
-        "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-        "owner": "AI.SDLC maintainers"
+        "source": "traceability-v2 unweighted average of 11 applicable child records",
+        "definition": "Unweighted aggregate of Traceability LEQ records; this model is never averaged with a different metric model.",
+        "scope": "AI.SDLC; aggregate evidence for one metric model only; release/publication/deployment excluded",
+        "formula": "Unweighted arithmetic mean of 11 applicable child Traceability LEQ scores; awaiting or error children invalidate the aggregate.",
+        "denominator": "11 applicable child records",
+        "pending_checks": []
       },
       "joulework": {
-        "status": "awaiting_inputs",
+        "status": "valid",
+        "score": 100,
+        "classification": "productive",
+        "measured_at": "2026-09-17T10:34:07.000Z",
         "model": "traceability-v2",
-        "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
-        "scope": "AI.SDLC",
-        "missing_inputs": [
-          "production verification evidence"
-        ],
-        "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-        "owner": "AI.SDLC maintainers"
+        "source": "traceability-v2 unweighted average of 11 applicable child records",
+        "definition": "Unweighted aggregate of Traceability JW proxy records; this model is never averaged with a different metric model.",
+        "scope": "AI.SDLC; aggregate evidence for one metric model only; release/publication/deployment excluded",
+        "formula": "Unweighted arithmetic mean of 11 applicable child Traceability JW proxy scores; awaiting or error children invalidate the aggregate.",
+        "denominator": "11 applicable child records",
+        "pending_checks": []
       },
       "source": "computed from ledger work, tests, evidence, and blockers",
       "reported_metrics": {
@@ -107,7 +119,7 @@
         "value": "v0.2.3 · released",
         "definition": "Latest registered release identity and its publication, deployment, and production-verification state.",
         "scope": "AI.SDLC",
-        "measured_at": "2026-09-17T13:41:03.227Z",
+        "measured_at": "2026-09-17T13:42:30.000Z",
         "source": "ledger release REL-004 (v0.2.3)",
         "owner": "AI.SDLC maintainers"
       },
@@ -121,7 +133,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-001 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-001 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-001; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -134,7 +146,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-001 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-001 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-001; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -151,7 +163,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-002 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-002 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-002; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -164,7 +176,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-002 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-002 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-002; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -181,7 +193,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-003 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-003 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-003; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -194,7 +206,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-003 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-003 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-003; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -211,7 +223,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-004 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-004 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-004; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -224,7 +236,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T10:34:07.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-004 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-004 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-004; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -241,7 +253,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T11:30:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-005 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-005 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-005; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -254,7 +266,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T11:30:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-005 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-005 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-005; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -271,7 +283,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T11:30:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-006 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-006 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-006; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -284,7 +296,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T11:30:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-006 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-006 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-006; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -301,7 +313,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-007 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-007 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-007; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -314,7 +326,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-007 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-007 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-007; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -331,7 +343,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-008 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-008 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-008; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -344,7 +356,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-008 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-008 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-008; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -361,7 +373,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-009 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-009 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-009; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -374,7 +386,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T12:20:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-009 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-009 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-009; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -391,7 +403,7 @@
             "classification": "healthy",
             "measured_at": "2026-09-17T13:10:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-010 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-010 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
             "scope": "AI.SDLC / WBS-010; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
@@ -404,7 +416,7 @@
             "classification": "productive",
             "measured_at": "2026-09-17T13:10:00.000Z",
             "model": "traceability-v2",
-            "source": "ledger ai-sdlc/WBS-010 at 2026-09-17T13:41:03.227Z",
+            "source": "ledger ai-sdlc/WBS-010 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
             "scope": "AI.SDLC / WBS-010; registered work-item evidence only; release/publication/deployment excluded",
             "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
@@ -414,28 +426,32 @@
         },
         {
           "id": "WBS-011",
-          "status": "active",
+          "status": "verified",
           "leq": {
-            "status": "awaiting_inputs",
+            "status": "valid",
+            "score": 100,
+            "classification": "healthy",
+            "measured_at": "2026-09-17T13:41:03.227Z",
             "model": "traceability-v2",
+            "source": "ledger ai-sdlc/WBS-011 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability LEQ proxy (not lifecycle LEQ): requirement linkage, declared and passed verification, evidence linkage, blocker-free execution, and explicit failure penalties.",
-            "scope": "AI.SDLC / WBS-011",
-            "missing_inputs": [
-              "production verification evidence"
-            ],
-            "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-            "owner": "AI.SDLC maintainers"
+            "scope": "AI.SDLC / WBS-011; registered work-item evidence only; release/publication/deployment excluded",
+            "formula": "20 × requirement linkage + 15 × required test-type declaration ratio + 35 × declared-check pass ratio + 20 × passed-check evidence ratio + 10 × blocker-free state − failure/blocker penalty (maximum 20).",
+            "denominator": "1/1 verification obligations passed or not applicable (1 declared checks plus 0 undeclared required types)",
+            "pending_checks": []
           },
           "joulework": {
-            "status": "awaiting_inputs",
+            "status": "valid",
+            "score": 100,
+            "classification": "productive",
+            "measured_at": "2026-09-17T13:41:03.227Z",
             "model": "traceability-v2",
+            "source": "ledger ai-sdlc/WBS-011 at 2026-09-17T13:42:30.000Z",
             "definition": "Traceability JouleWork proxy (not physical energy or lifecycle JW_proxy): evidence-backed useful work credited from linkage, passed verification, evidence, and completed outcomes, minus failure and blocker penalties.",
-            "scope": "AI.SDLC / WBS-011",
-            "missing_inputs": [
-              "production verification evidence"
-            ],
-            "next_action": "Merge the caller-permission correction after protected checks pass, rerun publication, verify the hosted asset digest, and merge the release-event ledger update.",
-            "owner": "AI.SDLC maintainers"
+            "scope": "AI.SDLC / WBS-011; registered work-item evidence only; release/publication/deployment excluded",
+            "formula": "20 × requirement linkage + 30 × declared-check pass ratio + 25 × passed-check evidence ratio + 25 × completed-work state − failure/blocker penalty (maximum 20).",
+            "denominator": "1/1 verification obligations passed or not applicable (1 declared checks plus 0 undeclared required types)",
+            "pending_checks": []
           }
         }
       ]
