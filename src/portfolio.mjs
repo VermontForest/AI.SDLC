@@ -64,14 +64,14 @@ export async function servePortfolioPortal(argv = [], options = {}) {
       response.end(renderPortfolioPortal(ledger, report, new Date()));
     } catch (error) {
       response.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
-      response.end(`AI.SLDC portal failed: ${error?.message || String(error)}`);
+      response.end(`AI.SDLC portal failed: ${error?.message || String(error)}`);
     }
   });
   await new Promise((resolvePromise, rejectPromise) => {
     server.once("error", rejectPromise);
     server.listen(port, host, resolvePromise);
   });
-  console.log(`AI.SLDC portfolio portal: http://${host}:${port}/#human-dashboard`);
+  console.log(`AI.SDLC portfolio portal: http://${host}:${port}/#human-dashboard`);
   return new Promise(() => {});
 }
 
@@ -367,13 +367,13 @@ function renderPortfolioPortal(ledger, validation, now) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(ledger.portfolio.name)} · AI.SLDC</title>
+  <title>${escapeHtml(ledger.portfolio.name)} · AI.SDLC</title>
   <style>
     :root{color-scheme:light;--ink:#182019;--muted:#667067;--paper:#f5f1e7;--card:#fffdf7;--line:#d8d0be;--green:#1d6b4b;--gold:#9d6d00;--red:#9c372d;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#faf7ef 0,#f0eadc 100%);color:var(--ink)}main{max-width:1240px;margin:auto;padding:32px 20px 72px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:20px}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 7px}h1{font-size:clamp(34px,5vw,58px);line-height:.98;margin:0;letter-spacing:-.035em}h2{margin:0;font-size:24px}p{line-height:1.5}.updated{color:var(--muted);text-align:right}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.card,.project{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px rgba(45,37,20,.06)}.card{padding:18px}.card strong{display:block;font-size:34px;margin-top:5px}.validation{padding:14px 18px;border-radius:14px;background:${validation.ok ? "#e9f4ed" : "#f8e7e2"};border:1px solid ${validation.ok ? "#bad5c5" : "#e1b4aa"};margin-bottom:18px}.projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.project{padding:22px}.project.stale{border-color:#d8a55d}.project-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.pill{font-size:12px;font-weight:800;padding:6px 9px;border-radius:999px;background:#ece7da}.pill.good{background:#dfeee5;color:var(--green)}.pill.warn{background:#f4e9c8;color:#795200}.pill.bad{background:#f3dcd7;color:var(--red)}.outcome{min-height:48px;color:#39423b}.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}.bar{height:8px;background:#e8e2d5;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.metrics div{padding:10px;background:#f5f1e8;border-radius:10px}.metrics dt{font-size:11px;color:var(--muted);text-transform:uppercase}.metrics dd{margin:4px 0 0;font-weight:750}.blockers{color:#6e2923}.actions{color:#224e39}.compact{margin:6px 0 14px;padding-left:20px}.compact li{margin:5px 0}details{border-top:1px solid var(--line);padding-top:12px}summary{font-weight:750;cursor:pointer}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{text-align:left;padding:8px;border-bottom:1px solid #e5ded0;vertical-align:top}code{background:#eee8dc;padding:2px 5px;border-radius:5px}.foot{margin-top:20px;color:var(--muted);font-size:13px}@media(max-width:840px){.projects{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}.hero{display:block}.updated{text-align:left}.metrics{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body><main id="human-dashboard">
-  <header class="hero"><div><p class="eyebrow">AI.SLDC · ${escapeHtml(ledger.portfolio.mode)} mode</p><h1>${escapeHtml(ledger.portfolio.name)}</h1></div><p class="updated">Updated ${escapeHtml(formatDate(ledger.portfolio.updated_at))}<br>Generated ${escapeHtml(formatDate(now.toISOString()))}</p></header>
+  <header class="hero"><div><p class="eyebrow">AI.SDLC · ${escapeHtml(ledger.portfolio.mode)} mode</p><h1>${escapeHtml(ledger.portfolio.name)}</h1></div><p class="updated">Updated ${escapeHtml(formatDate(ledger.portfolio.updated_at))}<br>Generated ${escapeHtml(formatDate(now.toISOString()))}</p></header>
   <div class="summary">
     <div class="card"><span class="eyebrow">Projects</span><strong>${ledger.projects.length}</strong></div>
     <div class="card"><span class="eyebrow">Work items</span><strong>${allWork.length}</strong></div>
@@ -467,7 +467,7 @@ function text(value) {
 }
 
 function printValidation(report) {
-  console.log(`AI.SLDC ${report.stage} gate: ${report.ok ? "passed" : "blocked"}`);
+  console.log(`AI.SDLC ${report.stage} gate: ${report.ok ? "passed" : "blocked"}`);
   console.log(`Scope: ${report.scope.project_id || "portfolio"}${report.scope.work_item_id ? ` / ${report.scope.work_item_id}` : ""}${report.scope.release_id ? ` / ${report.scope.release_id}` : ""}`);
   for (const item of report.errors) console.log(`- [${item.code}] ${item.message}`);
 }

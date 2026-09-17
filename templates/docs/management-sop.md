@@ -4,6 +4,14 @@ Last updated: 2026-07-07
 
 ## Loop Contract
 
+Carl is not the assistant's assistant. Agents discover tools and connectors,
+read documentation, investigate permitted alternatives, and execute authorized
+routine setup, troubleshooting, edits, and commands themselves. Never delegate
+connector research or implementation-tool selection to the user. Ask only for an
+essential user-owned decision or inaccessible authentication/consent, with the
+specific reason. Investigate capabilities before declaring blockers and continue
+independent authorized work without fabricating evidence.
+
 Every meaningful change starts with a Work Contract:
 
 - Active deliverable
@@ -27,11 +35,11 @@ Before the first lifecycle run on a machine, verify the complete official JSM
 dependency lock:
 
 ```bash
-ai-sldc skills:verify
+ai-sdlc skills:verify
 ```
 
 If licensed packages are absent, an authorized subscriber installs them with
-`ai-sldc skills:install`. AI.SLDC commits only names, versions, and integrity
+`ai-sdlc skills:install`. AI.SDLC commits only names, versions, and integrity
 hashes; premium skill bodies remain in JSM-managed local directories.
 
 Accepted `--files` forms:
@@ -58,6 +66,10 @@ Use distinct labels for:
 Completed work should say `Completed deliverable`, not `Active deliverable`.
 
 ## Loop Health
+
+After Finish, run `ai-sdlc verify-completion --intentional-files <paths>`.
+Blocked/failed gates, stale tested contents/configuration, missing JSM packages,
+pending external proof, or unhealthy metrics prevent completion claims.
 
 LEQ and JouleWork are operating metrics, not decorative numbers. An incomplete
 JSM lifecycle reduces LEQ, adds JouleWork waste, and prevents healthy status.

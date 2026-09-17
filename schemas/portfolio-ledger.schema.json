@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/VermontForest/AI.SLDC/schemas/portfolio-ledger.schema.json",
-  "title": "AI.SLDC portfolio traceability ledger",
+  "$id": "https://github.com/VermontForest/AI.SDLC/schemas/portfolio-ledger.schema.json",
+  "title": "AI.SDLC portfolio traceability ledger",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "portfolio", "projects"],

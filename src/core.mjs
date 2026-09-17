@@ -1,4 +1,5 @@
-import { spawn } from "node:child_process";
+import { captureProcess } from "./process.mjs";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
@@ -30,11 +31,11 @@ export async function initHarness(argv = [], options = {}) {
     template.project.id = slug(projectName);
     await writeJson(configPath, template);
   }
-  await copyTemplateIfMissing("AGENTS.sldc.snippet.md", join(root, "AGENTS.md"), args.force);
+  await copyTemplateIfMissing("AGENTS.sdlc.snippet.md", join(root, "AGENTS.md"), args.force);
   await copyTemplateIfMissing(join("docs", "management-sop.md"), join(root, "docs", "management-sop.md"), args.force);
   await copyTemplateIfMissing(join("docs", "test-release-plan.md"), join(root, "docs", "test-release-plan.md"), args.force);
   return {
-    message: `Initialized AI.SLDC harness in ${root}\nNext: add package scripts or run npx ai-sldc assess --files <paths>.`
+    message: `Initialized AI.SDLC harness in ${root}\nNext: add package scripts or run npx ai-sdlc assess --files <paths>.`
   };
 }
 
@@ -64,6 +65,9 @@ export async function assessChangeImpact(argv = [], options = {}) {
     failures.push(`Required Assess JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
   }
   const workContract = buildWorkContract(args);
+  if (workContract.status !== "present" || !stringArg(args.activeDeliverable) || !stringArg(args.why) || !stringArg(args.targetSurface) || !stringArg(args.lane) || !normalizeList(args.boundary).length || !normalizeList(args.proof).length) {
+    failures.push("Work Contract requires deliverable, why, target surface, lane, boundaries, and required proof.");
+  }
   const pendingExternalProof = unique(
     packs.flatMap((packId) => {
       const pack = config.packs?.[packId] || {};
@@ -75,6 +79,7 @@ export async function assessChangeImpact(argv = [], options = {}) {
     schema_version: 1,
     generated_at: new Date().toISOString(),
     status: failures.length ? "blocked" : packs.length > 0 ? "packs_required" : "no_packs_required",
+    evidence_binding: await evidenceBinding(root, files, config),
     project: compactProject(config.project),
     changed_files: files,
     matched_surfaces: matchedSurfaces.map((surface) => surface.id),
@@ -111,7 +116,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
   const packs = unique(
     normalizeList(args.pack).length
       ? normalizeList(args.pack)
-      : latestImpact?.required_packs || matchSurfaces(files, config).flatMap((surface) => surface.packs || [])
+      : matchSurfaces(files, config).flatMap((surface) => surface.packs || [])
   );
   const matchedSurfaces = matchSurfaces(files, config);
   const regressSkills = requiredSkillsForStage(matchedSurfaces, "Regress");
@@ -127,6 +132,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
     failures.push(`Required Regress JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
   }
   const jsmGateFailed = failures.length > 0;
+  const bindingBefore = await evidenceBinding(root, files, config);
 
   for (const packId of packs) {
     const pack = config.packs?.[packId];
@@ -147,6 +153,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
       }
       if (args.dryRun || args.skipCommands) {
         checks.push({ pack: packId, command, status: "skipped" });
+        failures.push(`${packId}: protected command was skipped`);
         continue;
       }
       const started = Date.now();
@@ -163,6 +170,9 @@ export async function runProtectedRegression(argv = [], options = {}) {
   }
 
   const pending = unique(pendingExternalProof);
+  if (JSON.stringify(bindingBefore) !== JSON.stringify(await evidenceBinding(root, files, config))) {
+    failures.push("Intentional files or configuration changed while protected checks ran; rerun Regress.");
+  }
   const status = failures.length
     ? "failed"
     : pending.length
@@ -178,6 +188,8 @@ export async function runProtectedRegression(argv = [], options = {}) {
     jsm_attestation: skillAttestation,
     jsm_skill_preflight: skillPreflight,
     checks,
+    evidence_binding: bindingBefore,
+    assess_generated_at: latestImpact?.generated_at || null,
     pending_external_proof: pending,
     failures,
     change_impact_artifact: artifactPath(config, "changeImpact")
@@ -209,6 +221,29 @@ export async function finishIteration(argv = [], options = {}) {
   const protectedRegression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
   const impactMatches = sameFileSet(files, changeImpact?.changed_files || []);
   const regressionMatches = sameFileSet(files, protectedRegression?.changed_files || []);
+  const binding = await evidenceBinding(root, files, config);
+  if (JSON.stringify(protectedRegression?.evidence_binding) !== JSON.stringify(binding)) {
+    blockers.push("Regression evidence is stale for current file contents or configuration; rerun Regress.");
+  }
+  if (changeImpact?.evidence_binding?.config_sha256 !== binding.config_sha256) {
+    blockers.push("Assess configuration changed; rerun Assess and Regress.");
+  }
+  if (!changeImpact?.generated_at || protectedRegression?.assess_generated_at !== changeImpact.generated_at) {
+    blockers.push("Regress does not belong to the latest Assess; rerun Regress.");
+  }
+  const requiredPacks = unique(matchedSurfaces.flatMap(surface => surface.packs || []));
+  for (const packId of requiredPacks) {
+    const pack = config.packs[packId];
+    if (!pack || !protectedRegression?.required_packs?.includes(packId)) {
+      blockers.push(`Required protected pack has no current evidence: ${packId}`);
+      continue;
+    }
+    for (const command of arrayValue(pack.commands)) {
+      if (!protectedRegression.checks?.some(check => check.pack === packId && check.command === command && check.status === "passed" && check.exit_code === 0)) {
+        blockers.push(`Required protected command has not passed: ${packId}: ${command}`);
+      }
+    }
+  }
 
   commands.push({
     name: "assess-evidence",
@@ -230,7 +265,7 @@ export async function finishIteration(argv = [], options = {}) {
 
   if (!protectedRegression) blockers.push("Protected-regression artifact is missing; run Regress for this file set.");
   else if (!regressionMatches) blockers.push("Protected-regression artifact is not bound to the intentional file set.");
-  else if (protectedRegression.status === "failed") failures.push("Latest protected regression failed.");
+  else if (!["passed", "passed_with_pending_external_proof"].includes(protectedRegression.status)) failures.push("Latest protected regression did not pass.");
   else if (!["complete", "not_required"].includes(protectedRegression.jsm_attestation?.status)) {
     blockers.push("Regress-stage JSM attestation is incomplete.");
   }
@@ -268,6 +303,9 @@ export async function finishIteration(argv = [], options = {}) {
     generated_at: new Date().toISOString(),
     status,
     production_changed: false,
+    evidence_binding: binding,
+    assess_generated_at: changeImpact?.generated_at || null,
+    regress_generated_at: protectedRegression?.generated_at || null,
     mode: {
       execute,
       skipGit,
@@ -298,7 +336,7 @@ export async function finishIteration(argv = [], options = {}) {
   };
   await writeArtifact(root, artifactPath(config, "iterationFinish"), report);
 
-  const refresh = await runHarnessStep("manage-refresh", () => refreshStatus(["--quiet"], { root }));
+  const refresh = await runHarnessStep("manage-refresh", () => refreshStatus(["--quiet", ...(args.config ? ["--config", stringArg(args.config)] : [])], { root }));
   commands.push(refresh.command);
   if (refresh.error) {
     failures.push(refresh.error);
@@ -325,7 +363,7 @@ export async function finishIteration(argv = [], options = {}) {
     console.log(`Production changed: no`);
     if (primaryCommitSha) console.log(`Primary work commit: ${primaryCommitSha}`);
   }
-  return { value: report, printJson: Boolean(args.json), exitCode: failures.length ? 1 : 0 };
+  return { value: report, printJson: Boolean(args.json), exitCode: status === "passed" ? 0 : 1 };
 }
 
 export async function refreshStatus(argv = [], options = {}) {
@@ -345,6 +383,39 @@ export async function refreshStatus(argv = [], options = {}) {
     console.log(`Status ${status.classification}; LEQ ${status.leq.score}; JW ${status.joulework.score}`);
   }
   return { value: status, printJson: Boolean(args.json) };
+}
+
+// Read-only completion gate. It never creates missing evidence or attests methods.
+export async function verifyCompletion(argv = [], options = {}) {
+  const root = options.root || process.cwd();
+  const args = parseArgs(argv);
+  const config = await loadConfig(root, args.config);
+  const files = normalizeFiles(args.intentionalFiles || args.files || []);
+  if (!files.length) throw new Error("verify-completion requires --intentional-files <repo paths>.");
+  const impact = await readJsonIfExists(join(root, artifactPath(config, "changeImpact")));
+  const regression = await readJsonIfExists(join(root, artifactPath(config, "protectedRegression")));
+  const finish = await readJsonIfExists(join(root, artifactPath(config, "iterationFinish")));
+  const binding = await evidenceBinding(root, files, config);
+  const failures = [];
+  if (!sameFileSet(files, impact?.changed_files || []) || !sameFileSet(files, regression?.changed_files || []) || !sameFileSet(files, finish?.mode?.intentionalFiles || [])) failures.push("Evidence does not cover the exact intentional file set.");
+  if (impact?.status === "blocked" || regression?.status !== "passed" || finish?.status !== "passed" || !finish?.work_contract_result?.closed) failures.push("Assess, Regress, and Finish must all pass without pending external proof.");
+  if (!impact?.generated_at || regression?.assess_generated_at !== impact.generated_at || finish?.assess_generated_at !== impact.generated_at || finish?.regress_generated_at !== regression?.generated_at) failures.push("Evidence stages do not belong to the same current lifecycle.");
+  if (JSON.stringify(binding) !== JSON.stringify(regression?.evidence_binding) || JSON.stringify(binding) !== JSON.stringify(finish?.evidence_binding) || impact?.evidence_binding?.config_sha256 !== binding.config_sha256) failures.push("File contents or configuration changed after verification.");
+  if ((regression?.pending_external_proof || []).length || (finish?.work_contract_result?.pending_proof || []).length) failures.push("External proof remains pending.");
+  const status = await buildStatus(root, config);
+  if (status.workflow.jsm_lifecycle.status !== "complete") failures.push("JSM lifecycle is incomplete.");
+  if (status.classification !== "healthy") failures.push(`Loop needs attention: LEQ ${status.leq.score}; JouleWork ${status.joulework.score}.`);
+  const value = { status: failures.length ? "blocked" : "passed", failures, files, leq: status.leq.score, joulework: status.joulework.score };
+  return { value, printJson: true, exitCode: failures.length ? 1 : 0 };
+}
+
+async function evidenceBinding(root, files, config) {
+  const hashes = {};
+  for (const file of [...files].sort()) {
+    try { hashes[file] = createHash("sha256").update(await readFile(resolve(root, file))).digest("hex"); }
+    catch (error) { if (error.code === "ENOENT") hashes[file] = null; else throw error; }
+  }
+  return { config_sha256: createHash("sha256").update(JSON.stringify(config)).digest("hex"), files: hashes };
 }
 
 export async function statusSummary(argv = [], options = {}) {
@@ -380,7 +451,7 @@ export async function runSelfTest() {
   ]) {
     assert(lockedJsmNames.has(requiredSkill), `JSM dependency lock should include ${requiredSkill}`);
   }
-  const root = await mkdtemp(join(tmpdir(), "ai-sldc-self-test-"));
+  const root = await mkdtemp(join(tmpdir(), "ai-sdlc-self-test-"));
   await writeJson(join(root, "package.json"), {
     scripts: {
       typecheck: "node -e \"process.exit(0)\"",
@@ -394,6 +465,7 @@ export async function runSelfTest() {
   await writeFile(join(root, "docs", "guide.md"), "# Guide\n\nLast updated: 2026-07-07\n", "utf8");
   await writeFile(join(root, "README.md"), "# Self Test\n", "utf8");
   await initHarness(["--project-name", "Self Test", "--force"], { root });
+  assert((await readFile(join(root, "AGENTS.md"), "utf8")).includes("Carl is not the assistant's assistant."), "Init must install the responsibility contract");
   const configPath = join(root, "harness.config.json");
   const config = JSON.parse(await readFile(configPath, "utf8"));
   config.packs.chain = {
@@ -402,6 +474,7 @@ export async function runSelfTest() {
   };
   config.jsm = { skillRoots: [".skills"] };
   config.metrics.taskMarkerGlobs = ["src/**"];
+  config.docs.staleDays = 3650;
   const lifecycleSkills = [
     { name: "assess-method", stages: ["Assess"] },
     { name: "regress-method", stages: ["Regress"] },
@@ -423,6 +496,8 @@ export async function runSelfTest() {
     "Exercise portable harness",
     "--why",
     "Prove generic routing works",
+    "--target-surface", "harness",
+    "--lane", "full-sdlc",
     "--boundary",
     "No production promotion",
     "--proof",
@@ -454,6 +529,9 @@ export async function runSelfTest() {
   assert(regressed.value.jsm_attestation.status === "complete", "Regress should record complete JSM attestation");
   const chained = await runProtectedRegression(["--pack", "chain", "--applied-skill", "regress-method"]);
   assert(chained.value.status === "passed", "regression should support chained shell commands");
+  const partialFinish = await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+  assert(partialFinish.exitCode === 1, "Finish must reject evidence for only an optional pack");
+  await runProtectedRegression(["--applied-skill", "regress-method"]);
   const mismatchedFinish = await finishIteration([
     "--intentional-files",
     "src/index.js",
@@ -462,6 +540,7 @@ export async function runSelfTest() {
     "--skip-git"
   ]);
   assert(mismatchedFinish.value.status === "blocked", "Finish should block evidence from a different file set");
+  assert(mismatchedFinish.exitCode === 1, "Blocked Finish must return a nonzero exit code");
   const missingFinishJsm = await finishIteration([
     "--intentional-files",
     "src/index.js",
@@ -482,8 +561,34 @@ export async function runSelfTest() {
   assert(refreshed.value.leq.score >= 80, "fresh fixture should have solid LEQ");
   assert(refreshed.value.joulework.score >= 70, "complete useful-work chain should reach productive JouleWork");
   assert(refreshed.value.workflow.jsm_lifecycle.status === "complete", "status should aggregate the three-stage JSM lifecycle");
+  const verified = await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"]);
+  assert(verified.exitCode === 0, "Current complete and healthy lifecycle must pass the read-only evidence gate");
+  const skipped = await runProtectedRegression(["--applied-skill", "regress-method", "--skip-commands"]);
+  assert(skipped.exitCode === 1, "Skipped protected checks must fail closed");
+  await runProtectedRegression(["--applied-skill", "regress-method"]);
+  await writeFile(join(root, "src", "index.js"), "export const ok = false;\n", "utf8");
+  const stale = await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+  assert(stale.exitCode === 1 && stale.value.blockers.some(x => x.includes("stale")), "Editing tested contents must invalidate Finish");
+  assert((await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"])).exitCode === 1, "Completion must reject stale or blocked evidence");
+  await runProtectedRegression(["--applied-skill", "regress-method"]);
+  config.packs.test.commands = ['node -e "process.exit(0)"'];
+  await writeJson(configPath, config);
+  const rerouted = await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+  assert(rerouted.exitCode === 1 && rerouted.value.blockers.some(x => x.includes("configuration")), "Configuration changes must invalidate evidence");
+  await assessChangeImpact([...assessArgs, "--applied-skill", "assess-method"]);
+  const newAssess = await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+  assert(newAssess.exitCode === 1 && newAssess.value.blockers.some(x => x.includes("latest Assess")), "New Assess must invalidate older Regress");
+  config.packs.test.externalProof = "Independent human acceptance is pending";
+  await writeJson(configPath, config);
+  await assessChangeImpact([...assessArgs, "--applied-skill", "assess-method"]);
+  await runProtectedRegression(["--applied-skill", "regress-method"]);
+  await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+  const pendingProof = await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"]);
+  assert(pendingProof.exitCode === 1 && pendingProof.value.failures.some(x => x.includes("External proof")), "Completion must retain external proof debt");
+  const incompleteContract = await assessChangeImpact(["--files", "src/index.js", "--applied-skill", "assess-method"]);
+  assert(incompleteContract.exitCode === 1 && incompleteContract.value.failures.some(x => x.includes("Work Contract")), "Assess must reject a missing Work Contract");
   return {
-    message: `AI.SLDC self-test passed in ${root}`,
+    message: `AI.SDLC self-test passed in ${root}`,
     value: { status: "passed", fixture: root },
     printJson: false
   };
@@ -526,7 +631,7 @@ async function buildStatus(root, config) {
         change_impact: changeImpact?.status || "missing",
         protected_regression: protectedRegression?.status || "missing",
         finish_iteration: finish?.status || "missing",
-        manage_metrics_test: "passed"
+        manage_metrics_test: "not_recorded"
       }
     },
     health_debt: [
@@ -1067,7 +1172,7 @@ function renderDashboardHtml(status) {
 <body>
   <main>
     <header>
-      <p class="label">AI.SLDC dashboard</p>
+      <p class="label">AI.SDLC dashboard</p>
       <h1>${escapeHtml(status.project.project_name)}</h1>
       <p>${escapeHtml(status.top_line)}. Next: <code>${escapeHtml(status.workflow.next_command)}</code></p>
     </header>
@@ -1160,19 +1265,8 @@ async function gitLines(root, args) {
 }
 
 async function runProcess(command, args, { cwd }) {
-  return new Promise((resolvePromise) => {
-    const child = spawn(command, args, { cwd, shell: false, windowsHide: true });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr?.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
-    child.on("close", (exitCode) => resolvePromise({ exitCode, stdout, stderr }));
-    child.on("error", (error) => resolvePromise({ exitCode: 1, stdout, stderr: error.message }));
-  });
+  const result = captureProcess(command, args, { cwd, shell: false, windowsHide: true });
+  return { exitCode: result.status ?? 1, stdout: result.stdout || "", stderr: result.stderr || result.error?.message || "" };
 }
 
 function commandRecord(name, command, exitCode) {
@@ -1204,7 +1298,7 @@ function escapeHtml(value) {
 }
 
 function printAssessment(report) {
-  console.log("AI.SLDC change-impact assessment");
+  console.log("AI.SDLC change-impact assessment");
   console.log(`Status: ${report.status}`);
   console.log(`Changed files: ${report.changed_files.length}`);
   console.log(`Required packs: ${report.required_packs.join(", ") || "none"}`);
@@ -1214,7 +1308,7 @@ function printAssessment(report) {
 }
 
 function printRegression(report) {
-  console.log("AI.SLDC protected regression");
+  console.log("AI.SDLC protected regression");
   console.log(`Status: ${report.status}`);
   console.log(`Packs: ${report.required_packs.join(", ") || "none"}`);
   console.log(`Regress JSM: ${report.jsm_attestation.status}`);

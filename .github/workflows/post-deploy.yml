@@ -1,4 +1,4 @@
-name: AI.SLDC post-deploy gate
+name: AI.SDLC post-deploy gate
 
 on:
   workflow_dispatch:
@@ -33,4 +33,3 @@ jobs:
         run: npm test
       - name: Enforce deployment and production outcome proof
         run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy --project "${{ inputs.project }}" --release "${{ inputs.release }}"
-

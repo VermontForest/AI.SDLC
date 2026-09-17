@@ -1,4 +1,4 @@
-name: AI.SLDC change gate
+name: AI.SDLC change gate
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ai-sldc-change-${{ github.workflow }}-${{ github.ref }}
+  group: ai-sdlc-change-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -34,4 +34,3 @@ jobs:
         run: npm run portal:build
       - name: Reject stale generated portal
         run: git diff --exit-code -- ops/portfolio-dashboard.html
-

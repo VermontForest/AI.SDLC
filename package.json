@@ -1,14 +1,15 @@
 {
-  "name": "ai-sldc",
+  "name": "ai-sdlc",
   "version": "0.2.0",
   "private": true,
   "description": "Portable AI SDLC workflow harness for stage-specific JSM methods, protected regression, LEQ, JouleWork, and human-readable status.",
   "type": "module",
   "bin": {
-    "ai-sldc": "bin/ai-sldc.mjs"
+    "ai-sdlc": "bin/ai-sdlc.mjs"
   },
   "scripts": {
-    "test": "node src/cli.mjs self-test && node --test tests/*.test.mjs",
+    "test:hooks": "node --test src/codex-hooks.test.mjs",
+    "test": "node scripts/verify-repository.mjs && node src/cli.mjs self-test && npm run test:hooks && node --test tests/*.test.mjs",
     "self-test": "node src/cli.mjs self-test",
     "jsm:install": "node src/cli.mjs skills:install",
     "jsm:verify": "node src/cli.mjs skills:verify",
@@ -25,7 +26,9 @@
     "plan:drift": "node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage drift",
     "portal:build": "node src/cli.mjs portal:build --ledger portfolio.ledger.json --output ops/portfolio-dashboard.html",
     "portal:serve": "node src/cli.mjs portal:serve --ledger portfolio.ledger.json --host 127.0.0.1 --port 5190",
-    "hooks:install": "git config core.hooksPath .githooks"
+    "hooks:install": "git config core.hooksPath .githooks",
+    "verify:repository": "node scripts/verify-repository.mjs",
+    "verify:completion": "node src/cli.mjs verify-completion"
   },
   "engines": {
     "node": ">=20"
@@ -38,7 +41,11 @@
     "jsm/",
     "README.md"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VermontForest/AI.SDLC.git"
+  },
   "dependencies": {
     "ajv": "^8.20.0"
   }

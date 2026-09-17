@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
 set -eu
 
-echo "AI.SLDC pre-commit: validating traceability ledger"
+echo "AI.SDLC pre-commit: validating traceability ledger"
 npm run plan:validate
 npm run portal:build
 
 if ! git diff --quiet -- ops/portfolio-dashboard.html; then
-  echo "AI.SLDC pre-commit blocked: ops/portfolio-dashboard.html is stale."
+  echo "AI.SDLC pre-commit blocked: ops/portfolio-dashboard.html is stale."
   echo "Stage the regenerated portal and commit again."
   exit 1
 fi
-

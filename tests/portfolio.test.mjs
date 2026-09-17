@@ -133,7 +133,7 @@ test("saved portal output is deterministic for an unchanged ledger", async () =>
 });
 
 async function fixture() {
-  const root = await mkdtemp(join(tmpdir(), "ai-sldc-portfolio-"));
+  const root = await mkdtemp(join(tmpdir(), "ai-sdlc-portfolio-"));
   const artifactBytes = "new-content\n";
   await writeFile(join(root, "artifact.txt"), artifactBytes, "utf8");
   const artifactHash = createHash("sha256").update(artifactBytes).digest("hex");

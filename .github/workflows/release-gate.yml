@@ -1,4 +1,4 @@
-name: AI.SLDC release gate
+name: AI.SDLC release gate
 
 on:
   workflow_dispatch:
@@ -33,4 +33,3 @@ jobs:
         run: npm test
       - name: Enforce release evidence, approval, artifact, and rollback gates
         run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release --project "${{ inputs.project }}" --release "${{ inputs.release }}"
-

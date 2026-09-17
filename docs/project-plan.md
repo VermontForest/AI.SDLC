@@ -1,8 +1,8 @@
-# AI.SLDC Project Plan
+# AI.SDLC Project Plan
 
 ## Purpose
 
-This is the public roadmap and implementation plan for AI.SLDC itself. It
+This is the public roadmap and implementation plan for AI.SDLC itself. It
 records approved product direction before implementation so repository changes,
 tests, evidence, and releases can be traced back to an explicit plan.
 
@@ -14,7 +14,7 @@ GitHub workflow definitions exist. Local behavioral and browser proof must pass,
 then an actual hosted GitHub Actions run must pass before this release is called
 publicly verified.
 
-AI.SLDC will make the project plan the root record for delivery. The plan will
+AI.SDLC will make the project plan the root record for delivery. The plan will
 define numbered user requirements, functional requirements, work breakdown,
 required test classes, evidence, approvals, release state, and production
 proof. A machine-readable traceability ledger will connect those records.
@@ -60,7 +60,7 @@ silently drift.
 
 Vibe Mode will support intentionally rapid, low-ceremony experimentation when
 the operator wants to explore, rearrange, or prototype without the full
-AI.SLDC gate stack.
+AI.SDLC gate stack.
 
 The planned contract is:
 

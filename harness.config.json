@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "ai-sdlc",
+    "name": "AI.SDLC",
+    "productName": "AI.SDLC"
+  },
+  "status": {
+    "json": "ops/status.json",
+    "markdown": "docs/status.md",
+    "dashboard": "ops/dashboard.html"
+  },
+  "artifacts": {
+    "changeImpact": "ops/change-impact.latest.json",
+    "protectedRegression": "ops/protected-regression.latest.json",
+    "iterationFinish": "ops/iteration-finish.latest.json",
+    "statusJson": "ops/status.json",
+    "statusMarkdown": "docs/status.md",
+    "dashboardHtml": "ops/dashboard.html"
+  },
+  "metrics": {
+    "targets": {
+      "leqHealthy": 85,
+      "jouleworkProductive": 70
+    },
+    "taskMarkerGlobs": [
+      "src/**",
+      "scripts/**",
+      "docs/**",
+      "README.md"
+    ]
+  },
+  "jsm": {
+    "skillRoots": [
+      "~/.claude/skills",
+      "~/.codex/skills",
+      "~/.agents/skills"
+    ]
+  },
+  "docs": {
+    "staleDays": 45,
+    "required": [
+      "README.md",
+      "AGENTS.md",
+      "docs/management-sop.md",
+      "docs/test-release-plan.md",
+      "docs/status.md",
+      "ops/status.json",
+      "ops/dashboard.html"
+    ]
+  },
+  "defaultSurface": "harness",
+  "surfaces": [
+    {
+      "id": "harness",
+      "label": "Portable framework",
+      "filePatterns": [
+        "**"
+      ],
+      "riskClasses": [
+        "workflow",
+        "code",
+        "docs"
+      ],
+      "packs": [
+        "validation"
+      ],
+      "skills": [
+        {
+          "name": "planning-workflow",
+          "stages": [
+            "Assess"
+          ]
+        },
+        {
+          "name": "readme-writing",
+          "stages": [
+            "Assess"
+          ]
+        },
+        {
+          "name": "testing-real-service-e2e-no-mocks",
+          "stages": [
+            "Regress"
+          ]
+        },
+        {
+          "name": "reality-check-for-project",
+          "stages": [
+            "Finish"
+          ]
+        },
+        {
+          "name": "codebase-report",
+          "stages": [
+            "Finish"
+          ]
+        }
+      ]
+    }
+  ],
+  "packs": {
+    "validation": {
+      "label": "Repository and lifecycle validation",
+      "commands": [
+        "npm test"
+      ]
+    }
+  }
+}

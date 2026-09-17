@@ -1,4 +1,4 @@
-name: AI.SLDC drift gate
+name: AI.SDLC drift gate
 
 on:
   schedule:
@@ -24,4 +24,3 @@ jobs:
         run: npm ci
       - name: Fail on stale plans, projects, or measured metrics
         run: npm run plan:drift
-
