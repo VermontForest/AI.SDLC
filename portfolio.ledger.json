@@ -3,7 +3,7 @@
   "portfolio": {
     "id": "ai-sdlc-public",
     "name": "AI.SDLC Public Framework",
-    "updated_at": "2026-09-17T13:42:30.000Z",
+    "updated_at": "2026-09-29T12:24:37Z",
     "stale_after_days": 14,
     "mode": "standard",
     "notes": "Public framework state only. Private consumer-project portfolios belong in local ledgers."
@@ -15,8 +15,8 @@
       "outcome": "Make planning, traceability, evidence, approval, release, and production proof executable and human-readable.",
       "owner": "AI.SDLC maintainers",
       "status": "verified",
-      "state_reason": "v0.2.3 is published through the protected GitHub release path; the hosted tarball matches the registered SHA-256, the release event is reviewable in PR #8, and no product deployment is claimed.",
-      "updated_at": "2026-09-17T13:42:30.000Z",
+      "state_reason": "v0.2.3 remains the published release. The official JSM collection and two skill-enforcement repairs are verified locally and prepared for protected GitHub review; no new release or deployment is claimed.",
+      "updated_at": "2026-09-29T12:24:37Z",
       "requirements": [
         {
           "id": "URS-001",
@@ -274,6 +274,30 @@
           ],
           "acceptance": [
             "GitHub hosts tag v0.2.3 and the registered tarball; the downloaded asset digest matches; the release event is merged into the ledger."
+          ]
+        },
+        {
+          "id": "URS-012",
+          "type": "user",
+          "text": "Current official Jeffrey methods remain usable and required methods cannot silently disappear or reuse evidence from different skill packages.",
+          "status": "verified",
+          "acceptance": [
+            "Every unmatched file keeps fallback methods and checks in a mixed change.",
+            "Changed selected skill packages require a fresh lifecycle.",
+            "Official packages stay local; the repository contains verified metadata only."
+          ]
+        },
+        {
+          "id": "FRS-014",
+          "type": "functional",
+          "text": "Union fallback controls per unmatched file and bind stage evidence to the selected package path, canonical root and complete package contents.",
+          "status": "verified",
+          "derived_from": [
+            "URS-012"
+          ],
+          "acceptance": [
+            "Positive and negative filesystem tests cover skill-body/reference/script edits, removal, root substitution, legacy evidence and recovery.",
+            "Verify the refreshed 142-skill official metadata lock through the authenticated JSM installation."
           ]
         }
       ],
@@ -917,6 +941,66 @@
           ],
           "blockers": [],
           "next_actions": []
+        },
+        {
+          "id": "WBS-012",
+          "title": "Refresh official JSM methods and repair skill lifecycle evidence",
+          "owner": "AI.SDLC maintainers",
+          "status": "verified",
+          "state_reason": "Local implementation and licensed dependency checks passed; GitHub review and publication are separate.",
+          "implements": [
+            "FRS-014"
+          ],
+          "affected_surfaces": [
+            "skill routing",
+            "stage evidence",
+            "official dependency metadata",
+            "workflow documentation"
+          ],
+          "protected_contracts": [
+            "fallback controls apply per file",
+            "changed methods invalidate evidence",
+            "premium bodies remain local",
+            "no fabricated application attestations"
+          ],
+          "required_test_types": [
+            "integration",
+            "regression"
+          ],
+          "tests": [
+            {
+              "id": "TST-028",
+              "type": "integration",
+              "status": "passed",
+              "command": "npm run jsm:verify",
+              "evidence_ids": [
+                "EV-028"
+              ]
+            },
+            {
+              "id": "TST-029",
+              "type": "regression",
+              "status": "passed",
+              "command": "npm test",
+              "evidence_ids": [
+                "EV-029"
+              ]
+            }
+          ],
+          "changed_files": [
+            "src/core.mjs",
+            "README.md",
+            "jsm/official-skills.lock.json",
+            "portfolio.ledger.json",
+            "ops/portfolio-dashboard.html",
+            "ops/portfolio-metrics.json",
+            "docs/project-plan.md",
+            "evidence/2026-09-29-skill-enforcement.json"
+          ],
+          "blockers": [],
+          "next_actions": [
+            "Complete protected GitHub pull-request checks; no new package release is requested."
+          ]
         }
       ],
       "evidence": [
@@ -1218,6 +1302,22 @@
           "artifact_ids": [
             "ART-004"
           ]
+        },
+        {
+          "id": "EV-028",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-29T12:17:36.992165+00:00",
+          "summary": "The official CLI updated 116 skills, retained 26 current skills, verified all 142 managed packages and matched the live catalog. The metadata lock verifies and all installed agent mirrors match the verified packages.",
+          "uri": "evidence/2026-09-29-skill-enforcement.json"
+        },
+        {
+          "id": "EV-029",
+          "type": "test_report",
+          "status": "passed",
+          "created_at": "2026-09-29T12:17:36.992165+00:00",
+          "summary": "The protected npm test pack passed, including seven new real-filesystem regression cases and reassessment recovery for omitted fallback controls and stale selected-package evidence.",
+          "uri": "evidence/2026-09-29-skill-enforcement.json"
         }
       ],
       "artifacts": [

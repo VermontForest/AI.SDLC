@@ -252,6 +252,8 @@ Skills are assigned by file surface and stage:
 The same skill may appear in more than one stage when its method genuinely
 applies more than once. Different surfaces are unioned, so a mixed code,
 documentation, and UI change may require several methods at each stage.
+An unmatched file uses `defaultSurface` individually. Adding a matching file
+must not remove the fallback skills or regression packs for another file.
 
 For backward compatibility, a string entry such as `"readme-writing"` means
 that the skill is required during Assess only. New configurations should use
@@ -275,10 +277,19 @@ They can be overridden for a project or test fixture:
 
 Each root is expected to contain `<skill-name>/SKILL.md`.
 
+Lifecycle evidence binds the selected path, canonical package root, and a
+deterministic hash of the package files, including references and scripts.
+Updating, removing, or switching a selected package invalidates the old
+assessment. Read and apply the changed methods, then rerun Assess, Regress,
+Finish, and `verify-completion`. Evidence created before package binding was
+introduced also needs a new lifecycle. These hashes identify the selected local
+bytes; they do not prove that the agent applied the method well or that an
+arbitrary custom skill root matches the official JSM inventory.
+
 ### Official JSM Dependency Collection
 
 AI.SDLC carries a metadata-only lock for the complete official JSM collection.
-At the time of the current lock, that is 135 named, versioned, integrity-bound
+At the time of the current lock, that is 142 named, versioned, integrity-bound
 skills. The lock is `jsm/official-skills.lock.json`.
 
 Premium skill bodies are not copied into this repository. Jeffrey's Skills.md
@@ -315,6 +326,32 @@ This separation is deliberate:
 See the [JSM service](https://jeffreys-skills.md/) and its
 [terms](https://jeffreys-skills.md/terms) for subscription and usage
 requirements.
+
+### Updating The Locked Collection
+
+Use `jsm upgrade --list` to check installed packages. For an authorized update,
+back up local packages and retain the old lock, then run:
+
+```bash
+jsm upgrade
+jsm verify
+# From the AI.SDLC source checkout, after reviewing the version changes:
+npm run jsm:lock
+npm run jsm:verify
+```
+
+`jsm:lock` records the installed inventory only after its integrity checks pass;
+it does not check whether every newly published official skill is installed.
+Use the official catalog and `jsm install-all --yes` when expanding the collection.
+An old lock rejecting new versions is an expected migration mismatch. Review the
+metadata diff instead of weakening verification or running `skills:install` to
+silently restore older global packages. Other checkouts and packaged consumers
+retain their own lock until deliberately updated.
+
+Check the full package contents in every configured agent skill root against
+JSM's verified installation. The first matching root supplies the method that
+the lifecycle binds; verifying a different copy alone does not validate it.
+Read and apply the new methods before recording fresh stage attestations.
 
 ## LEQ And JouleWork
 

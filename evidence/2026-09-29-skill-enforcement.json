@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-29T12:17:36.992165+00:00",
+  "base_commit": "358c361c282cacfc20c3c2aa33ad90aa8d0b79ba",
+  "scope": "Local validation of JSM dependency update and two skill-enforcement repairs before GitHub promotion.",
+  "source_sha256": {
+    "src/core.mjs": "4b44acec44912a289078f6fdbc169cb987d7f658bbc49fd783f74e4f4c45dabe",
+    "README.md": "6afa605bf821a96c42e80d3907417ac57718aef22d2a2d6f4e5363fabf55498f",
+    "jsm/official-skills.lock.json": "63496e25a6251cfdc095aa66cd0f065a520c8228a9587cf7bad537141664ed77"
+  },
+  "licensed_dependencies": {
+    "locked_skills": 142,
+    "verification": "passed",
+    "updated": 116,
+    "already_current": 26,
+    "live_catalog_name_and_version_parity": true,
+    "premium_bodies_redistributed": false
+  },
+  "validation": {
+    "protected_command": "npm test",
+    "status": "passed",
+    "exit_code": 0,
+    "elapsed_seconds": 7.58,
+    "regression_cases": [
+      "mixed matched and unmatched file routing",
+      "changed SKILL.md",
+      "changed reference",
+      "changed script",
+      "removed selected skill",
+      "identical-content root switch",
+      "legacy evidence without package hashes"
+    ],
+    "reassessment_recovery": "passed"
+  },
+  "application_record": [
+    {
+      "skill": "codebase-archaeology",
+      "action": "Read repository instructions and README, trace CLI -> core routing -> JSM preflight -> stage artifacts -> completion, inspect consumer attestations and hook enrollment."
+    },
+    {
+      "skill": "planning-workflow",
+      "action": "Apply the small bounded change approach: preserve vendor packages, update verified metadata, repair two demonstrated enforcement defects, validate before completion; constrain changes to three repository files."
+    },
+    {
+      "skill": "readme-writing",
+      "action": "Add concrete update commands, explain expected lock migration failures and separate package identity from actual method application; document per-file fallback and evidence migration."
+    },
+    {
+      "skill": "testing-real-service-e2e-no-mocks",
+      "action": "Use real temporary files, package trees and shell commands for regression cases; verify licensed JSM delivery and full-file mirror parity separately from fixture mechanics."
+    },
+    {
+      "skill": "reality-check-for-project",
+      "action": "Compare README promises with running routing/completion behavior; distinguish historical attestations, newly verified lifecycle, missing hook activation and unpublished fixes."
+    },
+    {
+      "skill": "codebase-report",
+      "action": "Save source-referenced findings, update receipt, known limits and reproducible patch as metadata-only deliverables."
+    }
+  ],
+  "limits": [
+    "Fixture methods prove harness behavior, not agent reasoning quality.",
+    "Selected-package hashes and official JSM inventory verification remain separate.",
+    "This record does not assert a new release, a deployment, a merged pull request, or activated Codex hooks."
+  ]
+}
