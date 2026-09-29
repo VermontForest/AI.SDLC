@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-07T16:13:44.366Z",
+  "generated_at": "2026-09-29T12:10:51.868Z",
   "source": {
     "service": "Jeffrey's Skills.md",
     "url": "https://jeffreys-skills.md",
@@ -10,165 +10,175 @@
     "note": "Premium skill bodies are installed through jsm and are not redistributed by AI.SDLC."
   },
   "cli": {
-    "minimum_version": "0.3.22",
-    "resolved_version": "0.3.22"
+    "minimum_version": "0.3.25",
+    "resolved_version": "0.3.25"
   },
-  "skill_count": 135,
+  "skill_count": 142,
   "skills": [
     {
       "name": "ab-testing",
-      "version": 2,
-      "sha256": "06d2b4a027075a137250b30a36bf6deee52cfb8309f9fb8101ee6cee24679cf9"
+      "version": 4,
+      "sha256": "aaf583c62e24a557ac2dc0a72c9d8005eed364e5475e49ca5299910fef59539a"
     },
     {
       "name": "admin-page-for-nextjs-sites",
-      "version": 2,
-      "sha256": "006938ec2ddfe0b9c3ebc940d808441367c7f927c561f04f417a18d949010fca"
+      "version": 5,
+      "sha256": "8d6029692da4ffabee07a2b42b1979e901f0792cede18a4519a87f91308a2a5f"
     },
     {
       "name": "agent-ergonomics-and-intuitiveness-maximization-for-cli-tools",
-      "version": 12,
-      "sha256": "3bfb99f4d9276be2615f0f82276ee9950ff909a081434de76ccfc435c2c8f86c"
+      "version": 18,
+      "sha256": "318d896788867ad0ae7d78b1b95a6f270a46ab8b84dedf06fa125ac7271ec4eb"
     },
     {
       "name": "agent-fungibility-philosophy",
-      "version": 5,
-      "sha256": "17428e0e10605269afe6febd85633a104358f8cb829701b40c3c921cad73df27"
+      "version": 7,
+      "sha256": "4624a94c3c96bd8415cb95ee4ea2a0f97950cc03e0110d10a53df04acf9345a5"
     },
     {
       "name": "agent-mail",
-      "version": 2,
-      "sha256": "6fe9cfce5cdb521ee68a46486c17f094f8dac245460c687d45cf52bb5574f619"
+      "version": 5,
+      "sha256": "440c30cec931d2a209f35895bee5aec942d629708970a5f7a6893266bafc662e"
     },
     {
       "name": "ai-model-into-rust-mega-fused-hyper-kernel",
-      "version": 1,
-      "sha256": "f0d3e11736f489e29612b061c5c9662aa4c1cd904e8a5b544bd3fa8acc2232d3"
+      "version": 4,
+      "sha256": "d36f18df72933e1baed08ced67d9c9dfc27bd9bbdb5ad5fd34913fb2c990b01b"
     },
     {
       "name": "asupersync-mega-skill",
-      "version": 5,
-      "sha256": "c1885568e2c8a9a8cdaf7110a4a1c6afacbecfe4a483b80b8722eb4cf6d06aa3"
+      "version": 8,
+      "sha256": "b19f8c692fde2a1000b0b183a7b4138194ba43b21532718668faeffca2bce0c5"
     },
     {
       "name": "automating-your-automations",
-      "version": 2,
-      "sha256": "9632047db95f3fbfc665872856c46fcd3d9e16a1c0ee659b98e7484ce17db377"
+      "version": 5,
+      "sha256": "6ff72b6162fa1be4122b9ac3ff0c452952e9395976bdfc4aab0d809e28859b1a"
     },
     {
       "name": "bd-to-br-migration",
-      "version": 3,
-      "sha256": "578756bdae2a2d8b587613c2cd1e8f4a72497020fd3aaea3bd3890cd1c7c5e08"
+      "version": 5,
+      "sha256": "99fda1c1a42cf8c8ec9c377824909212f391c9eb4cc172960782c2baba9ef3b3"
     },
     {
       "name": "beads-br",
-      "version": 3,
-      "sha256": "f3ee1932f89eb80e9e4eb3969c7af33c093eca8e75c04bb8e6481d5c86e0ba38"
+      "version": 4,
+      "sha256": "df7ff0fc44c284ac4d824174ce460604a2d551c5946082d81c68ed2b0894721e"
     },
     {
       "name": "beads-bv",
-      "version": 1,
-      "sha256": "ec3e0490a8fddcf8bbbe78c1482ca68f9cfc3d2a755ce5309e222346d87899a8"
+      "version": 2,
+      "sha256": "d114f8b020d20ba95225b46075f5292a6ea9f7de31171c289940d0fab28ff780"
     },
     {
       "name": "beads-compliance-and-completion-verification",
-      "version": 14,
-      "sha256": "72d2ba722a9ae925291619d81b262d4333dfd2cca07c25fea64f437861c99751"
+      "version": 21,
+      "sha256": "45bad6eb530a188f4787d03c37d6e7a2a82b1c7dc82435523b1e044aaf829efb"
     },
     {
       "name": "beads-workflow",
-      "version": 4,
-      "sha256": "140ed01539cc98504ab9e8eb1390721355904342870aed78f87cff34698db9f0"
+      "version": 5,
+      "sha256": "fce6eb8873d1bcc0498c99ae0bc514c8e80c5d6d7f83cb1988a37e00a96ea812"
+    },
+    {
+      "name": "bend2-mega-skill",
+      "version": 6,
+      "sha256": "2ba1fe256c50d0dcd0d5a25f2385de0d4ca440843557c70147e88df688fe4eb8"
     },
     {
       "name": "brenner",
-      "version": 1,
-      "sha256": "c312d085773a1ee73804b8570106ba9c7b89eae6a707a00762ecdbb84ec55eec"
+      "version": 2,
+      "sha256": "38e1cf0bde2b57e57d49b42c7bd761ecf869a78e88410365b5ac3e2bdaa96c85"
     },
     {
       "name": "brennerbot-with-ntm",
-      "version": 5,
-      "sha256": "41dc351b0591efefb09e93a704afcf1adaeadebd56bd17dd4ab2f55dcb576b78"
+      "version": 14,
+      "sha256": "a7391c49113440b60b6518b5d7a78f36614a88e1975e547260d790f04c18ec38"
     },
     {
       "name": "browser-extension-automation",
-      "version": 1,
-      "sha256": "66d204ea8d0a7b7ff16820e5a4b191c773f9495ad823a1e377169f70ede2a951"
+      "version": 2,
+      "sha256": "e4ed111bdeab2bf5dd600b84bca0257a737feeadb6f741dd4f324b36548e7cd4"
+    },
+    {
+      "name": "bulk-convert-huge-folder-of-pdfs-into-markdown",
+      "version": 5,
+      "sha256": "ccb4010cd84f60a136e8217c2ce06513a9d6c5640eb24ff52c5ed571adaefb97"
     },
     {
       "name": "caam",
-      "version": 3,
-      "sha256": "6129722f949efaa86a1a40c60ac0d1d2ce967dc7cceae2cc650fd511a900a8e1"
+      "version": 5,
+      "sha256": "910089875d8b84dd961f3cc6377b7641fe80e646698551614b29f1b80c24edc5"
     },
     {
       "name": "cass",
-      "version": 8,
-      "sha256": "813a8fbb22024ce845d824cb94f6de55ca9baf10dbcadfdfc11f78b8934a1e29"
+      "version": 20,
+      "sha256": "54aa5ef22ae3b0fa9889c2b0b604155ee625d7aaeeace3f0b1a54dbdbef761b4"
     },
     {
       "name": "cass-memory",
-      "version": 3,
-      "sha256": "e7951b84dfcc6c40571f8bbc8309635aa144f179bb441e546cb80b930624d7d3"
+      "version": 5,
+      "sha256": "dab355056b869cb2f7ae87b32e71e846656696ee21354ea8c0d2b61a1419b4bf"
     },
     {
       "name": "cc-hooks",
-      "version": 2,
-      "sha256": "a885ff59721f281e4649df92011b91b3050e850fb595f649842ecee48d4c329c"
+      "version": 5,
+      "sha256": "2022816fe5aaa789d70e23d331a833630c41a5290aa8a3408fb934f43cd6cb59"
     },
     {
       "name": "changelog-md-workmanship",
-      "version": 3,
-      "sha256": "6355e11be4206f55f30811bddc7484445da8c8692e484abebd6978458025ca6e"
+      "version": 5,
+      "sha256": "f7c23764eb7f85ab585030a208e6e68adbdbcaf09b9c7545ab659b77b055d571"
     },
     {
       "name": "choose-the-best-skills-for-me-to-run-in-this-project",
-      "version": 1,
-      "sha256": "bd7fcdb805d0a42b616856651b3f0c2f96d52b1016954496ebacdb14a803774b"
+      "version": 3,
+      "sha256": "9af48af5a3393b410b483ea97ca884cafd14ab19fc1625616ceab4d058ee2c69"
     },
     {
       "name": "code-review-gemini-swarm-with-ntm",
-      "version": 3,
-      "sha256": "7cc6ead90cc0e0db281df034fabe7b199f4f7e86fb6b2ac37b970d49fa3b2540"
+      "version": 6,
+      "sha256": "f94f40d32558951009d7d97c715d54e445a0adf60b47f2cd5c34102eddaa909d"
     },
     {
       "name": "codebase-archaeology",
-      "version": 1,
-      "sha256": "f2e53392dbaa25456e472ffba82900b515e395d0bd02b08a0ee83fde50811405"
+      "version": 2,
+      "sha256": "e265215e120e313bab3da87d0ea11c65340fde1f1401ebf3de8995b164a8d650"
     },
     {
       "name": "codebase-audit",
-      "version": 2,
-      "sha256": "f9afaa7a66594b8989fa4d5d1ab2253b02f7783413c7fb50f6ffc4d4b1c78aba"
+      "version": 3,
+      "sha256": "5559c7262b11ce2f9dffc4e7a43d0b1c6ab050aa616b3e72a6c877b72cdb13c0"
     },
     {
       "name": "codebase-pattern-extraction",
-      "version": 1,
-      "sha256": "5c763e87d3545834fcd03c850ae77acb2c578366e2134e6db29444700650fa4a"
+      "version": 2,
+      "sha256": "2a93321fd925aced993f09c54807de31f0570e92a215958180a9bddba5915c9e"
     },
     {
       "name": "codebase-report",
-      "version": 5,
-      "sha256": "087ee3b79cfcd72e1aff42e94c8eff5fcbd3fe659e8089abfa774e4029b481ed"
+      "version": 7,
+      "sha256": "f372b09ba0713ee4538899170aa85f62d917d493e1b8f03bea0d19670d7eea13"
     },
     {
       "name": "csctf",
-      "version": 1,
-      "sha256": "e12a1c75ad084fcccf556d96950b0c85142154c5e62ee5dcc31ac43f24fbaa8f"
+      "version": 3,
+      "sha256": "b37bb57116737c1797e2f164f6d883ff378afd6befdc339e004687570d8d042d"
     },
     {
       "name": "cursor",
-      "version": 1,
-      "sha256": "b71e7a5fc6d03f432afe79ffcde36615b6900bc47099241782d812af3f0cb7fd"
+      "version": 2,
+      "sha256": "b51993e97d35b588d47d46b830b7bb51889b44944629e126285e47f7c9035b97"
     },
     {
       "name": "dcg",
-      "version": 5,
-      "sha256": "0f73abd811b5b71466b71a5c3ed9abca18cb19a6108be2d9ae7ede855cb83aec"
+      "version": 8,
+      "sha256": "fb600584c0d7d1a5e1ee57738b337f3ee2532af338051b34c0a7db6c061509ba"
     },
     {
       "name": "de-monolithize-your-codebase-isomorphically",
-      "version": 2,
-      "sha256": "795f795b034a8e4da859f1750bbaebcf7b74c1b5b61778719967c13605750602"
+      "version": 7,
+      "sha256": "91a34cdfbee7439829dc4cd8a8ee11b5e468989b070681776ef3072a832e5e3b"
     },
     {
       "name": "de-slopify",
@@ -177,138 +187,148 @@
     },
     {
       "name": "deadlock-finder-and-fixer",
-      "version": 7,
-      "sha256": "8899be2632ca3143ce3d35250b0df3039ed4da51078ee3f71087ce9aa47ecd75"
+      "version": 12,
+      "sha256": "19e497830d260a7851df39c4bd400585fc8762ff6227ff3e338c24987275e4d8"
     },
     {
       "name": "documentation-website-for-software-project",
-      "version": 13,
-      "sha256": "e1333eeeac9238cbac6738f363efc27ff3c85c43f419fcf695b625ce4df3a460"
+      "version": 15,
+      "sha256": "ef53f10bc524762e92e1f7f38e30907fccc34b20fc16e0dcfac916582776c117"
+    },
+    {
+      "name": "drone-flyover-video-to-home-model-in-blender",
+      "version": 5,
+      "sha256": "deba8741ce33e5e25fd5ed430cb251b0ba084e104baa0e2427da7b4fc057fe8a"
     },
     {
       "name": "dsr",
-      "version": 1,
-      "sha256": "b1087d948e0d24fdf16e8ec11858e4778224ef258116012ef4644b52a538c1b8"
+      "version": 4,
+      "sha256": "d9b44a0bc9a917dac1a4c94d0cf83ead491612757aed29e4064c42d643752626"
     },
     {
       "name": "dueling-idea-wizards",
-      "version": 5,
-      "sha256": "47dba82ed2058c0127a548e7379bb4e86ce5243094c119d49edf4b913564fc9c"
+      "version": 8,
+      "sha256": "1c336c887fae377776f970647d9edd1ae5678423b0b3872d5d88e2376bacaa96"
     },
     {
       "name": "e2e-testing-for-webapps",
-      "version": 3,
-      "sha256": "73d1b2211be7bd7edf881cd27f70cda1fef6ab0b0a04c219d6e1a3a56bd5f73c"
+      "version": 5,
+      "sha256": "b27bd0e520ab90d7588df12ff85c2744b15c584b46406b06120201f5f8ff62b5"
     },
     {
       "name": "eidetic-engine-cli",
-      "version": 1,
-      "sha256": "b5fcc5edac2a81ab14a5a595c5a01dfc42a69ba8778c1e350cc885c3f25e71b9"
+      "version": 8,
+      "sha256": "a68121e97713eab68680b8a21d313e08357b10682c380eae6a82e1f46755b342"
     },
     {
       "name": "extreme-software-optimization",
-      "version": 1,
-      "sha256": "7ff9d50d8c7cd7fae39893f311858c1ad8c20950b647d111a482f65cc5690e7d"
+      "version": 3,
+      "sha256": "d045a522c322ad34c732d39458bc71dc2dd265bfa18e79164834989af7e9a40e"
+    },
+    {
+      "name": "fixing-beads-problems",
+      "version": 3,
+      "sha256": "5c850f72dc09f2c6539222a5a94a23788a49574197751556c24ae17a3419c371"
     },
     {
       "name": "focr",
-      "version": 5,
-      "sha256": "c91bfab509fdeaebf930bcd7038aef985134fbeab0d996d8f34f9a05ea3e117f"
+      "version": 6,
+      "sha256": "210582363effd3a50aa41dd03c795e3b15b4f825f58065ebaa1b2bd3d64b9eff"
     },
     {
       "name": "frankensearch-integration-for-rust-projects",
-      "version": 1,
-      "sha256": "60a846b05e7dc5129381aceb410f1b71197319696407af5f72b8011e7e66fdad"
+      "version": 3,
+      "sha256": "b54c34420deada40d7fc511e2cc4a92f7ee6f64b7b62aa32e2158a424ca363b3"
     },
     {
       "name": "frankensqlite-mega-skill",
-      "version": 2,
-      "sha256": "b5151363bf22b67fef97ed4193f0391c7d0ea8d8eb948be490529f7400db35df"
+      "version": 7,
+      "sha256": "d8797f6148bd36142aec076fe63d9c73fe2ac8b26ebae069aaaf70d8b62b31f2"
     },
     {
       "name": "frankensuite-website-development",
-      "version": 1,
-      "sha256": "ef22556bdcf12e990a5b7c54d78bd66d727226b061a454f2f14d95fca794c84f"
+      "version": 2,
+      "sha256": "fcc7eea59da722176570fccfc67bc4e2a3d11542e55770aa7c76c62acab71f55"
     },
     {
       "name": "frankentui",
-      "version": 1,
-      "sha256": "a98c0ae79eaf80fb17fc4a8a1a683dc6e02236b70a3cbad7ac6819c3b471cc54"
+      "version": 3,
+      "sha256": "8179ac8f96f41bf732a649b51504350a752ea40eac753ce7201fcc214f2cc7bb"
     },
     {
       "name": "fsnow",
-      "version": 1,
-      "sha256": "783d3d49fadbe7a794f0a027f2a4debdda49d03453291a0ad47e69233927e039"
+      "version": 3,
+      "sha256": "7e8269d9afe639a81f45b93afd3a9ec1f38534c1c2b2d4dc854498298f384363"
     },
     {
       "name": "ftts",
-      "version": 3,
-      "sha256": "32fc102e3fe75c4a2af1bde70d5f935e0321b3273556b792e103e6a66e847328"
+      "version": 5,
+      "sha256": "3f7e948b3022ee2732e0e0c6cbc076a346e0df829cafa3e342250ce052c264ec"
     },
     {
       "name": "fw",
-      "version": 1,
-      "sha256": "a4cb71fd92513e85789a62efaaf158d31010f9e4d328cacb16ea184f5e522e60"
+      "version": 3,
+      "sha256": "147910c26968cced9ef43f97a76a17d21bc41d31fd255070226b2118172095de"
     },
     {
       "name": "ga4",
-      "version": 2,
-      "sha256": "63df9e72f144b021839df78dc5c3d3a75e1a633c3b2b4df19cd0f0bc94b8578e"
+      "version": 6,
+      "sha256": "a7bd7774b4805cbc361c24d6636e88fae4c98fa28add3cd21af8556cb1d1b3a3"
     },
     {
       "name": "gcloud",
-      "version": 1,
-      "sha256": "ce740ffd9c952df052eafd1f7c32b28d80f5000343d5fab7b460426b033a631a"
+      "version": 2,
+      "sha256": "4ce2cd73d01ab038d5c160c07eab1cf10cfc754cf4197004f7d62706cc0d26b2"
     },
     {
       "name": "gdb-for-debugging",
-      "version": 2,
-      "sha256": "be60b7b916b5f49768088e284b3f49ee6d61ba93d0744bd295ef005e16b531b1"
+      "version": 5,
+      "sha256": "40a468f541e144ba2a2535c03f61aedea4cc248c75a3039f655a0282248d49b5"
     },
     {
       "name": "gh-actions",
-      "version": 2,
-      "sha256": "09edfabffb69d5bf68c7c41a70124855ae296ee254353c15e6c7eb717a9119f3"
+      "version": 4,
+      "sha256": "6b0b91eb0ec245f94aebf2348fa4c889439b511cfbf727858b4f0665f80854e0"
     },
     {
       "name": "gh-cli",
-      "version": 1,
-      "sha256": "e8b4fc79ef51558190befe8636c41689914adeafd981fb110beb9ec0bfa498a4"
+      "version": 3,
+      "sha256": "30d2fb06e4e78c7ec8b45141ee7f0a14fcc50a67c753374b4d4ebfa5c102513d"
     },
     {
       "name": "gh-og-share-images",
-      "version": 2,
-      "sha256": "1a65b6d3c1021a05cf61cd1de20c272c2033e4bac6a38ee19b88645f90a9d6f5"
+      "version": 3,
+      "sha256": "44c6af1ef6265e327daa402bda0f094d1e526b61caabb2e93946d4a1b805b012"
     },
     {
       "name": "gh-triage-ru",
-      "version": 3,
-      "sha256": "538dd7b416dae62177b9f6d85cb6e2dd40aaa70903ff306d24d31de13dd1bd8f"
+      "version": 4,
+      "sha256": "7c32d1e1a552235792a7d847dfeba72a0b79348db821d76885472bb5460dbc46"
     },
     {
       "name": "ghostty",
-      "version": 1,
-      "sha256": "c0090f591f8963d4796596871bfdfb70603b1e7cfec4d038f5f94c8146d22096"
+      "version": 2,
+      "sha256": "a86b4aa37f95784ab0e08fc10cf49f8d066a02adca76b55977e2b487dff8b86a"
     },
     {
       "name": "giil",
-      "version": 1,
-      "sha256": "253e1c95bfd4000903eae1075ebc59e1c054bdc267dc720600792e1c932b2289"
+      "version": 2,
+      "sha256": "8e657eac413a73e08b9e0da4435662f59404ad92dbc2fa74b9fa069ae5c67c41"
     },
     {
       "name": "git-repo-janitor",
-      "version": 7,
-      "sha256": "81ed1820242b285b25feb7615cf81be01580c8f99cefdf67914765dac4ec8c18"
+      "version": 15,
+      "sha256": "1d7b61099b999a209c34f15ecb6d748ab7aee5858043db6d1aa3d1bd1d594f40"
     },
     {
       "name": "git-stash-janitor",
-      "version": 8,
-      "sha256": "e9d07f68efd52af0cab8dbe89616cd8076005dd73d5c16876effb83ee41360ba"
+      "version": 15,
+      "sha256": "599932985e20013e4daa09f5b8fbe27171cf3b00d500f2474dfb3c6d7dc2d143"
     },
     {
       "name": "git-worktree-branch-rationalization",
-      "version": 7,
-      "sha256": "75224519ad8d1258374ed17230b635300c4c04b2174dd4d4afadd1f0f2cb92f6"
+      "version": 13,
+      "sha256": "089ca02e39ac5b608c49c4f704ff8919e97e92bd71e9f46c0a82f37d7a077a92"
     },
     {
       "name": "idea-wizard",
@@ -317,58 +337,63 @@
     },
     {
       "name": "installer-workmanship",
-      "version": 2,
-      "sha256": "2d7dc034dfa8865f18f1551923b08a31ac1534f49b89155afa098f7ea9d3de9e"
+      "version": 4,
+      "sha256": "5dc50446bd0f93dcb7489a9a51868127ef61a9b5cf1e39ea3b3ec1b8cd7d31e7"
     },
     {
       "name": "interactive-visualization-creator",
-      "version": 1,
-      "sha256": "124e788e0c92321feaa8a0833a0b67e5e31831f0f08604a0f01dbf5368f524fb"
+      "version": 2,
+      "sha256": "10f37428b1e7d6faa2940bd1d2dab16ddcd0a294b473a653474a116416a29b69"
     },
     {
       "name": "iphone-videos-to-music-video-with-audio-track",
-      "version": 1,
-      "sha256": "2492c7cb9078974baa1d9813a006bf8dfb4dca3d0461880f000d5101466c57dd"
+      "version": 2,
+      "sha256": "d5074be11e10c5de760ceae71a706fed90fa899daae0ee27216ba5793303255f"
     },
     {
       "name": "just-say-no-to-process-porn-and-ceremony",
-      "version": 1,
-      "sha256": "1a89a8014c8654fbf15ec6ade4ec34361a348263f63874ee62b2e048938fcc3d"
+      "version": 2,
+      "sha256": "91d4e8e8b3ac7269dabcefde75eb748d1a07cb04b22a6171ce1624977cf51b85"
     },
     {
       "name": "lean-formal-feedback-loop",
-      "version": 2,
-      "sha256": "7e3878408578cb806f10f2d9d6ccf82d0886e083a2ba8020a8fe04bbcd69487f"
+      "version": 4,
+      "sha256": "5458959902d079c0d3cc0c6111e016980868386ce0fc241849a5a8b8fdcb5c82"
     },
     {
       "name": "lean-proof-mastery-with-epistemic-humility",
-      "version": 6,
-      "sha256": "1b027976b6694978c4fc2cd6b48f84602fcf40f41921674224afb7b8991f7ef5"
+      "version": 7,
+      "sha256": "aace4352ae5fbfab5e812a009168c7226989fccdf368ffbcb857595a68f140a9"
     },
     {
       "name": "library-updater",
-      "version": 5,
-      "sha256": "c2443794b705bc33284cf86ac95998761c12f62ffd4b765249cf08e90aa5150e"
+      "version": 6,
+      "sha256": "77ccc4b9159016b5afa153e304804b5cc054e5db4fabc6146a566dea2310db49"
     },
     {
       "name": "mcp-server-design",
-      "version": 6,
-      "sha256": "c2c975d0cd42c93f8a91c4dabbf396f9a4215187b2c5e3eb0d407359c0ba379a"
+      "version": 9,
+      "sha256": "39c8df73f191719bb583fe3aa6de7c7d1455289a3c4929dfec4390c833903611"
     },
     {
       "name": "mini-display-for-headless-system-status",
-      "version": 2,
-      "sha256": "5acd370dadeaa7d2431573a025ced748f7ac93b34b83a60ee66609c0ce5733df"
+      "version": 3,
+      "sha256": "7c2089c8b92ed1bb7d279e3a41f22f6b89216f3a925ebc59ae1fb2ab702cd0cb"
     },
     {
       "name": "mock-code-finder",
-      "version": 1,
-      "sha256": "0709e0ea4d724ed249646886b6a4cbdde97c3acbb5bd93ebf2898411d4a24e66"
+      "version": 3,
+      "sha256": "b566d4da7c7de1a3198807303627f6bdccb8d56c16981e8a487bbb320869eb1b"
     },
     {
       "name": "modes-of-reasoning-project-analysis",
-      "version": 7,
-      "sha256": "d735514b105a9e26eebf36c90ffeb1e817f41f171cbb745f89b738c9264adbcc"
+      "version": 8,
+      "sha256": "5d292069089baaef2b63fe5a743dec280fc315f8654c0c52cec9a39b3c4f7e29"
+    },
+    {
+      "name": "multi-agent-swarm-workflow",
+      "version": 3,
+      "sha256": "c201849f8256ea33c3d89587cccbd8dafa7b70a24edd93b9b56821abb30dc033"
     },
     {
       "name": "multi-model-triangulation",
@@ -377,218 +402,228 @@
     },
     {
       "name": "multi-pass-bug-hunting",
-      "version": 1,
-      "sha256": "cfb7876274761509bc4aa631e2571c1d70600eb42fdb0561683ae924258ded62"
+      "version": 2,
+      "sha256": "2778aed1cd40a875282aaee264d51d44d28d9faa5c1372cc5b3c50ff6a8306f8"
     },
     {
       "name": "ntm",
-      "version": 12,
-      "sha256": "2f57b244ddc63f2eb554ddee97eab7a043a7f183906fbfdb3152eafb43ac1ab7"
+      "version": 16,
+      "sha256": "7717c28a87de212a9b684db761a8fa947bc4970e8fd8b38b26f7d76778de4a24"
     },
     {
       "name": "og-share-images",
-      "version": 2,
-      "sha256": "ac2b0e34f0a9c7c979b28d7ba2d79b7d670a47d1033b2304e7a001e021762265"
+      "version": 3,
+      "sha256": "2a71891706aaad481c78f05f94bf164f22e4b6d460e98b7edfc242eeb4eb70e1"
+    },
+    {
+      "name": "open-beads-weighted-tmux-agent-sessions",
+      "version": 3,
+      "sha256": "d4523f214ed448d3557456c74e07943f6143181e5b74c8f5344b30f64a04e32d"
     },
     {
       "name": "operationalizing-expertise",
-      "version": 6,
-      "sha256": "3b7ef18187aa1baedbca709c95ec1c762a495fe788a3d136fa61453c62c09a21"
+      "version": 9,
+      "sha256": "1cf481f287d3a1f7b99d73d579a8d3502bb095f980ecf3331105779846e91076"
     },
     {
       "name": "optimizing-your-rust-projects-for-wasm-in-browsers-and-phones",
-      "version": 3,
-      "sha256": "66c09b607419db98327d0c0bc3c3ed1e75f3608740ac4a7b33b8f486d468ab00"
+      "version": 5,
+      "sha256": "c3923dc056b0dfb05b397577ee18ab107c46678c06f063ca7ebb8368ba9fa090"
     },
     {
       "name": "path-rationalization",
-      "version": 2,
-      "sha256": "a90df91ed3c101cbfd785cf8d36b2c9021933ac865b90e2823dfcb7cb30bee39"
+      "version": 4,
+      "sha256": "af3977054faf693b94a278044d900b8c5da3b234aa67559b39c3ec2126acd53c"
     },
     {
       "name": "pi-agent-rust",
-      "version": 1,
-      "sha256": "2442820ead87aba632847d83c8f19ae531aa9f1217475154b252b997f656f00f"
+      "version": 3,
+      "sha256": "fab9b3ab23c5083dba8565293acbb21c4e396959a9ed864a71dcd627ff864581"
     },
     {
       "name": "planning-workflow",
-      "version": 6,
-      "sha256": "836cb96af7f0101b9983eb319bf255ca546a31740ad8be424f636bf70024cb8e"
+      "version": 7,
+      "sha256": "2cd9ccb817410c835167282c479e00af9f5feaefdcdf660015f09ab19fc9a8ba"
+    },
+    {
+      "name": "porting-to-bend2",
+      "version": 8,
+      "sha256": "32c46e7ba72c60fb8cba1823a39453206a7598d5e06860a2f555726a8edebd21"
     },
     {
       "name": "profiling-software-performance",
-      "version": 7,
-      "sha256": "a8755d3197e9e0a0cc3488e731c50380ddebb852140da1095ca842033c47ee8a"
+      "version": 10,
+      "sha256": "e6c9734b5e1a803cab50ec18982a6e31229514b11964772662da6a981b7b1c92"
     },
     {
       "name": "rch",
-      "version": 6,
-      "sha256": "37d1dfad8ba80a74cdd9e315f9ba5aa1cd34737497ed1b756f7cb6a3fd713000"
+      "version": 10,
+      "sha256": "20edad4bf30b227d7c4b3441e570ad0eecd3847be2c49c06d246574f50d7db71"
     },
     {
       "name": "readme-writing",
-      "version": 1,
-      "sha256": "3612968d01f521416811452ffb9fe4954a2eec3ebf8345b595e22c8ca09910b8"
+      "version": 2,
+      "sha256": "bb054b625ffd416a540ed3c6279a42340661dfa4c3ec5f57e4222bb7538c05c4"
     },
     {
       "name": "reality-check-for-project",
-      "version": 3,
-      "sha256": "838400d620b84678c27c9ce0d39b54ec2d39dce06dc24b8709ad1b5a669774ab"
+      "version": 4,
+      "sha256": "8aad4e46d46f939e40a5ead9663d4b36bc24a18232afd96d6a54dc404af21207"
     },
     {
       "name": "redacting-sensitive-parts-of-screencast-videos",
-      "version": 1,
-      "sha256": "4ff6d369d71d47f8b5fd7d48e3801fcdbcc6cddac2ec6aa0cec7dbb38095f52b"
+      "version": 3,
+      "sha256": "7fbb0b5b1a72c40edc998b872bbcfe8a183159ba162d8d8a78dd5272eaac6afb"
     },
     {
       "name": "release-preparations",
-      "version": 3,
-      "sha256": "33e6605ed5159a9ee37b2b99e1c4659c39502ae28478dccd38b3f5920f9919bb"
+      "version": 8,
+      "sha256": "aac67b25d1b9bf07cfa7cf79454a529983cf4d4432c0034a05b15c802cd587b1"
     },
     {
       "name": "repeatedly-apply-skill",
-      "version": 3,
-      "sha256": "a9dcfc6ddc41c5a800d249f2b511a4bebb971abb38be984f7461e3f63b7e4e2f"
+      "version": 4,
+      "sha256": "396a87780dd3fc8121675a993719965984c98fa647b52971bb279e1de8fd1c7a"
     },
     {
       "name": "research-software",
-      "version": 1,
-      "sha256": "9cdfc98c211297089a2a42b605c6fbfd1e2fd8b7a53cf61c9036755ec4756294"
+      "version": 2,
+      "sha256": "6c316502bbbe5fb983ab0160e5dcc054b9dcacb4d48acfb1d3b114abc76bb0f9"
     },
     {
       "name": "rg-optimized",
-      "version": 4,
-      "sha256": "33b9ed2c3060cc2f40d4176549c7339109928cddb1ff9b0cdb537f7e60c31c4b"
+      "version": 6,
+      "sha256": "fe277b9e17a58d802529625eedff74f824b697ef07e152e1ca74bd17a6d5bb8a"
     },
     {
       "name": "ru-multi-repo-workflow",
-      "version": 2,
-      "sha256": "35a28a02d58c7ad7233b51821cd2df3eb43511777397c8d2e0da662e75735294"
+      "version": 3,
+      "sha256": "c9070bda6056031cf4bf1c871ed4d2d4aba2227dc1ca133a2baa3d4895d3d2d9"
     },
     {
       "name": "running-the-gauntlet-on-your-rust-port",
-      "version": 6,
-      "sha256": "e3a3fed3c228c3de859a0159ad7fc65a94cd464c52c1e4791921d1e89272af00"
+      "version": 14,
+      "sha256": "218af3d0ad82983d0960b6e49d5145915ba8a6afcea87c4002913d7af4eaea07"
     },
     {
       "name": "rust-cli-with-sqlite",
-      "version": 1,
-      "sha256": "910c6cc2666674957826cbbd5f79e3ba3702a67e2fe3083aba85347842b00794"
+      "version": 2,
+      "sha256": "164736af5afb74883f25365b8e06680a03ff6a43cb4dbd9671d4ac708410cdf7"
     },
     {
       "name": "rust-crates-publishing",
-      "version": 1,
-      "sha256": "e37d8aae4d153cc11180cc39be620488d1a335f2363df774e57c87cd1456d2ac"
+      "version": 2,
+      "sha256": "5c6241c192cb456b0dcfe26319e7ac09dab8eafbed90852457cf96e1c06747da"
     },
     {
       "name": "rust-undefined-behavior-exorcist",
-      "version": 13,
-      "sha256": "db893031b982f18ff4c6a634f00090199e761cf9489c3ffb56e6afee54ad43d2"
+      "version": 19,
+      "sha256": "f678201e1d62f8f9324089b2b67be5feccd5f9e46525d822a7ce51d93933477b"
     },
     {
       "name": "rust-unsafe-code-exorcist",
-      "version": 9,
-      "sha256": "def7173987c2f4b218f37639965bf7747fa249774d7cb54b7357d0626f290a0e"
+      "version": 17,
+      "sha256": "fdc8a2a3feda601c45549d5ad797d16857e529218e72a2be7086de574251ef2c"
     },
     {
       "name": "saas-billing-patterns-for-stripe-and-paypal",
-      "version": 12,
-      "sha256": "42356a85d640090d5998949df2dee98425af2e37f8efbd37d8a1e299e05123e1"
+      "version": 16,
+      "sha256": "69ce9f95e3fa1a954be9ce7ed93022b5239e69e4d6c2af3d3687186d2b7091cf"
     },
     {
       "name": "saas-cli-auth-flow",
-      "version": 1,
-      "sha256": "81656ec6818aa9093457da4ddc9b87f53358bb70661f1db0a0bcabcadc6be93d"
+      "version": 3,
+      "sha256": "5eff0977fce3a8d780e49098bc6e1197b3c0fd188c41601c30fb4a334be16d9f"
     },
     {
       "name": "saas-customer-analytics",
-      "version": 3,
-      "sha256": "3c527098e531e4c7844c0e45a0933b1ee35cade148271a90b63121b3cfd0a5a5"
+      "version": 4,
+      "sha256": "ee380557009b9ae3ca1118c3a395e6a491fa0e1d20cb999931c53b36fb6974fa"
     },
     {
       "name": "security-audit-for-saas",
-      "version": 6,
-      "sha256": "30dd6af5fc078a0d55d5a8067010732d6cfb06b95b2570f0dc5f52d827aa3c57"
+      "version": 11,
+      "sha256": "00c58c6d36b924987e4ee926a9311b81b22877da1fad28f23891ffdf924e9703"
     },
     {
       "name": "seo-for-saas-businesses",
-      "version": 5,
-      "sha256": "e1856339ab14e9f4d6b99aa457567ee7f64f56628a6c7469d4e850585dfc72ec"
+      "version": 10,
+      "sha256": "8c158b06cb7d076e09674a8c10db42b6983f23acc951cd9005fca5d5a80ef66c"
     },
     {
       "name": "simplify-and-refactor-code-isomorphically",
-      "version": 10,
-      "sha256": "fa859d5693b84ea4dc83b7098b875f71be482623ed65804262875a0e54728734"
+      "version": 14,
+      "sha256": "714d82aaf714135fcf3b31bf28a71cfd18cd46aae83582ab850fe42c29fb4348"
     },
     {
       "name": "slack-migration-to-mattermost-phase-1-extraction",
-      "version": 5,
-      "sha256": "7818162707bedf1edb8c621c65e6f0deaadb403fdba4f76c1d7ed6c088e5de98"
+      "version": 8,
+      "sha256": "f04867941a30e217c2c1e1241d8c3dc7b4e14c6b3412142482e301103d0e5bae"
     },
     {
       "name": "slack-migration-to-mattermost-phase-2-setup-and-import",
-      "version": 2,
-      "sha256": "9fff3b9af301b5206b23b9919033f4beeabe64f0a6866868db1aef867fd23a19"
+      "version": 6,
+      "sha256": "0194de99da9083d79faf49c8179cccb0ff7a26829916df8f46ac13d7288b08de"
     },
     {
       "name": "slack-migration-to-mattermost-phase-3-ongoing-maintenance",
-      "version": 5,
-      "sha256": "4733498d0adce158d51d4a4f1853238d376df126baaf06944653cdf80b69d7bf"
+      "version": 8,
+      "sha256": "c22ec5c59840d5c8147e03bcc8e7087fb7a0a488adc6f6d0531d59fedf7e248e"
     },
     {
       "name": "slb",
-      "version": 2,
-      "sha256": "0d12b9f7747367a7351ab3e129684b3f76584bb0c38b6f4239b843118eb9a8f8"
+      "version": 4,
+      "sha256": "ee53db1ea4a93e91779db93e7a1127a3133c15fbc9607006339dbfc66a278a8b"
     },
     {
       "name": "ssh",
-      "version": 1,
-      "sha256": "4a6ca31e9b546365d3d6b8b1c97a9100b37db6c975346bb3eeae64b1616f237e"
+      "version": 2,
+      "sha256": "b354986042aa9ce19a9f485612bb0318128dc3a666dab45f4e690268f188aed6"
     },
     {
       "name": "stripe-checkout",
-      "version": 2,
-      "sha256": "48f8fa4fa5b297d0929beda6857d9dca58d94d8e729451cb0b31903789a71171"
+      "version": 4,
+      "sha256": "53608ab5224df3579e495976962043dd7ecd52b17b99689d243ea7039d4c26e4"
     },
     {
       "name": "supabase",
-      "version": 2,
-      "sha256": "86865ff053807e9d125be2f2ad95122b5f3624a22bb1a800e0c072c5a7315e28"
+      "version": 3,
+      "sha256": "b0c502fbeaff3b758b10695f47581beead5fff3fd2bf589af1075000bedc9101"
     },
     {
       "name": "system-performance-remediation",
-      "version": 3,
-      "sha256": "c221326eaf655d47d257e832b100aeb9d090e7de207a7801927ccca7c317911c"
+      "version": 6,
+      "sha256": "b3361e6786226b2d938d4bef73bcb096816b84b2faa7bf93a56424258fca7ba2"
     },
     {
       "name": "tanstack",
-      "version": 3,
-      "sha256": "6d72f7d596ee676a9748c2bed5a8cbf5c948c0a5993498859f0acd2046b00b37"
+      "version": 4,
+      "sha256": "2758c1b5bdd28ab4974063e62cbaa4fa58f28b08a359963fc5eaf9e1d4a4b9e8"
     },
     {
       "name": "tax-return-preparation-and-advice-generic",
-      "version": 1,
-      "sha256": "eebf4216332e57d2390a9de3b78588e24c9f7feee14c629745c5e1385874f8b4"
+      "version": 3,
+      "sha256": "f2df70bd2f123d5c5298c05f7d7f12cfd90c60c7c9c97add0b10bd86b9779a0e"
     },
     {
       "name": "testing-conformance-harnesses",
-      "version": 3,
-      "sha256": "de918773b4ee7bdac3aac8b5d78d188006ebbd910a36be28ddab3a0cd89e9d54"
+      "version": 5,
+      "sha256": "b3357329c6588ff387c4fc6d8162b291088c6cd2431efeb127e9442086daa0b9"
     },
     {
       "name": "testing-fuzzing",
-      "version": 4,
-      "sha256": "610fc1c271c07fd76e56f461edec2ecbfa74dcd1857a1ad7201dcb687d2cdcea"
+      "version": 6,
+      "sha256": "a93b39fa34d1ec4d55320527992fa0d929954e0fd39f50a136d8382faf1ecd60"
     },
     {
       "name": "testing-golden-artifacts",
-      "version": 3,
-      "sha256": "bd9ac0f831bee2a0bda7920e5d859d121f7ecbe95b11b9fb9e2a0ac8cfbd6f27"
+      "version": 4,
+      "sha256": "ed5d2d8cae99c07e858e75051eabaee4f5d106ba26c38ff8926eebca2fea83ff"
     },
     {
       "name": "testing-metamorphic",
-      "version": 6,
-      "sha256": "0b7463576125f0cd0a74f27fa22c57c6c01baa20548acc8976cd3c5732348a52"
+      "version": 7,
+      "sha256": "4356609817f5683f7761f5c4c6fcff90a9ed44b45e5607384b3a833e31b6c9ec"
     },
     {
       "name": "testing-real-service-e2e-no-mocks",
@@ -597,33 +632,33 @@
     },
     {
       "name": "threejs-visualizations-with-good-quality-and-real-physics",
-      "version": 1,
-      "sha256": "1216d7677e691f798880e5ef434fcd80a6772649d9b4e7d0255fa72f5d9f94f1"
+      "version": 3,
+      "sha256": "a3ffa5108ca40de69274515ab391c5637b19b877bf7f109134866457c5f5f0c3"
     },
     {
       "name": "transcribing-audio-from-calls-and-meetings",
-      "version": 3,
-      "sha256": "76e8eab91c82f7723a3a158dd07a4ba6072eb9300f2235740dac336a8563f644"
+      "version": 6,
+      "sha256": "1a53f08a2cf2b20db04bb9ea08ca8e6c2bb3d12da4d003ce6a35461a49c355a5"
     },
     {
       "name": "transcribing-youtube-videos",
-      "version": 1,
-      "sha256": "3ecb294f1c1df66876d8fe541b55b787fb08dfdd591aed88200ad7a776456da1"
+      "version": 4,
+      "sha256": "14906431c53f40efa11d16ec37dcbcc06f942e36bb78159abd49c1dd07c3b0f3"
     },
     {
       "name": "tui-glamorous",
-      "version": 4,
-      "sha256": "52008ecfbcda8e902ccaa4c6e37d3f29f620cf3f4c2c911e123773a6e530071e"
+      "version": 5,
+      "sha256": "1b2d700f18c0618e8929e4c2969d8ace4d674ee5200ab37f60916c4a923fa746"
     },
     {
       "name": "tui-inspector",
-      "version": 1,
-      "sha256": "13673e632b27e17db53d2fd6fb1bddf7419cc9668afb54f288574f9525c6b756"
+      "version": 3,
+      "sha256": "df0d7e632c0fc88775e6e5d1ee6a422d3f39d91d58c151cdef62e4458cf7a508"
     },
     {
       "name": "ubs",
-      "version": 2,
-      "sha256": "6074651a7f2c31b529b7d550006fae6a52d69c8e0f7d977217f07e92a79325cc"
+      "version": 4,
+      "sha256": "a1f0ec41eecc88bda9e161ccad71a5d545109d0b4d1881e57c87710848e381a3"
     },
     {
       "name": "ui-polish",
@@ -632,63 +667,63 @@
     },
     {
       "name": "user-support-ticketing-system-for-saas",
-      "version": 7,
-      "sha256": "525d233746e036eafb33fba32d87a964799c405466007684d500c52fd9757f78"
+      "version": 10,
+      "sha256": "eba25b2cdbd2c61a476b9389056323372a653bb90aaf9a8f985945c1839d205c"
     },
     {
       "name": "user-support-triage-for-saas-and-open-source-projects",
-      "version": 9,
-      "sha256": "63afab5f5cf611fc626378e041db597f1c13be63b684fbaff21e92d6d6ea80ff"
+      "version": 13,
+      "sha256": "b2d8483bd29092c12fa15a293096771968b5121fb93f92dc4d7702d1c093567a"
     },
     {
       "name": "ux-audit",
-      "version": 1,
-      "sha256": "a78adeefa5be8cf08bed9e6db2bb139157c90c5a9e209bfcbb6e1a0dce3a64d3"
+      "version": 2,
+      "sha256": "ba8f5461311e284020f524ab89c02d1714c46c777d7c61ca67e8b42735b693d2"
     },
     {
       "name": "vercel",
-      "version": 4,
-      "sha256": "20f4d671e7277d584456e03b9df650c9989993ab4b8815adbbb5ef4cd7f24e4d"
+      "version": 6,
+      "sha256": "6f152560734d1f2aa68d089727339dac7e646e1a58560c042ff2b749fb17b13d"
     },
     {
       "name": "vibing-with-ntm",
-      "version": 14,
-      "sha256": "21fafccebc3a6241b9f970758b2ae27dc943b7b34f922e28c503910573400d37"
+      "version": 20,
+      "sha256": "c40c379e2b193a44e13c6ac7fe959773a2b9a6aaf7f5a5cf51a1bbfc6cbbfa37"
     },
     {
       "name": "video-obs-youtube-music",
-      "version": 5,
-      "sha256": "e3d6a075aa532c44db0712526c7e2398dec57b6a2a6b5aca3d96af8210d850c4"
+      "version": 11,
+      "sha256": "4400a274309b2528b5f49fe9ea567c3c4b7c74d74ddf1c0f7ef5209086264a18"
     },
     {
       "name": "web-frontend-ui-ux-excellence-on-desktop-and-mobile",
-      "version": 3,
-      "sha256": "048d863cfcc4bc03a3b63f5262abb30e2e4d2280ee0a127b09c129e598400255"
+      "version": 5,
+      "sha256": "d078eeb238d9b67efa9835c873e5d85889e7d3aa687eab415c8c7c745603217a"
     },
     {
       "name": "wezterm",
-      "version": 2,
-      "sha256": "4bd989bdd2889f98e025bfef370c29cf62a91d282cb09e84cf72ac18bc12e130"
+      "version": 6,
+      "sha256": "c1b77bc9f2dc80fdb6fbbd74bc7174531991a70c5f3b0e7a748008a16700c1c5"
     },
     {
       "name": "wills-and-estate-planning-skill",
-      "version": 4,
-      "sha256": "b6e1acfa54e61ed38acd56d892bcaa7cfd490d3808bf11c99d92decb3d4e7aeb"
+      "version": 6,
+      "sha256": "e64dbda16b4a7456bd8fddaa0f755012472b66cc48e5692f2455100504c8635a"
     },
     {
       "name": "world-class-doctor-mode-for-cli-tools",
-      "version": 7,
-      "sha256": "ebb009e97dd4e8c7ba3e6cadde8653535737385ba20b1c21949114cf9f1555ec"
+      "version": 14,
+      "sha256": "e928fa5b863061508cb225cfb8978550f014f43cd67e036728abb5ad2cd17c83"
     },
     {
       "name": "wrangler",
-      "version": 1,
-      "sha256": "1bbe01d868c7309d234cf2510169641999e8201c616f3aa3c32137f19521f76e"
+      "version": 2,
+      "sha256": "f21d8b859a89605f7a0621f9d64a4632c9d624ac9ebcac6300c9c18cf8713e81"
     },
     {
       "name": "xf",
-      "version": 6,
-      "sha256": "5a5be6d02f05f2a0bd121caf2caedd15ed223fcd208ae5c97db7ac8c0c9e291f"
+      "version": 12,
+      "sha256": "c9c79cec76d89e1a755446784516fb24d86b455ec90981443e6b6e92f795c504"
     }
   ]
 }

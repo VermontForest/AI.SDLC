@@ -151,3 +151,24 @@ Before Vibe Mode can be released:
 2. CI enforcement and generated portal
 3. Public documentation, self-hosting proof, and release
 4. Vibe Mode design and implementation
+
+## 2026-09-29: Current Jeffrey Skills And Method Evidence
+
+The operator requested current local Jeffrey skills, an AI.SDLC usage review,
+and GitHub promotion of the verified repairs. URS-012, FRS-014 and WBS-012
+track this bounded change.
+
+- Refresh the metadata lock from 135 historical entries to 142 verified official
+  packages. Keep premium bodies outside the public repository.
+- Apply the default surface to each unmatched file, then union controls across
+  the change, so adding a documentation file cannot remove code checks.
+- Bind each lifecycle to the selected skill paths, canonical roots and full
+  package content hashes. Body/reference/script changes, package removal, root
+  substitution and old evidence without hashes require reassessment.
+- Preserve explicit method application as an inspectable agent attestation.
+  Package identity does not prove reasoning quality or activate Codex hooks.
+
+The local regression and licensed dependency record is
+`evidence/2026-09-29-skill-enforcement.json`. Promotion uses a review branch and
+the existing required GitHub checks. This change does not publish a new package
+release or claim a product deployment.

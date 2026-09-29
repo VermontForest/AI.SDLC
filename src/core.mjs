@@ -1,7 +1,7 @@
 import { captureProcess } from "./process.mjs";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, readdir, realpath, rename, stat, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -131,8 +131,11 @@ export async function runProtectedRegression(argv = [], options = {}) {
   if (skillAttestation.status === "missing_required_skills") {
     failures.push(`Required Regress JSM skills were not attested as applied: ${skillAttestation.missing_skills.join(", ")}`);
   }
-  const jsmGateFailed = failures.length > 0;
   const bindingBefore = await evidenceBinding(root, files, config);
+  if (latestImpact && JSON.stringify(latestImpact.evidence_binding?.skills) !== JSON.stringify(bindingBefore.skills)) {
+    failures.push("Selected JSM skill packages changed or lack content binding; rerun Assess before Regress.");
+  }
+  const jsmGateFailed = failures.length > 0;
 
   for (const packId of packs) {
     const pack = config.packs?.[packId];
@@ -171,7 +174,7 @@ export async function runProtectedRegression(argv = [], options = {}) {
 
   const pending = unique(pendingExternalProof);
   if (JSON.stringify(bindingBefore) !== JSON.stringify(await evidenceBinding(root, files, config))) {
-    failures.push("Intentional files or configuration changed while protected checks ran; rerun Regress.");
+    failures.push("Intentional files, configuration, or selected JSM skill packages changed while protected checks ran; rerun Assess if skills changed, then Regress.");
   }
   const status = failures.length
     ? "failed"
@@ -227,6 +230,9 @@ export async function finishIteration(argv = [], options = {}) {
   }
   if (changeImpact?.evidence_binding?.config_sha256 !== binding.config_sha256) {
     blockers.push("Assess configuration changed; rerun Assess and Regress.");
+  }
+  if (JSON.stringify(changeImpact?.evidence_binding?.skills) !== JSON.stringify(binding.skills)) {
+    blockers.push("Selected JSM skill packages changed or lack content binding; rerun Assess and Regress.");
   }
   if (!changeImpact?.generated_at || protectedRegression?.assess_generated_at !== changeImpact.generated_at) {
     blockers.push("Regress does not belong to the latest Assess; rerun Regress.");
@@ -400,7 +406,8 @@ export async function verifyCompletion(argv = [], options = {}) {
   if (!sameFileSet(files, impact?.changed_files || []) || !sameFileSet(files, regression?.changed_files || []) || !sameFileSet(files, finish?.mode?.intentionalFiles || [])) failures.push("Evidence does not cover the exact intentional file set.");
   if (impact?.status === "blocked" || regression?.status !== "passed" || finish?.status !== "passed" || !finish?.work_contract_result?.closed) failures.push("Assess, Regress, and Finish must all pass without pending external proof.");
   if (!impact?.generated_at || regression?.assess_generated_at !== impact.generated_at || finish?.assess_generated_at !== impact.generated_at || finish?.regress_generated_at !== regression?.generated_at) failures.push("Evidence stages do not belong to the same current lifecycle.");
-  if (JSON.stringify(binding) !== JSON.stringify(regression?.evidence_binding) || JSON.stringify(binding) !== JSON.stringify(finish?.evidence_binding) || impact?.evidence_binding?.config_sha256 !== binding.config_sha256) failures.push("File contents or configuration changed after verification.");
+  if (JSON.stringify(binding) !== JSON.stringify(regression?.evidence_binding) || JSON.stringify(binding) !== JSON.stringify(finish?.evidence_binding) || impact?.evidence_binding?.config_sha256 !== binding.config_sha256) failures.push("File contents, configuration, or selected JSM skill packages changed after verification.");
+  if (JSON.stringify(impact?.evidence_binding?.skills) !== JSON.stringify(binding.skills)) failures.push("Selected JSM skill packages changed or lack content binding; rerun Assess.");
   if ((regression?.pending_external_proof || []).length || (finish?.work_contract_result?.pending_proof || []).length) failures.push("External proof remains pending.");
   const status = await buildStatus(root, config);
   if (status.workflow.jsm_lifecycle.status !== "complete") failures.push("JSM lifecycle is incomplete.");
@@ -415,7 +422,10 @@ async function evidenceBinding(root, files, config) {
     try { hashes[file] = createHash("sha256").update(await readFile(resolve(root, file))).digest("hex"); }
     catch (error) { if (error.code === "ENOENT") hashes[file] = null; else throw error; }
   }
-  return { config_sha256: createHash("sha256").update(JSON.stringify(config)).digest("hex"), files: hashes };
+  const surfaces = matchSurfaces(files, config);
+  const skills = unique(["Assess", "Regress", "Finish"].flatMap(stage => requiredSkillsForStage(surfaces, stage))).sort();
+  const preflight = await resolveSkillPreflight(skills, root, config);
+  return { config_sha256: createHash("sha256").update(JSON.stringify(config)).digest("hex"), files: hashes, skills: preflight.exact_skill_paths };
 }
 
 export async function statusSummary(argv = [], options = {}) {
@@ -504,6 +514,23 @@ export async function runSelfTest() {
     "npm test",
     "--verifier-required"
   ];
+  const fallbackSkill = { name: "fallback-method", stages: ["Assess", "Regress", "Finish"] };
+  const fallbackSurface = config.surfaces.find(surface => surface.id === config.defaultSurface);
+  // Give fallback routing a distinct real fixture package so omitted methods
+  // cannot be hidden by the shared methods used by the rest of this self-test.
+  await mkdir(join(root, ".skills", fallbackSkill.name), { recursive: true });
+  await writeFile(join(root, ".skills", fallbackSkill.name, "SKILL.md"), "# Routing fixture method\n", "utf8");
+  fallbackSurface.skills = [...lifecycleSkills, fallbackSkill];
+  await writeJson(configPath, config);
+  const mixedArgs = ["--files", "README.md,package.json", ...assessArgs.slice(3), "--applied-skill", "assess-method"];
+  const mixedMissing = await assessChangeImpact(mixedArgs);
+  assert(mixedMissing.exitCode === 1 && mixedMissing.value.skill_attestation.missing_skills.includes(fallbackSkill.name), "A matched doc plus unmatched file must still require the fallback method");
+  const mixedRouted = await assessChangeImpact([...mixedArgs, "--applied-skill", fallbackSkill.name]);
+  assert(mixedRouted.exitCode === 0 && ["docs", "typecheck", "test"].every(pack => mixedRouted.value.required_packs.includes(pack)), "Mixed matched/unmatched files must union specific and fallback protected packs");
+  assert(["assess", "regress", "finish"].every(stage => mixedRouted.value.required_skills_by_stage[stage].includes(fallbackSkill.name)), "Fallback methods must route at every configured stage");
+  fallbackSurface.skills = lifecycleSkills;
+  await writeJson(configPath, config);
+  console.error(JSON.stringify({ suite: "skill-evidence", test: "per-file-fallback", phase: "assert", status: "passed" }));
   const missingAssessJsm = await assessChangeImpact(assessArgs);
   assert(missingAssessJsm.exitCode === 1, "Assess should fail closed without its applied JSM skill");
   assert(missingAssessJsm.value.skill_attestation.status === "missing_required_skills", "Assess should record missing JSM attestation");
@@ -563,6 +590,56 @@ export async function runSelfTest() {
   assert(refreshed.value.workflow.jsm_lifecycle.status === "complete", "status should aggregate the three-stage JSM lifecycle");
   const verified = await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"]);
   assert(verified.exitCode === 0, "Current complete and healthy lifecycle must pass the read-only evidence gate");
+  const skillDir = join(root, ".skills", "assess-method");
+  const skillFile = join(skillDir, "SKILL.md");
+  const originalSkill = await readFile(skillFile, "utf8");
+  await mkdir(join(skillDir, "references"), { recursive: true });
+  await mkdir(join(skillDir, "scripts"), { recursive: true });
+  const referenceFile = join(skillDir, "references", "guide.md");
+  const scriptFile = join(skillDir, "scripts", "check.mjs");
+  await writeFile(referenceFile, "Original fixture reference\n");
+  await writeFile(scriptFile, "export const fixture = true;\n");
+  config.jsm.skillRoots = [".skills-override", ".skills"];
+  await writeJson(configPath, config);
+  const completeFixture = async () => {
+    assert((await assessChangeImpact([...assessArgs, "--applied-skill", "assess-method"])).exitCode === 0, "Reassessment must accept current fixture packages");
+    assert((await runProtectedRegression(["--applied-skill", "regress-method"])).exitCode === 0, "Current fixture packages must allow protected commands");
+    assert((await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"])).exitCode === 0, "Current fixture packages must allow Finish");
+    assert((await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"])).exitCode === 0, "Reassessed and retested packages must pass completion");
+  };
+  const packageChanges = [
+    { name: "skill-body", change: () => writeFile(skillFile, "# Changed fixture method\n"), restore: () => writeFile(skillFile, originalSkill) },
+    { name: "reference", change: () => writeFile(referenceFile, "Changed fixture reference\n"), restore: () => writeFile(referenceFile, "Original fixture reference\n") },
+    { name: "script", change: () => writeFile(scriptFile, "export const fixture = false;\n"), restore: () => writeFile(scriptFile, "export const fixture = true;\n") },
+    { name: "removed-method", change: () => rename(skillFile, `${skillFile}.unavailable`), restore: () => rename(`${skillFile}.unavailable`, skillFile) },
+    { name: "selected-root", change: () => cp(skillDir, join(root, ".skills-override", "assess-method"), { recursive: true }), restore: () => rename(join(root, ".skills-override"), join(root, ".skills-unused")) }
+  ];
+  for (const change of packageChanges) {
+    const started = Date.now();
+    await completeFixture();
+    await change.change();
+    const changedCompletion = await verifyCompletion(["--intentional-files", "src/index.js,docs/guide.md"]);
+    assert(changedCompletion.exitCode === 1 && changedCompletion.value.failures.some(reason => reason.includes("JSM skill packages")), `${change.name}: changed selected packages must invalidate existing completion`);
+    const changedFinish = await finishIteration(["--intentional-files", "src/index.js,docs/guide.md", "--applied-skill", "finish-method", "--skip-git"]);
+    assert(changedFinish.exitCode === 1 && changedFinish.value.blockers.some(reason => reason.includes("JSM skill packages")), `${change.name}: changed packages must block Finish`);
+    const changedRegression = await runProtectedRegression(["--applied-skill", "regress-method"]);
+    assert(changedRegression.exitCode === 1 && changedRegression.value.failures.some(reason => reason.includes("rerun Assess")), `${change.name}: changed packages must require reassessment`);
+    assert(changedRegression.value.checks.filter(check => check.command).every(check => check.status === "skipped_jsm_gate"), `${change.name}: stale package evidence must skip protected commands`);
+    if (change.name === "skill-body") await completeFixture();
+    await change.restore();
+    console.error(JSON.stringify({ suite: "skill-evidence", test: change.name, phase: "assert", status: "passed", elapsed_ms: Date.now() - started }));
+  }
+  config.jsm.skillRoots = [".skills"];
+  await writeJson(configPath, config);
+  await completeFixture();
+  const legacyImpactPath = join(root, artifactPath(config, "changeImpact"));
+  const legacyImpact = JSON.parse(await readFile(legacyImpactPath, "utf8"));
+  delete legacyImpact.evidence_binding.skills;
+  await writeJson(legacyImpactPath, legacyImpact);
+  const legacyRegression = await runProtectedRegression(["--applied-skill", "regress-method"]);
+  assert(legacyRegression.exitCode === 1 && legacyRegression.value.failures.some(reason => reason.includes("lack content binding")), "Assess artifacts without package bindings must require reassessment");
+  console.error(JSON.stringify({ suite: "skill-evidence", test: "legacy-binding", phase: "assert", status: "passed" }));
+  await completeFixture();
   const skipped = await runProtectedRegression(["--applied-skill", "regress-method", "--skip-commands"]);
   assert(skipped.exitCode === 1, "Skipped protected checks must fail closed");
   await runProtectedRegression(["--applied-skill", "regress-method"]);
@@ -711,9 +788,11 @@ function matchSurfaces(files, config) {
       surfaces.push(surface);
     }
   }
-  if (surfaces.length === 0 && config.defaultSurface) {
+  const hasUnmatchedFile = files.some(file => !surfaces.some(surface =>
+    arrayValue(surface.filePatterns).some(pattern => matchesGlob(file, pattern))));
+  if ((surfaces.length === 0 || hasUnmatchedFile) && config.defaultSurface) {
     const fallback = config.surfaces.find((surface) => surface.id === config.defaultSurface);
-    if (fallback) surfaces.push(fallback);
+    if (fallback && !surfaces.includes(fallback)) surfaces.push(fallback);
   }
   return surfaces;
 }
@@ -952,7 +1031,7 @@ async function resolveSkillPreflight(skills, root, config) {
   for (const skill of skills) {
     const candidates = roots.map((root) => join(root, skill, "SKILL.md"));
     const found = candidates.find((candidate) => existsSync(candidate));
-    if (found) exact_skill_paths.push({ skill, path: found });
+    if (found) exact_skill_paths.push({ skill, path: found, package_root: await realpath(dirname(found)), package_sha256: await skillPackageHash(dirname(found)) });
     else missing_skills.push(skill);
   }
   return {
@@ -963,6 +1042,27 @@ async function resolveSkillPreflight(skills, root, config) {
     missing_skills,
     exact_skill_paths
   };
+}
+
+async function skillPackageHash(root) {
+  const entries = [];
+  async function visit(path, name, ancestors = []) {
+    const canonical = await realpath(path);
+    const info = await stat(path);
+    if (info.isDirectory()) {
+      if (ancestors.includes(canonical)) throw new Error(`Cyclic JSM skill package directory: ${path}`);
+      entries.push([name, "directory"]);
+      for (const child of (await readdir(path)).sort()) {
+        await visit(join(path, child), name ? `${name}/${child}` : child, [...ancestors, canonical]);
+      }
+    } else if (info.isFile()) {
+      entries.push([name, "file", createHash("sha256").update(await readFile(path)).digest("hex")]);
+    } else {
+      throw new Error(`Unsupported JSM skill package entry: ${path}`);
+    }
+  }
+  await visit(root, "");
+  return createHash("sha256").update(JSON.stringify(entries)).digest("hex");
 }
 
 function resolveSkillRoot(root, path) {
