@@ -14,6 +14,10 @@
     "resolved_version": "0.3.22"
   },
   "skill_count": 135,
+  "enforcement": "retired",
+  "retired_on": "2026-11-14",
+  "retired_by": "Carl Weiss",
+  "retirement_note": "Historical record only. This lock no longer blocks commits, merges, deploys, or completion.",
   "skills": [
     {
       "name": "ab-testing",

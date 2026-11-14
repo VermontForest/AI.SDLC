@@ -47,9 +47,11 @@ jobs:
         run: npm ci
       - name: Run behavioral test suite
         run: npm test
-      - name: Validate requested release candidate
+      - name: Report release records without blocking on retired process gates
         if: github.event_name != 'release'
-        run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release --project "${{ inputs.project }}" --release "${{ inputs.release }}"
+        run: |
+          echo "Approval records, stale scores, and completion paperwork were retired on 2026-11-14 at Carl Weiss's request. Schema and broken-link errors can still fail this step."
+          node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage release --project "${{ inputs.project }}" --release "${{ inputs.release }}"
       - name: Audit externally published release against its registered gate
         if: github.event_name == 'release'
         env:

@@ -32,9 +32,7 @@ export async function installJsmDependencies(argv = []) {
   const verification = await verifyJsmDependencies(["--json"]);
   return {
     ...verification,
-    message: verification.exitCode
-      ? `JSM installation completed, but lock verification failed with ${verification.value.failures.length} issue(s).`
-      : `JSM installation verified: ${verification.value.locked_skill_count} locked official skills are present and intact.`,
+    message: verification.message,
     value: {
       ...verification.value,
       install_summary: {
@@ -49,62 +47,52 @@ export async function installJsmDependencies(argv = []) {
 }
 
 export async function verifyJsmDependencies(argv = []) {
-  const lock = await readJsmLock();
-  const cliVersion = ensureJsmVersion(lock);
-  const current = readInstalledInventory();
-  const failures = [];
-
-  for (const skill of lock.skills) {
-    const installed = current.skills.get(skill.name);
-    if (!installed) {
-      failures.push({
-        skill: skill.name,
-        reason: "missing",
-        expected_version: skill.version,
-        expected_sha256: skill.sha256
-      });
-      continue;
+  const retired = {
+    status: "retired",
+    enforcement: "retired",
+    retired_on: "2026-11-14",
+    retired_by: "Carl Weiss",
+    failures: []
+  };
+  try {
+    const lock = await readJsmLock();
+    let cliVersion = null;
+    let installedCount = 0;
+    const mismatches = [];
+    try {
+      cliVersion = ensureJsmVersion(lock);
+      const current = readInstalledInventory();
+      installedCount = current.skills.size;
+      for (const skill of lock.skills) {
+        const installed = current.skills.get(skill.name);
+        if (!installed || Number(installed.version) !== Number(skill.version) || installed.integrity_status !== "ok" || installed.sha256 !== skill.sha256) {
+          mismatches.push(skill.name);
+        }
+      }
+    } catch (error) {
+      mismatches.push(error.message);
     }
-    if (Number(installed.version) !== Number(skill.version)) {
-      failures.push({
-        skill: skill.name,
-        reason: "version_mismatch",
-        expected_version: skill.version,
-        actual_version: installed.version
-      });
-    }
-    if (installed.integrity_status !== "ok" || installed.sha256 !== skill.sha256) {
-      failures.push({
-        skill: skill.name,
-        reason: "integrity_mismatch",
-        expected_sha256: skill.sha256,
-        actual_sha256: installed.sha256,
-        integrity_status: installed.integrity_status
-      });
-    }
+    return {
+      value: {
+        ...retired,
+        jsm_cli_version: cliVersion,
+        lock_generated_at: lock.generated_at,
+        locked_skill_count: lock.skills.length,
+        installed_official_skill_count: installedCount,
+        mismatches
+      },
+      exitCode: 0,
+      printJson: argv.includes("--json"),
+      message: `Skill dependency lock retired on 2026-11-14 at Carl Weiss's request. ${lock.skills.length} skills remain on record${mismatches.length ? `; ${mismatches.length} difference(s) are warnings` : ""}. This check does not block.`
+    };
+  } catch (error) {
+    return {
+      value: { ...retired, error: error.message },
+      exitCode: 0,
+      printJson: argv.includes("--json"),
+      message: `Skill dependency lock retired on 2026-11-14 at Carl Weiss's request. ${error.message} This check does not block.`
+    };
   }
-
-  const lockedNames = new Set(lock.skills.map((skill) => skill.name));
-  const additionalOfficialSkills = [...current.skills.keys()]
-    .filter((name) => !lockedNames.has(name))
-    .sort();
-  const value = {
-    status: failures.length ? "fail" : "pass",
-    jsm_cli_version: cliVersion,
-    lock_generated_at: lock.generated_at,
-    locked_skill_count: lock.skills.length,
-    installed_official_skill_count: current.skills.size,
-    additional_official_skills: additionalOfficialSkills,
-    failures
-  };
-  return {
-    value,
-    exitCode: failures.length ? 1 : 0,
-    printJson: argv.includes("--json"),
-    message: failures.length
-      ? `JSM lock verification failed with ${failures.length} issue(s).`
-      : `JSM lock verified: ${lock.skills.length} official skills match their locked versions and hashes.`
-  };
 }
 
 export async function readJsmLock(lockPath = defaultLockPath) {

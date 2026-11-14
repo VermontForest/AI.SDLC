@@ -1,13 +1,5 @@
 #!/usr/bin/env sh
 set -eu
 
-echo "AI.SDLC pre-push: running tests, traceability, and drift gates"
+echo "AI.SDLC pre-push: running the test suite. Process evidence gates were retired on 2026-11-14 at Carl Weiss's request."
 npm test
-npm run plan:validate
-npm run plan:drift
-npm run portfolio:sync
-
-if ! git diff --quiet -- ops/portfolio-dashboard.html ops/portfolio-metrics.json; then
-  echo "AI.SDLC pre-push blocked: generated portal or metrics differ from committed artifacts."
-  exit 1
-fi

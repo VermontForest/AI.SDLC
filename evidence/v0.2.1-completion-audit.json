@@ -56,5 +56,11 @@
     "Lifecycle event automation refuses to fabricate production tests or acceptance evidence.",
     "Projects without recorded work or an explicit measured metric source remain unknown.",
     "Vibe Mode remains planned and unimplemented."
-  ]
+  ],
+  "process_gates": {
+    "status": "retired",
+    "retired_on": "2026-11-14",
+    "retired_by": "Carl Weiss",
+    "note": "Historical record. The process gates described here no longer block commits, merges, or deploys."
+  }
 }

@@ -72,5 +72,11 @@
       "validation (windows-latest, 22)",
       "validation (windows-latest, 24)"
     ]
+  },
+  "process_gates": {
+    "status": "retired",
+    "retired_on": "2026-11-14",
+    "retired_by": "Carl Weiss",
+    "note": "Historical record. The process gates described here no longer block commits, merges, or deploys."
   }
 }

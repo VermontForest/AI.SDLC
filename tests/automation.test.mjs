@@ -5,13 +5,14 @@ import test from "node:test";
 
 const root = resolve(import.meta.dirname, "..");
 
-test("change workflow runs the behavioral, ledger, and generated-portal gates", async () => {
+test("change workflow runs the test suite and does not block on retired process gates", async () => {
   const workflow = await text(".github/workflows/ci.yml");
+  assert.match(workflow, /jobs:\r?\n {2}validate:/);
   assert.match(workflow, /npm test/);
-  assert.match(workflow, /npm run plan:validate/);
-  assert.match(workflow, /npm run portfolio:sync/);
-  assert.match(workflow, /portfolio\.ledger\.json/);
-  assert.match(workflow, /git diff --exit-code -- ops\/portfolio-dashboard\.html ops\/portfolio-metrics\.json/);
+  assert.match(workflow, /retired on 2026-11-14/);
+  assert.doesNotMatch(workflow, /npm run plan:validate/);
+  assert.doesNotMatch(workflow, /git diff --exit-code/);
+  assert.doesNotMatch(workflow, /portfolio\.ledger\.json/);
   assertPinnedActions(workflow);
 });
 
@@ -40,6 +41,8 @@ test("release, post-deploy, and drift workflows enforce distinct transitions", a
   assert.match(drift, /schedule:/);
   assert.match(drift, /npm run plan:drift/);
   assert.match(drift, /npm run portfolio:sync/);
+  assert.match(drift, /retired on 2026-11-14/);
+  assert.doesNotMatch(drift, /git diff --exit-code/);
   assert.match(publish, /uses: \.\/.github\/workflows\/release-gate\.yml/);
   assert.match(publish, /needs: release-gate/);
   assert.match(publish, /^permissions:\r?\n(?:  #.*\r?\n)+  contents: write\r?\n  pull-requests: write/m);
@@ -49,18 +52,17 @@ test("release, post-deploy, and drift workflows enforce distinct transitions", a
   for (const workflow of [release, postDeploy, drift, publish]) assertPinnedActions(workflow, workflow === publish ? 1 : 2);
 });
 
-test("local hooks fail closed on ledger or portal drift", async () => {
+test("local hooks keep tests and do not block on retired process gates", async () => {
   const preCommit = await text(".githooks/pre-commit");
   const prePush = await text(".githooks/pre-push");
-  assert.match(preCommit, /set -eu/);
-  assert.match(preCommit, /npm run plan:validate/);
-  assert.match(preCommit, /npm run portfolio:sync/);
-  assert.match(preCommit, /portfolio\.ledger\.json/);
-  assert.match(preCommit, /git diff --quiet -- ops\/portfolio-dashboard\.html ops\/portfolio-metrics\.json/);
+  assert.match(preCommit, /retired on 2026-11-14/);
+  assert.match(preCommit, /exit 0/);
+  assert.doesNotMatch(preCommit, /npm run plan:validate/);
+  assert.doesNotMatch(preCommit, /git diff --quiet/);
   assert.match(prePush, /set -eu/);
   assert.match(prePush, /npm test/);
-  assert.match(prePush, /npm run plan:drift/);
-  assert.match(prePush, /npm run portfolio:sync/);
+  assert.doesNotMatch(prePush, /npm run plan:drift/);
+  assert.doesNotMatch(prePush, /portfolio:sync/);
 });
 
 test("hosted validation uses supported Node and current action runtimes", async () => {

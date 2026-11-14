@@ -33,5 +33,11 @@
     "Hosted v0.2.3 release tag and asset",
     "Downloaded hosted asset digest match",
     "Merged release-event ledger update"
-  ]
+  ],
+  "process_gates": {
+    "status": "retired",
+    "retired_on": "2026-11-14",
+    "retired_by": "Carl Weiss",
+    "note": "Historical record. The process gates described here no longer block commits, merges, or deploys."
+  }
 }

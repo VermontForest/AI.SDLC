@@ -29,23 +29,25 @@ test("schema violations and broken traceability links fail", async () => {
   assert.ok(report.errors.some((item) => item.code === "bad_link"));
 });
 
-test("required verification types and evidence are enforced", async () => {
+test("required verification types and evidence are reported and do not block", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].work_items[0].tests = ledger.projects[0].work_items[0].tests.filter((item) => item.type !== "production");
+  ledger.projects[0].releases[0].production_test_ids = [];
   let report = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "missing_test_type"));
+  warns(report, "missing_test_type");
 
   const second = await fixture();
   second.ledger.projects[0].work_items[0].tests[0].evidence_ids = [];
   report = await validateLedger(second.ledger, { root: second.root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "missing_evidence"));
+  warns(report, "missing_evidence");
 });
 
 test("completed work cannot hide a pending declared check behind another passed check of the same type", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].work_items[0].tests.push({ id: "TST-003", type: "production", status: "planned", evidence_ids: [] });
   const report = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "test_not_passed" && item.message.includes("TST-003")));
+  warns(report, "test_not_passed");
+  assert.ok(report.visible_debt.some((item) => item.code === "test_not_passed" && item.message.includes("TST-003")));
 
   ledger.projects[0].work_items[0].status = "active";
   const metrics = computePortfolioMetrics(ledger, NOW);
@@ -66,7 +68,7 @@ test("undeclared required verification remains in active-work metric denominator
   assert.deepEqual(metric.pending_checks, ["required production verification (not declared)"]);
 });
 
-test("a failed task blocks itself but not an unrelated scoped task", async () => {
+test("a failed task is reported and does not block an unrelated task", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].status = "active";
   ledger.projects[0].work_items.push({
@@ -87,55 +89,55 @@ test("a failed task blocks itself but not an unrelated scoped task", async () =>
   const scoped = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-001", now: NOW });
   assert.equal(scoped.ok, true, scoped.errors.map((item) => item.message).join("; "));
   const failed = await validateLedger(ledger, { root, stage: "change", projectId: "demo", workItemId: "WBS-002", now: NOW });
-  assert.ok(failed.errors.some((item) => item.code === "task_failed"));
+  warns(failed, "task_failed");
 });
 
-test("release gate rejects missing approval and an unready rollback", async () => {
+test("release check warns about a missing approval and an unready rollback", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].approvals[0].status = "pending";
   ledger.projects[0].approvals[0].decided_at = undefined;
   ledger.projects[0].releases[0].rollback.status = "planned";
   const report = await validateLedger(ledger, { root, stage: "release", projectId: "demo", releaseId: "REL-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "approval_missing"));
-  assert.ok(report.errors.some((item) => item.code === "rollback_not_ready"));
+  warns(report, "approval_missing");
+  warns(report, "rollback_not_ready");
 });
 
-test("content claims reject delivery-only artifacts and absent comparisons", async () => {
+test("content claims warn about delivery-only artifacts and absent comparisons", async () => {
   const first = await fixture();
   first.ledger.projects[0].artifacts[1].revision_type = "delivery";
   let report = await validateLedger(first.ledger, { root: first.root, stage: "release", projectId: "demo", releaseId: "REL-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "false_content_claim"));
+  warns(report, "false_content_claim");
 
   const second = await fixture();
   second.ledger.projects[0].artifacts[1].comparison_evidence_ids = [];
   report = await validateLedger(second.ledger, { root: second.root, stage: "release", projectId: "demo", releaseId: "REL-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "missing_outcome_evidence"));
+  warns(report, "missing_outcome_evidence");
 });
 
-test("release gate detects wrong artifact identity", async () => {
+test("release check warns about a wrong artifact identity", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].artifacts[1].sha256 = "0".repeat(64);
   const report = await validateLedger(ledger, { root, stage: "release", projectId: "demo", releaseId: "REL-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "artifact_mismatch"));
+  warns(report, "artifact_mismatch");
 });
 
-test("post-deploy gate requires real deployment and production proof", async () => {
+test("post-deploy check warns about a missing deployment and production proof", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].releases[0].deployment.status = "not_started";
   ledger.projects[0].releases[0].deployment.deployed_at = undefined;
   ledger.projects[0].releases[0].production_test_ids = [];
   const report = await validateLedger(ledger, { root, stage: "post-deploy", projectId: "demo", releaseId: "REL-001", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "deployment_missing"));
-  assert.ok(report.errors.some((item) => item.code === "production_proof_missing"));
+  warns(report, "deployment_missing");
+  warns(report, "production_proof_missing");
 });
 
-test("drift gate rejects stale project and metric state", async () => {
+test("drift check warns about stale project and metric state", async () => {
   const { ledger, root } = await fixture();
   ledger.projects[0].updated_at = "2026-01-01T00:00:00.000Z";
   ledger.projects[0].metrics.leq.measured_at = "2026-01-01T00:00:00.000Z";
   const report = await validateLedger(ledger, { root, stage: "drift", projectId: "demo", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "stale_project"));
-  assert.ok(report.errors.some((item) => item.code === "stale_metric"));
+  warns(report, "stale_project");
+  warns(report, "stale_metric");
 });
 
 test("portal is generated from the validated ledger", async () => {
@@ -257,7 +259,9 @@ test("missing, stale, and dependent metric inputs never become invented scores",
   project.metrics.leq = { status: "awaiting_inputs", definition: "Current LEQ.", scope: "Demo Project", missing_inputs: ["verification evidence"], next_action: "Run verification.", owner: "Demo owner" };
   project.metrics.joulework = { status: "awaiting_inputs", definition: "Current JouleWork.", scope: "Demo Project", missing_inputs: ["completed outcome evidence"], next_action: "Record outcome evidence.", owner: "Demo owner" };
   const report = await validateLedger(completed.ledger, { root: completed.root, stage: "change", now: NOW });
-  assert.ok(report.errors.some((item) => item.code === "metric_awaiting_inputs"));
+  assert.equal(report.ok, true, report.errors.map((item) => item.message).join("; "));
+  assert.ok(report.visible_debt.some((item) => item.code === "metric_awaiting_inputs"));
+  assert.equal(report.errors.some((item) => item.code === "metric_awaiting_inputs"), false);
 });
 
 test("release metrics are scoped to registered release work instead of unrelated active work", async () => {
@@ -330,7 +334,7 @@ test("portfolio sync writes deterministic board and metrics from one ledger", as
   assert.equal(metrics.projects[0].work_items[0].leq.score, 100);
 });
 
-test("release and deployment events update the ledger only after their gates pass", async () => {
+test("release and deployment events record while retired process checks stay warnings", async () => {
   const released = await fixture();
   await writeFile(join(released.root, "portfolio.json"), `${JSON.stringify(released.ledger, null, 2)}\n`, "utf8");
   let result = await recordLifecycleEvent([
@@ -361,23 +365,31 @@ test("release and deployment events update the ledger only after their gates pas
   assert.equal(saved.projects[0].releases[0].status, "production_proven");
   assert.equal(saved.projects[0].releases[0].deployment.evidence_id, "EV-DEPLOYMENT-demo-production");
 
-  const rejected = await fixture();
-  rejected.ledger.projects[0].work_items[0].tests[1].status = "planned";
-  rejected.ledger.projects[0].work_items[0].tests[1].evidence_ids = [];
-  rejected.ledger.projects[0].releases[0].production_test_ids = [];
-  const original = `${JSON.stringify(rejected.ledger, null, 2)}\n`;
-  await writeFile(join(rejected.root, "portfolio.json"), original, "utf8");
+  const warned = await fixture();
+  warned.ledger.projects[0].work_items[0].tests[1].status = "planned";
+  warned.ledger.projects[0].work_items[0].tests[1].evidence_ids = [];
+  warned.ledger.projects[0].releases[0].production_test_ids = [];
+  const preview = await validateLedger(warned.ledger, { root: warned.root, stage: "post-deploy", projectId: "demo", releaseId: "REL-001", now: NOW });
+  warns(preview, "production_proof_missing");
+  await writeFile(join(warned.root, "portfolio.json"), `${JSON.stringify(warned.ledger, null, 2)}\n`, "utf8");
   result = await recordLifecycleEvent([
     "--ledger", "portfolio.json",
     "--event", "deployment",
     "--ref", "demo-production",
-    "--run-url", "https://example.invalid/runs/rejected",
+    "--run-url", "https://example.invalid/runs/warned",
     "--output", "dashboard.html",
     "--metrics-output", "metrics.json"
-  ], { root: rejected.root, now: NOW });
-  assert.equal(result.exitCode, 1);
-  assert.equal(await readFile(join(rejected.root, "portfolio.json"), "utf8"), original);
+  ], { root: warned.root, now: NOW });
+  assert.equal(result.exitCode, 0);
+  saved = JSON.parse(await readFile(join(warned.root, "portfolio.json"), "utf8"));
+  assert.equal(saved.projects[0].releases[0].status, "production_proven");
 });
+
+function warns(report, code) {
+  assert.equal(report.ok, true, report.errors.map((item) => item.message).join("; "));
+  assert.ok(report.visible_debt.some((item) => item.code === code), `expected warning ${code}`);
+  assert.equal(report.errors.some((item) => item.code === code), false);
+}
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "ai-sdlc-portfolio-"));

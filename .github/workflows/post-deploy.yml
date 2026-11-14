@@ -49,9 +49,11 @@ jobs:
         run: npm ci
       - name: Run behavioral test suite
         run: npm test
-      - name: Validate requested production proof
+      - name: Report production records without blocking on retired process gates
         if: github.event_name != 'deployment_status'
-        run: node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy --project "${{ inputs.project }}" --release "${{ inputs.release }}"
+        run: |
+          echo "Production-proof paperwork was retired as a blocking gate on 2026-11-14 at Carl Weiss's request. Schema and broken-link errors can still fail this step."
+          node src/cli.mjs plan:validate --ledger portfolio.ledger.json --stage post-deploy --project "${{ inputs.project }}" --release "${{ inputs.release }}"
       - name: Record successful deployment only after production proof passes
         if: github.event_name == 'deployment_status'
         env:
