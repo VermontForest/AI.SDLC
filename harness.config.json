@@ -65,38 +65,7 @@
       "packs": [
         "validation"
       ],
-      "skills": [
-        {
-          "name": "planning-workflow",
-          "stages": [
-            "Assess"
-          ]
-        },
-        {
-          "name": "readme-writing",
-          "stages": [
-            "Assess"
-          ]
-        },
-        {
-          "name": "testing-real-service-e2e-no-mocks",
-          "stages": [
-            "Regress"
-          ]
-        },
-        {
-          "name": "reality-check-for-project",
-          "stages": [
-            "Finish"
-          ]
-        },
-        {
-          "name": "codebase-report",
-          "stages": [
-            "Finish"
-          ]
-        }
-      ]
+      "skills": []
     }
   ],
   "packs": {
