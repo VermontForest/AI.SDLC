@@ -35,7 +35,7 @@ assert(config.surfaces.some(surface => surface.filePatterns.includes("**")), "Re
 const skillLock = await json("jsm/official-skills.lock.json");
 const names = new Set(skillLock.skills.map(skill => skill.name));
 for (const surface of config.surfaces) {
-  for (const stage of ["Assess", "Regress", "Finish"]) assert(surface.skills.some(skill => skill.stages.includes(stage)), `${surface.id} missing ${stage}`);
+  assert(Array.isArray(surface.skills), `${surface.id} must declare its method list, including an explicitly empty list`);
   for (const skill of surface.skills) assert(names.has(skill.name), `Unpinned method: ${skill.name}`);
   for (const pack of surface.packs) assert.deepEqual(config.packs[pack].commands, ["npm test"]);
 }

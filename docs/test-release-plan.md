@@ -45,3 +45,7 @@ This repository has no product deployment step. Publishing a package or changing
 access permissions is outside the spelling migration. Existing consumers must
 update command names and package references to ai-sdlc and regenerate/review
 their project instructions; no misspelled aliases remain.
+
+## November 14 routing decision
+
+See [the approved five-method routing change](approved-routing-change-20261114.md). SDLC-2 permits explicit empty default method lists; configured methods remain enforced. Dependency-lock and all non-method controls remain unchanged.

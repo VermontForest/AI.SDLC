@@ -66,26 +66,7 @@
         "typecheck",
         "test"
       ],
-      "skills": [
-        {
-          "name": "planning-workflow",
-          "stages": [
-            "Assess"
-          ]
-        },
-        {
-          "name": "testing-real-service-e2e-no-mocks",
-          "stages": [
-            "Regress"
-          ]
-        },
-        {
-          "name": "reality-check-for-project",
-          "stages": [
-            "Finish"
-          ]
-        }
-      ]
+      "skills": []
     },
     {
       "id": "docs",
@@ -101,20 +82,7 @@
       "packs": [
         "docs"
       ],
-      "skills": [
-        {
-          "name": "readme-writing",
-          "stages": [
-            "Assess"
-          ]
-        },
-        {
-          "name": "codebase-report",
-          "stages": [
-            "Finish"
-          ]
-        }
-      ]
+      "skills": []
     },
     {
       "id": "frontend",
@@ -146,12 +114,6 @@
           "name": "screenshot",
           "stages": [
             "Regress"
-          ]
-        },
-        {
-          "name": "reality-check-for-project",
-          "stages": [
-            "Finish"
           ]
         }
       ]
