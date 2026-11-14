@@ -1,15 +1,12 @@
 # Minimal AI.SDLC Example
 
-Last updated: 2026-07-07
+Last updated: 2026-11-14
 
-From the example project root:
+Carl Weiss retired the process gates on 2026-11-14. The commands below are
+optional notes. A missing skill or a stale score does not stop them. The check
+that still matters is the project's test command.
 
 ```bash
-ai-sdlc skills:verify
 ai-sdlc init
-npm run assess:change-impact -- --files README.md --applied-skill readme-writing --active-deliverable "Try the harness" --why "Prove routing" --target-surface docs --lane docs --boundary "No deployment" --proof "npm run docs:verify"
-npm run regress:protected -- --files README.md
-npm run finish:iteration -- --intentional-files README.md --applied-skill codebase-report --skip-git
-npm run manage:refresh
-ai-sdlc verify-completion --intentional-files README.md
+npm test
 ```

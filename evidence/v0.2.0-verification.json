@@ -47,5 +47,11 @@
     "change_gate_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628928",
     "cross_platform_url": "https://github.com/VermontForest/AI.SDLC/actions/runs/35212628920",
     "result": "The hosted change gate passed. The existing validation matrix also passed on Ubuntu and Windows with Node.js 20 and 24."
+  },
+  "process_gates": {
+    "status": "retired",
+    "retired_on": "2026-11-14",
+    "retired_by": "Carl Weiss",
+    "note": "Historical record. The process gates described here no longer block commits, merges, or deploys."
   }
 }

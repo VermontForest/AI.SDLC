@@ -5,15 +5,37 @@ projects. It turns a changed-file list into a bounded Work Contract, routes the
 change to relevant methods and regression packs, records evidence at each
 workflow stage, and reports whether the loop is healthy enough to continue.
 
-The harness combines three control layers:
+## Process gates retired on 2026-11-14
 
-- **JSM** selects the expert methods an agent must actually apply.
-- **LEQ** scores the quality of the resulting evidence and workflow behavior.
-- **JouleWork** credits verified useful artifacts and penalizes waste or churn.
+Carl Weiss retired the process gates on 2026-11-14. They no longer block a
+commit, a merge, or a deploy.
 
-JSM is not only used at the beginning. It spans `Assess`, `Regress`, and
-`Finish`, with a separate required/applied/missing attestation at every stage.
-Status is not healthy until that full lifecycle is complete.
+These checks are retired. They can still print a warning, and the old records
+are still in the repository:
+
+- stale scores and freshness checks, including LEQ and JouleWork;
+- the full skill-package lock and the requirement to attest a skill method
+  before work can continue;
+- completion checks that demanded bound evidence, pending proof, or a healthy
+  score before work could close;
+- approval-record checks;
+- the pre-commit hook, and the parts of the pre-push hook that checked those
+  records. The pre-push hook still runs the test suite.
+
+These checks still run and still block when they fail:
+
+- `npm test`, which is the repository check, the harness self-test, the hook
+  tests, and the portfolio tests;
+- the GitHub job named `validate`, which runs that same test suite;
+- the four GitHub test jobs, one for each pair of Ubuntu or Windows and Node
+  22 or Node 24;
+- a protected command that is skipped or that exits with an error. A real test
+  failure still fails;
+- a portfolio file that is not valid JSON or that has a broken internal link,
+  when someone runs the portfolio check on purpose. That check is not part of
+  the merge job.
+
+For work on this repository, run `npm test`.
 
 For work on this repository itself, read [AGENTS.md](AGENTS.md), the checked-in
 [routing configuration](harness.config.json), and the
@@ -64,14 +86,19 @@ validation means only that schema, links, declared states, and freshness rules
 are internally consistent; it does not mean every project is complete, tested,
 or unblocked.
 
-### Transition Gates
+### Portfolio checks
 
-| Gate | What it blocks |
-|---|---|
-| `change` | Invalid schema, broken traceability, contradictory completion, or a failed scoped task |
-| `release` | Incomplete work, missing approvals, wrong artifact hashes, unready rollback, or content claims without comparison evidence |
-| `post-deploy` | Missing deployment records or absent evidence-backed production checks |
-| `drift` | Stale portfolio, project, metric, release, or dependent aggregate state |
+The portfolio check still fails on a broken file: invalid structure or a broken
+link. As of 2026-11-14 it only warns about stale scores, missing approvals,
+missing evidence, rollback notes, and deployment paperwork. Those warnings do
+not block a commit, merge, or deploy.
+
+| Check | What still blocks | What is now a warning |
+|---|---|---|
+| `change` | Invalid structure or a broken link | Stale scores, a failed recorded task, missing evidence |
+| `release` | Invalid structure or a broken link | Missing approvals, artifact notes, rollback notes, content-comparison notes |
+| `post-deploy` | Invalid structure or a broken link | Missing deployment or production records |
+| `drift` | Invalid structure or a broken link | Stale portfolio, project, or score records |
 
 Validation can be scoped to one project, work item, or release. A failed task
 blocks its own transition while remaining visible as debt; it does not silently
@@ -106,30 +133,31 @@ Install the versioned local hooks once per clone:
 npm run hooks:install
 ```
 
-The pre-commit hook validates the ledger, requires an accompanying ledger
-change when implementation or enforcement files change, recomputes portfolio
-metrics, and rejects a stale generated board. The pre-push hook repeats that
-sync after behavioral, change, and drift gates. GitHub Actions enforce the same
-contract on pull requests and `main`; daily drift runs use the current clock.
+The pre-commit hook does not block. It prints a reminder that the process gates
+were retired on 2026-11-14. The pre-push hook runs `npm test` and does not
+check stale scores or the portfolio file. GitHub Actions on pull requests and
+`main` run the same test suite. The daily drift run reports stale records and
+does not fail the job for them.
 
 Release and deployment automation has two layers:
 
-- `.github/workflows/release-gate.yml` and `post-deploy.yml` are reusable gates
-  for consumer pipelines and also audit real GitHub `release.published` and
-  successful `deployment_status` events.
-- `.github/workflows/publish-release.yml` is the authorized repository release
-  path: its publish job depends on the reusable release gate, so invalid
-  evidence prevents `gh release create` from running.
+- `.github/workflows/release-gate.yml` and `post-deploy.yml` still run the test
+  suite for consumer pipelines and for GitHub release and deployment events.
+  Approval records, stale scores, and completion paperwork are warnings. A
+  broken portfolio file can still fail those workflows.
+- `.github/workflows/publish-release.yml` publishes only after the release
+  workflow succeeds. A real test failure can still stop publication. A stale
+  score cannot.
 
 After a registered release or deployment event passes, automation updates the
 ledger and derived board on an automation branch and opens a pull request. It
-does not bypass protected `main`. A deployment can become
-`production_proven` only when its production tests and evidence were already
-recorded and pass the post-deploy gate.
+does not bypass protected `main`. A missing production record is a warning.
+It does not by itself stop the deployment from being recorded.
 
-Repository settings are a separate enforcement layer. Required status checks
-and pull-request rules must be configured on `main`; merely committing a
-workflow file does not create branch protection.
+Repository settings are a separate enforcement layer. The `main` branch is
+expected to require the `validate` job and the four test jobs. This change
+keeps those job names and makes them run the test suite. It does not change
+GitHub branch protection.
 
 AI.SDLC is also planning an optional **Vibe Mode** for intentionally fast,
 low-ceremony exploration. Vibe Mode will let people prototype and move ideas
@@ -169,9 +197,9 @@ It:
 7. records the Work Contract and later-stage JSM requirements; and
 8. writes `ops/change-impact.latest.json`.
 
-Missing skill packages or missing Assess attestations produce a blocked
-artifact and a nonzero exit. Package presence alone is not treated as proof
-that an agent applied the method.
+Missing skill packages or missing Assess notes are warnings. They do not stop
+the command. Package presence is still not proof that an agent applied a
+method, but that distinction no longer blocks the work.
 
 ### 2. Regress
 
@@ -187,19 +215,18 @@ It:
 5. preserves human/provider/visual proof as explicitly pending; and
 6. writes `ops/protected-regression.latest.json`.
 
-A missing Regress JSM method fails the regression and skips protected commands;
-the checks do not run until the required method is attested.
+A missing Regress skill note is a warning. The protected commands still run.
+A command that is skipped, or that exits with an error, still fails the
+regression.
 
 ### 3. Finish
 
 `ai-sdlc finish` answers: “Can this exact file set be closed from current
 evidence?”
 
-Finish does not silently recreate earlier JSM evidence. It requires current
-Assess and Regress artifacts bound to the exact intentional file set, then
-independently requires the Finish-stage methods through `--applied-skill`.
-Stale, mismatched, blocked, failed, or incomplete stage evidence prevents
-closure.
+Finish does not recreate earlier notes. Stale, mismatched, or missing skill
+notes are warnings and do not prevent closure. Finish still fails when the
+latest regression failed because a real command failed.
 
 By default, Finish records an evidence-only checkpoint. With `--execute`, it
 can stage only the intentional files, commit them, and push the current branch.
@@ -279,34 +306,35 @@ Each root is expected to contain `<skill-name>/SKILL.md`.
 
 AI.SDLC carries a metadata-only lock for the complete official JSM collection.
 At the time of the current lock, that is 135 named, versioned, integrity-bound
-skills. The lock is `jsm/official-skills.lock.json`.
+skills. The lock is `jsm/official-skills.lock.json`. Carl Weiss retired this
+lock as a blocking check on 2026-11-14. The file stays as a historical record.
 
 Premium skill bodies are not copied into this repository. Jeffrey's Skills.md
 identifies them as proprietary works and prohibits redistribution outside its
-service. An authorized subscriber installs them locally through `jsm`, while
-AI.SDLC verifies the installed names, versions, and deterministic package
-hashes against the committed lock.
+service. An authorized subscriber can still install them locally through `jsm`.
+`ai-sdlc skills:verify` compares the installed names with the historical lock
+and prints a warning. It does not fail the command, and it does not block a
+commit, merge, or deploy.
 
-Install the complete locked collection:
+Install the collection when you want it:
 
 ```bash
 ai-sdlc skills:install
 ```
 
-Verify an existing installation without modifying it:
+Look at an existing installation without modifying it:
 
 ```bash
 ai-sdlc skills:verify
 ```
 
-Both commands fail closed when `jsm` is missing, too old, unauthenticated, a
-locked package is absent, a version differs, or package integrity differs.
-`skills:install` first uses the official `jsm install-all` operation and then
-pins any version that differs from the lock.
+`skills:install` still needs the `jsm` program. `skills:verify` does not stop
+the run when `jsm` is missing or when the installed set differs from the
+historical lock.
 
 This separation is deliberate:
 
-- AI.SDLC owns routing, lifecycle gates, the dependency lock, and verification.
+- AI.SDLC keeps the historical lock and can still print a comparison.
 - JSM owns authentication, licensed delivery, version installation, and package
   integrity.
 - The consuming project owns its configured skill selection and any

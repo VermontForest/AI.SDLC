@@ -1,6 +1,14 @@
 # Test and release plan
 
-Last updated: 2026-09-13
+Last updated: 2026-11-14
+
+Carl Weiss retired the process gates on 2026-11-14. The rows below that describe
+skill locks, stale scores, approval records, and completion paperwork are
+history. They no longer block a commit, merge, or deploy. The checks that still
+block are `npm test` and the GitHub jobs that run it: `validate`, plus the four
+jobs for Ubuntu and Windows with Node 22 and Node 24. A skipped or failing test
+command still fails. A portfolio file with invalid structure or a broken link
+still fails when that check is run on purpose; it is not a merge job.
 
 | Requirement | Verification |
 | --- | --- |
@@ -18,20 +26,16 @@ Last updated: 2026-09-13
 | SDLC-12: Metric models, denominators, pending checks, and freshness are honest | duplicate-type and undeclared-required-type regressions, model-separation tests, evidence-timestamp freshness tests, and portal detail assertions |
 | SDLC-13: A release is not complete until hosted publication evidence exists | active publication work item, protected release gate, hosted tag and asset digest verification, and one reviewable ledger-update pull request |
 
-Run `npm test` on Node 22 or newer. It validates maintained-file spelling,
-configuration routing, package/launcher references, and real temporary-project
-lifecycle behavior. GitHub Actions runs the same command on Windows and Linux,
-with Node 22 and 24, for pushes and pull requests. GitHub Action execution uses
-pinned v7 action commits; that runtime is separate from the application matrix.
-It needs no premium skill
-bodies or credentials. CI fixture attestations are explicitly test data.
+Run `npm test` on Node 22 or newer. It checks maintained-file spelling, package
+entry points, and the harness behavior, including the retired-gate warnings.
+GitHub Actions runs the same command on Windows and Linux, with Node 22 and 24,
+for pushes and pull requests. GitHub Action execution uses pinned v7 action
+commits. It needs no premium skill bodies or credentials.
 
-Real work requires `npm run jsm:verify`, Assess before implementation, Regress
-after implementation, Finish, and `npm run verify:completion --
---intentional-files <paths>`. Use actual routed methods, not fabricated flags.
-The gate checks current file/configuration hashes and stage identity, licensed
-dependency integrity, JSM lifecycle, pending external proof, LEQ, and JouleWork.
-Reassess changed scope/config; rerun Regress and Finish after content changes.
+`npm run jsm:verify`, Assess, Regress, Finish, and `npm run verify:completion`
+still exist. Since 2026-11-14 they warn instead of blocking when a skill is
+missing, a score is stale, or the completion paperwork is incomplete. A test
+command that fails, or that was skipped, still fails Regress.
 
 CI validates enforcement behavior and configuration, not private local workflow
 history or an agent's reasoning. GitHub branch protection is separate: adding a

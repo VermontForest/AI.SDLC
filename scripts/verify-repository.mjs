@@ -33,10 +33,11 @@ assert.equal(pkg.scripts["verify:completion"], "node src/cli.mjs verify-completi
 const config = await json("harness.config.json");
 assert(config.surfaces.some(surface => surface.filePatterns.includes("**")), "Repository routing must cover new and hidden files too");
 const skillLock = await json("jsm/official-skills.lock.json");
-const names = new Set(skillLock.skills.map(skill => skill.name));
+assert.equal(skillLock.enforcement, "retired", "Historical skill lock must stay marked retired");
+assert.equal(skillLock.retired_on, "2026-11-14");
+assert.equal(skillLock.skill_count, skillLock.skills.length);
 for (const surface of config.surfaces) {
-  for (const stage of ["Assess", "Regress", "Finish"]) assert(surface.skills.some(skill => skill.stages.includes(stage)), `${surface.id} missing ${stage}`);
-  for (const skill of surface.skills) assert(names.has(skill.name), `Unpinned method: ${skill.name}`);
+  assert(Array.isArray(surface.skills), `${surface.id} must declare its method list, including an explicitly empty list`);
   for (const pack of surface.packs) assert.deepEqual(config.packs[pack].commands, ["npm test"]);
 }
 for (const path of ["AGENTS.md", "templates/AGENTS.sdlc.snippet.md", "docs/management-sop.md", "templates/docs/management-sop.md"]) {
@@ -45,4 +46,4 @@ for (const path of ["AGENTS.md", "templates/AGENTS.sdlc.snippet.md", "docs/manag
   assert(/alternatives/i.test(body) && /authentication/i.test(body), `${path} missing escalation boundary`);
 }
 for (const command of ["assess", "regress", "finish", "verify-completion"]) assert((await read("src/cli.mjs")).includes(`case "${command}"`));
-console.log(`Repository contract passed (${paths.length} maintained files; ${skillLock.skill_count} locked methods).`);
+console.log(`Repository contract passed (${paths.length} maintained files; ${skillLock.skill_count} historical skill records, lock retired).`);

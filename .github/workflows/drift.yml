@@ -24,7 +24,7 @@ jobs:
         run: npm ci
       - name: Recompute human board and portfolio metrics
         run: npm run portfolio:sync
-      - name: Reject stale generated board or metrics
-        run: git diff --exit-code -- ops/portfolio-dashboard.html ops/portfolio-metrics.json
-      - name: Fail on stale plans, projects, or measured metrics
-        run: npm run plan:drift
+      - name: Report stale plans without blocking
+        run: |
+          echo "Process gates retired on 2026-11-14 at Carl Weiss's request. Stale scores are warnings."
+          npm run plan:drift

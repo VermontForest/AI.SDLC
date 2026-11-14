@@ -6,6 +6,13 @@ This is the public roadmap and implementation plan for AI.SDLC itself. It
 records approved product direction before implementation so repository changes,
 tests, evidence, and releases can be traced back to an explicit plan.
 
+## Process gates retired on 2026-11-14
+
+Carl Weiss retired the blocking process gates on 2026-11-14. Stale scores,
+skill locks, approval records, and completion paperwork no longer stop a merge
+or a deploy. The test jobs remain. The sections below are the historical plan;
+where they say a gate blocks a merge, that instruction is retired.
+
 ## Current Priority: Executable Traceability And CI Enforcement
 
 **Implementation status:** v0.2.0 was publicly verified and merged. v0.2.1 added

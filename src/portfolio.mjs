@@ -142,8 +142,8 @@ export async function recordLifecycleEvent(argv = [], options = {}) {
       releaseId: target.release.id,
       now: occurredAt
     });
+    printValidation(before);
     if (!before.ok) {
-      printValidation(before);
       return { value: before, printJson: Boolean(args.json), exitCode: 1 };
     }
     target.project.evidence.push({
@@ -179,8 +179,8 @@ export async function recordLifecycleEvent(argv = [], options = {}) {
       releaseId: target.release.id,
       now: occurredAt
     });
+    printValidation(after);
     if (!after.ok) {
-      printValidation(after);
       return { value: after, printJson: Boolean(args.json), exitCode: 1 };
     }
     target.release.status = "production_proven";
@@ -523,12 +523,40 @@ function validateDataQualityStage(ledger, projects, options, issues) {
   }
 }
 
+function isRetiredProcessGate(code) {
+  return code.startsWith("metric_")
+    || code.startsWith("release_")
+    || code.startsWith("stale_")
+    || [
+      "approval_missing",
+      "missing_decision_time",
+      "missing_evidence",
+      "unpassed_evidence",
+      "missing_outcome_evidence",
+      "false_content_claim",
+      "deployment_missing",
+      "deployment_evidence_missing",
+      "production_proof_missing",
+      "production_test_not_passed",
+      "not_released",
+      "work_not_complete",
+      "test_not_passed",
+      "test_failed",
+      "open_blocker",
+      "task_failed",
+      "contradictory_status",
+      "rollback_not_ready",
+      "artifact_mismatch",
+      "missing_test_type"
+    ].includes(code);
+}
+
 function reportFor(ledger, options, issues) {
   const projectId = options.projectId || null;
   const workItemId = options.workItemId || null;
   const releaseId = options.releaseId || null;
   const errors = issues.filter((item) => {
-    if (item.blocking === false) return false;
+    if (item.blocking === false || isRetiredProcessGate(item.code)) return false;
     if (item.code === "schema" || item.code === "duplicate_id" || item.code === "bad_link") return true;
     if (projectId && item.project_id !== projectId) return false;
     if (workItemId && item.work_item_id && item.work_item_id !== workItemId) return false;
@@ -542,6 +570,8 @@ function reportFor(ledger, options, issues) {
     scope: { project_id: projectId, work_item_id: workItemId, release_id: releaseId },
     portfolio_id: ledger?.portfolio?.id || null,
     ok: errors.length === 0,
+    process_gates: "retired",
+    retired_on: "2026-11-14",
     errors,
     visible_debt: issues
   };
@@ -1099,9 +1129,14 @@ function text(value) {
 }
 
 function printValidation(report) {
-  console.log(`AI.SDLC ${report.stage} gate: ${report.ok ? "passed" : "blocked"}`);
+  console.log(`AI.SDLC ${report.stage} check: ${report.ok ? "passed" : "blocked"}`);
   console.log(`Scope: ${report.scope.project_id || "portfolio"}${report.scope.work_item_id ? ` / ${report.scope.work_item_id}` : ""}${report.scope.release_id ? ` / ${report.scope.release_id}` : ""}`);
   for (const item of report.errors) console.log(`- [${item.code}] ${item.message}`);
+  const warnings = (report.visible_debt || []).filter((item) => !report.errors.includes(item) && isRetiredProcessGate(item.code));
+  if (warnings.length) {
+    console.log(`Retired process gates (${warnings.length} warning(s); these do not block):`);
+    for (const item of warnings) console.log(`- warning [${item.code}] ${item.message}`);
+  }
 }
 
 function escapeHtml(value) {

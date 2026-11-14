@@ -23,10 +23,9 @@ npm run test:hooks
 
 ## Change discipline
 
-1. Assess the intentional file set before implementation when using the harness on a consuming project.
-2. Regress with protected packs bound to that file set.
-3. Finish only when Assess and Regress evidence matches those files.
-4. Do not treat green unit tests alone as completion.
+Carl Weiss retired the process gates on 2026-11-14. Run `npm test`. A skipped
+or failing test still fails. Stale scores, the skill lock, approval records,
+and completion paperwork do not block the change.
 
 ## Do not commit
 

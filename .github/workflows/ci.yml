@@ -30,22 +30,5 @@ jobs:
         run: npm ci
       - name: Run behavioral test suite
         run: npm test
-      - name: Validate change traceability
-        run: npm run plan:validate
-      - name: Require ledger updates for implementation and enforcement changes
-        if: github.event_name == 'pull_request'
-        shell: bash
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
-          if printf '%s\n' "$changed" | grep -Eq '^(src/|schemas/|\.github/workflows/|\.githooks/|package(-lock)?\.json$)' \
-            && ! printf '%s\n' "$changed" | grep -qx 'portfolio.ledger.json'; then
-            echo "Implementation or enforcement changed without portfolio.ledger.json."
-            exit 1
-          fi
-      - name: Recompute human board and portfolio metrics
-        run: npm run portfolio:sync
-      - name: Reject stale generated board or metrics
-        run: git diff --exit-code -- ops/portfolio-dashboard.html ops/portfolio-metrics.json
+      - name: Note retired process gates
+        run: echo "Process gates retired on 2026-11-14 at Carl Weiss's request. This job runs the test suite only. Stale LEQ and JouleWork scores, the skill lock, approval records, and completion paperwork do not block the merge."

@@ -1,8 +1,8 @@
 # Management SOP
 
-Last updated: 2026-07-07
+Last updated: 2026-11-14
 
-## Loop Contract
+## What still has to pass
 
 Carl is not the assistant's assistant. Agents discover tools and connectors,
 read documentation, investigate permitted alternatives, and execute authorized
@@ -12,66 +12,19 @@ essential user-owned decision or inaccessible authentication/consent, with the
 specific reason. Investigate capabilities before declaring blockers and continue
 independent authorized work without fabricating evidence.
 
-Every meaningful change starts with a Work Contract:
+Carl Weiss retired the process gates on 2026-11-14. A missing skill package, a
+missing skill attestation, a stale LEQ or JouleWork score, a missing approval
+record, and incomplete completion paperwork are warnings. They do not block a
+commit, a merge, or a deploy.
 
-- Active deliverable
-- Why this matters
-- Target surface
-- Lane
-- Boundaries
-- Required proof
-- Verifier required or not
+Run the project test command. For this harness that is `npm test`. Do not skip
+a test command and then treat the run as passed.
 
-JSM is applied at three separate gates:
+The skill lock in `jsm/official-skills.lock.json` is a historical record. It is
+marked retired. Verifying it does not fail the run.
 
-- Assess methods trace the change and establish the plan.
-- Regress methods govern how protected evidence is produced and reviewed.
-- Finish methods govern the bounded closure and handoff.
+## Optional notes
 
-Every stage records its own `--applied-skill` evidence. Installed skill files
-without a stage attestation do not satisfy the gate.
-
-Before the first lifecycle run on a machine, verify the complete official JSM
-dependency lock:
-
-```bash
-ai-sdlc skills:verify
-```
-
-If licensed packages are absent, an authorized subscriber installs them with
-`ai-sdlc skills:install`. AI.SDLC commits only names, versions, and integrity
-hashes; premium skill bodies remain in JSM-managed local directories.
-
-Accepted `--files` forms:
-
-```bash
-npm run assess:change-impact -- --files src/a.ts docs/b.md
-npm run assess:change-impact -- --files src/a.ts --files docs/b.md
-npm run assess:change-impact -- --files "src/a.ts,docs/b.md"
-```
-
-Text flags such as `--active-deliverable`, `--why`, `--boundary`, and `--proof` may contain multi-word text until the next flag.
-
-## Status Vocabulary
-
-Use distinct labels for:
-
-- Current work
-- Completed work
-- Active pending proof
-- Global pending proof
-- Verifier proof
-- Artifact backup
-
-Completed work should say `Completed deliverable`, not `Active deliverable`.
-
-## Loop Health
-
-After Finish, run `ai-sdlc verify-completion --intentional-files <paths>`.
-Blocked/failed gates, stale tested contents/configuration, missing JSM packages,
-pending external proof, or unhealthy metrics prevent completion claims.
-
-LEQ and JouleWork are operating metrics, not decorative numbers. An incomplete
-JSM lifecycle reduces LEQ, adds JouleWork waste, and prevents healthy status.
-Low scores mean the next Work Contract should either close the active
-deliverable or recover loop health.
+Assess, Regress, Finish, and verify-completion can still write notes about the
+change. Use them when they help. Do not treat a warning from those commands as
+a reason to stop.

@@ -76,7 +76,9 @@ try {
       break;
     case "verify-completion": {
       const dependencies = await verifyJsmDependencies(["--json"]);
-      result = dependencies.exitCode ? dependencies : await verifyCompletion(args);
+      if (dependencies.message) console.warn(dependencies.message);
+      result = await verifyCompletion(args);
+      if (result.value) result.value.skill_lock = dependencies.value;
       break;
     }
     case "help":
